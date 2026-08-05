@@ -1,0 +1,115 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper Functions ──────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isActive == true;
+    }
+
+    function isOrganizer() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'organizer' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isActive == true;
+    }
+
+    function isOrganizerOfEvent(eventId) {
+      return isOrganizer() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.assignedEventId == eventId;
+    }
+
+    // ── Events Collection ─────────────────────────────────
+    match /events/{eventId} {
+      allow read: if true; // Public can read events
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || isOrganizerOfEvent(eventId);
+    }
+
+    // ── Registrations ─────────────────────────────────────
+    match /registrations/{regId} {
+      allow create: if true; // Anyone can register
+      allow read: if isAdmin() || isOrganizer() ||
+        (isAuthenticated() && resource.data.email == request.auth.token.email);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Payments ──────────────────────────────────────────
+    match /payments/{payId} {
+      allow create: if true;
+      allow read: if isAdmin() || isOrganizer();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Tickets ───────────────────────────────────────────
+    match /tickets/{ticketId} {
+      allow create: if true;
+      allow read: if true; // Public can view tickets (needed for QR scan)
+      allow update, delete: if isAdmin();
+    }
+
+    // ── Users (Admins/Organizers) ─────────────────────────
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── Sponsors ──────────────────────────────────────────
+    match /sponsors/{sponsorId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Announcements ─────────────────────────────────────
+    match /announcements/{annId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Gallery ───────────────────────────────────────────
+    match /gallery/{imageId} {
+      allow read: if true;
+      allow create, update: if isAdmin() || isOrganizer();
+      allow delete: if isAdmin();
+    }
+
+    // ── Settings ──────────────────────────────────────────
+    match /settings/{settingId} {
+      allow read: if true; // Need to check Razorpay enabled status
+      allow write: if isAdmin();
+    }
+
+    // ── Notifications ─────────────────────────────────────
+    match /notifications/{notifId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Attendance ────────────────────────────────────────
+    match /attendance/{attendId} {
+      allow read: if isAdmin() || isOrganizer();
+      allow write: if isAdmin() || isOrganizer();
+    }
+
+    // ── Certificates ──────────────────────────────────────
+    match /certificates/{certId} {
+      allow read: if true;
+      allow write: if isAdmin() || isOrganizer();
+    }
+
+    // ── Contact Form ──────────────────────────────────────
+    match /contacts/{contactId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

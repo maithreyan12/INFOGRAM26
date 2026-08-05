@@ -1,0 +1,81 @@
+'use client';
+
+import { motion, useInView, useSpring, useTransform } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
+import { Calendar, Users, Building, Trophy } from 'lucide-react';
+
+const stats = [
+  { id: 1, label: 'Events', value: 20, suffix: '+', icon: Calendar, color: 'text-sky-400', bg: 'bg-sky-400/10', border: 'border-sky-400/20' },
+  { id: 2, label: 'Participants', value: 500, suffix: '+', icon: Users, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-400/20' },
+  { id: 3, label: 'Sponsors', value: 10, suffix: '+', icon: Building, color: 'text-pink-400', bg: 'bg-pink-400/10', border: 'border-pink-400/20' },
+  { id: 4, label: 'Prize Pool', value: 50000, prefix: '₹', suffix: '+', icon: Trophy, color: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'border-yellow-400/20' },
+];
+
+function AnimatedCounter({ value, prefix = '', suffix = '' }: { value: number; prefix?: string; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-40px' });
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!isInView) return;
+    let raf: number;
+    const start = performance.now();
+    const duration = 1600;
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const tick = (now: number) => {
+      const elapsed = Math.min((now - start) / duration, 1);
+      setCount(Math.round(easeOut(elapsed) * value));
+      if (elapsed < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [isInView, value]);
+
+  return (
+    <span ref={ref} className="tabular-nums">
+      {prefix}{count >= 1000 ? count.toLocaleString() : count}{suffix}
+    </span>
+  );
+}
+
+export default function StatsSection() {
+  return (
+    <section className="relative z-20 -mt-16 sm:-mt-20 section-padding">
+      <div className="container-xl mx-auto px-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+          {stats.map((stat, i) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={stat.id}
+                initial={{ opacity: 0, y: 24, scale: 0.96 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                whileTap={{ scale: 0.96 }}
+                viewport={{ once: true, margin: '-30px' }}
+                transition={{
+                  delay: i * 0.08,
+                  type: 'spring',
+                  stiffness: 300,
+                  damping: 24,
+                }}
+                style={{ willChange: 'transform, opacity', WebkitTapHighlightColor: 'transparent' }}
+                className="glass-card p-4 sm:p-6 md:p-8 rounded-2xl flex flex-col items-center text-center cursor-default select-none"
+              >
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl ${stat.bg} border ${stat.border} flex items-center justify-center mb-3 sm:mb-4`}>
+                  <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
+                </div>
+                <div className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-1 ${stat.color}`}>
+                  <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
+                </div>
+                <p className="text-[10px] sm:text-xs text-white/50 font-semibold uppercase tracking-widest">
+                  {stat.label}
+                </p>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}

@@ -1,0 +1,29 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+
+  // Simple root redirects to dashboards to maintain cleanly structured app
+  if (path === '/admin') {
+    return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+  }
+  
+  if (path === '/organizer') {
+    return NextResponse.redirect(new URL('/organizer/dashboard', request.url));
+  }
+
+  // NOTE: True route protection for /admin/* and /organizer/* 
+  // is handled via client-side Firebase Auth context wrappers since
+  // server-side verification requires Firebase Admin SDK which we are skipping for simplicity here.
+  
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    '/admin',
+    '/organizer',
+    // Match other routes you might want to run middleware on
+  ],
+};
