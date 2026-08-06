@@ -1,169 +1,359 @@
 'use client';
 
-import { motion, Variants } from 'framer-motion';
-import { ChevronDown, ArrowRight } from 'lucide-react';
+import { motion, Variants, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function HeroSection() {
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [mounted, setMounted] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref });
+  const titleY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+  const titleOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
   useEffect(() => {
+    setMounted(true);
     const targetDate = new Date('2026-08-22T00:00:00').getTime();
-
     const interval = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = targetDate - now;
-
-      if (distance < 0) {
-        clearInterval(interval);
-        return;
-      }
-
+      const now = Date.now();
+      const d = targetDate - now;
+      if (d < 0) { clearInterval(interval); return; }
       setTimeLeft({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((distance % (1000 * 60)) / 1000),
+        days: Math.floor(d / 86400000),
+        hours: Math.floor((d % 86400000) / 3600000),
+        minutes: Math.floor((d % 3600000) / 60000),
+        seconds: Math.floor((d % 60000) / 1000),
       });
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
-  const containerVariants: Variants = {
+  const container: Variants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-      },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
   };
 
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 280, damping: 24 } },
+  const item: Variants = {
+    hidden: { opacity: 0, y: 40, filter: 'blur(10px)' },
+    visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: 'spring', stiffness: 200, damping: 22 } },
   };
+
+  const CountUnit = ({ value, label }: { value: number; label: string }) => (
+    <div className="flex flex-col items-center">
+      <motion.div
+        key={value}
+        initial={{ y: -20, opacity: 0, scale: 0.8 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        className="relative"
+      >
+        <span
+          className="text-3xl xs:text-4xl sm:text-5xl font-black tabular-nums"
+          style={{
+            fontFamily: 'var(--font-display)',
+            color: '#00d4ff',
+            textShadow: '0 0 30px rgba(0,212,255,0.7), 0 0 60px rgba(0,212,255,0.3)',
+          }}
+        >
+          {String(value).padStart(2, '0')}
+        </span>
+      </motion.div>
+      <span
+        className="text-[8px] xs:text-[10px] text-white/40 uppercase tracking-[0.2em] mt-1 font-medium"
+        style={{ fontFamily: 'var(--font-heading)' }}
+      >
+        {label}
+      </span>
+    </div>
+  );
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden z-10 pt-20 tech-grid">
-      {/* Floating particles */}
-      <div className="particle" style={{ top: '15%', left: '10%', animationDelay: '0s', animationDuration: '7s' }} />
-      <div className="particle" style={{ top: '25%', right: '15%', animationDelay: '1.5s', animationDuration: '9s' }} />
-      <div className="particle" style={{ top: '60%', left: '20%', animationDelay: '3s', animationDuration: '6s' }} />
-      <div className="particle" style={{ top: '70%', right: '25%', animationDelay: '4.5s', animationDuration: '8s' }} />
-      <div className="particle" style={{ top: '40%', left: '50%', animationDelay: '2s', animationDuration: '10s' }} />
-      <div className="particle" style={{ top: '80%', left: '40%', animationDelay: '5s', animationDuration: '7.5s' }} />
-      <div className="particle" style={{ top: '10%', right: '40%', animationDelay: '6s', animationDuration: '8.5s' }} />
+    <section
+      ref={ref}
+      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden z-10 tech-grid"
+      style={{ paddingTop: 'max(72px, env(safe-area-inset-top, 0px) + 72px)' }}
+    >
+      {/* ── Deep glow orbs ── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            width: '70vw', height: '70vw', maxWidth: 600, maxHeight: 600,
+            top: '5%', left: '50%', x: '-50%',
+            background: 'radial-gradient(circle, rgba(0,212,255,0.18) 0%, rgba(0,180,220,0.08) 40%, transparent 70%)',
+            filter: 'blur(40px)',
+          }}
+          animate={{ scale: [1, 1.12, 1], opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            width: '50vw', height: '50vw', maxWidth: 400,
+            bottom: '10%', right: '-10%',
+            background: 'radial-gradient(circle, rgba(0,100,200,0.2) 0%, transparent 70%)',
+            filter: 'blur(60px)',
+          }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+        />
+      </div>
 
-      {/* Decorative background elements */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#00d4ff]/15 rounded-full blur-[100px] float-animation" style={{ willChange: 'transform', transform: 'translateZ(0)' }}></div>
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#0a3d6b]/30 rounded-full blur-[120px] float-animation" style={{ animationDelay: '2s', willChange: 'transform', transform: 'translateZ(0)' }}></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#00d4ff]/5 rounded-full blur-[150px]" style={{ willChange: 'transform', transform: 'translateZ(0)' }}></div>
-
+      {/* ── Animated scan line ── */}
       <motion.div
-        className="container-xl section-padding px-4 xs:px-6 w-full flex flex-col items-center text-center z-10"
-        variants={containerVariants}
+        className="absolute left-0 right-0 h-px pointer-events-none"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(0,212,255,0.4), transparent)' }}
+        animate={{ top: ['10%', '90%', '10%'] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+      />
+
+      {/* ── Particles ── */}
+      {mounted && [
+        { top: '12%', left: '8%', delay: '0s', dur: '7s', size: 3 },
+        { top: '22%', right: '12%', delay: '1.5s', dur: '9s', size: 2 },
+        { top: '65%', left: '18%', delay: '3s', dur: '6s', size: 4 },
+        { top: '72%', right: '22%', delay: '4.5s', dur: '8s', size: 2 },
+        { top: '38%', left: '48%', delay: '2s', dur: '10s', size: 3 },
+        { top: '85%', left: '35%', delay: '5s', dur: '7.5s', size: 2 },
+        { top: '8%', right: '38%', delay: '6s', dur: '8.5s', size: 3 },
+        { top: '50%', left: '5%', delay: '3.5s', dur: '9s', size: 2 },
+        { top: '30%', right: '5%', delay: '7s', dur: '6.5s', size: 3 },
+      ].map((p, i) => (
+        <div
+          key={i}
+          className="particle absolute rounded-full"
+          style={{
+            top: p.top, left: (p as any).left, right: (p as any).right,
+            width: p.size, height: p.size,
+            background: 'rgba(0, 212, 255, 0.8)',
+            boxShadow: '0 0 6px rgba(0,212,255,0.8)',
+            animationDelay: p.delay, animationDuration: p.dur,
+          }}
+        />
+      ))}
+
+      {/* ── Main content ── */}
+      <motion.div
+        className="relative z-10 w-full flex flex-col items-center text-center px-4"
+        style={{ y: titleY, opacity: titleOpacity }}
+        variants={container}
         initial="hidden"
         animate="visible"
-        style={{ willChange: 'transform, opacity' }}
       >
-        {/* College Name */}
-        <motion.p 
-          variants={itemVariants} 
-          className="text-[9px] xs:text-xs sm:text-sm md:text-base text-white/60 font-medium tracking-[0.1em] sm:tracking-[0.2em] uppercase mb-1 max-w-[95%] leading-relaxed" 
-          style={{ fontFamily: 'var(--font-heading)', willChange: 'transform, opacity' }}
-        >
-          C. Abdul Hakeem College of Engineering &amp; Technology
-        </motion.p>
+        {/* College badge */}
+        <motion.div variants={item} className="mb-5">
+          <div
+            className="inline-flex flex-col items-center gap-1 px-5 py-2 rounded-full"
+            style={{
+              background: 'rgba(0,212,255,0.06)',
+              border: '1px solid rgba(0,212,255,0.2)',
+              backdropFilter: 'blur(12px)',
+            }}
+          >
+            <span
+              className="text-[9px] xs:text-[10px] text-white/50 tracking-[0.2em] uppercase"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              C. Abdul Hakeem College of Engineering &amp; Technology
+            </span>
+            <span
+              className="text-[11px] xs:text-xs font-bold tracking-[0.15em] uppercase"
+              style={{ fontFamily: 'var(--font-heading)', color: '#00d4ff' }}
+            >
+              Department of Information Technology
+            </span>
+          </div>
+        </motion.div>
 
-        {/* Department */}
-        <motion.p 
-          variants={itemVariants} 
-          className="text-[11px] xs:text-sm sm:text-base md:text-lg text-[#00d4ff] font-semibold tracking-[0.08em] sm:tracking-[0.15em] uppercase mb-4 max-w-[95%] leading-relaxed" 
-          style={{ fontFamily: 'var(--font-heading)', willChange: 'transform, opacity' }}
-        >
-          Department of Information Technology
-        </motion.p>
+        {/* ══ MASSIVE INFOGRAM'26 TITLE ══ */}
+        <motion.div variants={item} className="relative w-full mb-3">
+          {/* Glow behind text */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,212,255,0.15) 0%, transparent 70%)',
+              filter: 'blur(20px)',
+            }}
+          />
 
-        {/* Main Title — INFOGRAM'26 in Orbitron */}
-        <motion.h1
-          variants={itemVariants}
-          className="text-[clamp(2rem,11vw,9rem)] font-black tracking-tight gradient-text-animated uppercase leading-none"
-          style={{ fontFamily: 'var(--font-display)', willChange: 'transform, opacity', textShadow: '0 0 60px rgba(0, 212, 255, 0.3)' }}
-        >
-          INFOGRAM&apos;26
-        </motion.h1>
+          {/* INFOGRAM */}
+          <motion.h1
+            className="relative gradient-text-animated font-black uppercase leading-none"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(3.2rem, 18vw, 10rem)',
+              letterSpacing: '-0.02em',
+              textShadow: '0 0 80px rgba(0,212,255,0.5), 0 4px 30px rgba(0,0,0,0.8)',
+              lineHeight: 0.9,
+            }}
+            animate={{
+              textShadow: [
+                '0 0 40px rgba(0,212,255,0.4), 0 4px 30px rgba(0,0,0,0.8)',
+                '0 0 90px rgba(0,212,255,0.7), 0 0 120px rgba(0,212,255,0.3), 0 4px 30px rgba(0,0,0,0.8)',
+                '0 0 40px rgba(0,212,255,0.4), 0 4px 30px rgba(0,0,0,0.8)',
+              ],
+            }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            INFOGRAM
+          </motion.h1>
+
+          {/* '26 — separate line, extra punch */}
+          <motion.div
+            className="relative flex items-center justify-center gap-2 xs:gap-4"
+            style={{ marginTop: '-4px' }}
+          >
+            <motion.div
+              className="h-px flex-1 max-w-[60px] xs:max-w-[100px]"
+              style={{ background: 'linear-gradient(90deg, transparent, #ffd700)' }}
+              animate={{ opacity: [0.5, 1, 0.5], scaleX: [0.8, 1, 0.8] }}
+              transition={{ duration: 2.5, repeat: Infinity }}
+            />
+            <span
+              className="font-black gradient-text-animated"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(3.2rem, 18vw, 10rem)',
+                letterSpacing: '-0.02em',
+                lineHeight: 0.9,
+                textShadow: '0 0 60px rgba(255,215,0,0.5)',
+              }}
+            >
+              &apos;26
+            </span>
+            <motion.div
+              className="h-px flex-1 max-w-[60px] xs:max-w-[100px]"
+              style={{ background: 'linear-gradient(90deg, #ffd700, transparent)' }}
+              animate={{ opacity: [0.5, 1, 0.5], scaleX: [0.8, 1, 0.8] }}
+              transition={{ duration: 2.5, repeat: Infinity }}
+            />
+          </motion.div>
+        </motion.div>
 
         {/* Tagline */}
-        <motion.p variants={itemVariants} className="text-base sm:text-xl md:text-2xl text-white/80 mt-4 tracking-[0.08em] uppercase px-2" style={{ fontFamily: 'var(--font-heading)', willChange: 'transform, opacity' }}>
+        <motion.p
+          variants={item}
+          className="text-sm xs:text-base sm:text-xl text-white/70 tracking-[0.12em] uppercase mb-3"
+          style={{ fontFamily: 'var(--font-heading)' }}
+        >
           Where Innovation Earns Recognition
         </motion.p>
 
-        {/* Event Date - Gold */}
-        <motion.div variants={itemVariants} className="mt-6 flex items-center gap-3" style={{ willChange: 'transform, opacity' }}>
-          <div className="h-px w-8 sm:w-12 bg-gradient-to-r from-transparent to-[#ffd700]/50" />
-          <span className="text-xl sm:text-3xl md:text-4xl font-black text-[#ffd700] tracking-wider glow-text-gold" style={{ fontFamily: 'var(--font-heading)' }}>
+        {/* Date */}
+        <motion.div variants={item} className="flex items-center gap-3 mb-8">
+          <div className="h-px w-10 sm:w-16" style={{ background: 'linear-gradient(90deg, transparent, #ffd700)' }} />
+          <motion.span
+            className="text-xl xs:text-2xl sm:text-3xl font-black"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              color: '#ffd700',
+              textShadow: '0 0 30px rgba(255,215,0,0.6)',
+              letterSpacing: '0.05em',
+            }}
+            animate={{ textShadow: ['0 0 20px rgba(255,215,0,0.4)', '0 0 50px rgba(255,215,0,0.8)', '0 0 20px rgba(255,215,0,0.4)'] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             22nd August 2026
-          </span>
-          <div className="h-px w-8 sm:w-12 bg-gradient-to-l from-transparent to-[#ffd700]/50" />
+          </motion.span>
+          <div className="h-px w-10 sm:w-16" style={{ background: 'linear-gradient(90deg, #ffd700, transparent)' }} />
         </motion.div>
 
-        {/* Countdown */}
-        <motion.div 
-          variants={itemVariants} 
-          className="mt-10 sci-fi-frame p-4 xs:p-6 flex items-center justify-center gap-2 xs:gap-4 md:gap-8 w-full max-w-xl bg-[#040d1a]/80 backdrop-blur-md" 
-          style={{ willChange: 'transform, opacity' }}
+        {/* ══ Countdown ══ */}
+        <motion.div
+          variants={item}
+          className="w-full max-w-sm xs:max-w-md mb-8"
+          style={{
+            background: 'linear-gradient(135deg, rgba(0,212,255,0.06), rgba(0,100,200,0.04))',
+            border: '1px solid rgba(0,212,255,0.2)',
+            borderTop: '1px solid rgba(0,212,255,0.4)',
+            borderRadius: 20,
+            backdropFilter: 'blur(24px)',
+            padding: '20px 24px',
+            boxShadow: '0 0 40px rgba(0,212,255,0.1), inset 0 1px 0 rgba(255,255,255,0.08)',
+          }}
         >
-          {[
-            { value: timeLeft.days, label: 'Days' },
-            { value: timeLeft.hours, label: 'Hours' },
-            { value: timeLeft.minutes, label: 'Minutes' },
-            { value: timeLeft.seconds, label: 'Seconds' },
-          ].map((unit, i) => (
-            <div key={unit.label} className="flex items-center gap-2 xs:gap-4 md:gap-8">
-              <div className="flex flex-col items-center min-w-[42px] xs:min-w-[54px] sm:min-w-[60px]">
-                <span className="text-xl xs:text-3xl sm:text-4xl md:text-5xl font-bold" style={{ fontFamily: 'var(--font-display)', color: '#00d4ff', textShadow: '0 0 15px rgba(0, 212, 255, 0.4)' }}>
-                  {String(unit.value).padStart(2, '0')}
-                </span>
-                <span className="text-[7px] xs:text-[9px] sm:text-xs text-white/50 uppercase tracking-widest mt-1" style={{ fontFamily: 'var(--font-heading)' }}>
-                  {unit.label}
-                </span>
-              </div>
-              {i < 3 && <span className="text-lg xs:text-2xl md:text-4xl text-[#00d4ff]/40 font-light mb-4 shrink-0">:</span>}
+          {/* Corner accents */}
+          <div className="relative">
+            <div className="absolute -top-3 -left-3 w-4 h-4" style={{ borderTop: '2px solid #00d4ff', borderLeft: '2px solid #00d4ff' }} />
+            <div className="absolute -top-3 -right-3 w-4 h-4" style={{ borderTop: '2px solid #00d4ff', borderRight: '2px solid #00d4ff' }} />
+            <div className="absolute -bottom-3 -left-3 w-4 h-4" style={{ borderBottom: '2px solid #ffd700', borderLeft: '2px solid #ffd700' }} />
+            <div className="absolute -bottom-3 -right-3 w-4 h-4" style={{ borderBottom: '2px solid #ffd700', borderRight: '2px solid #ffd700' }} />
+
+            <div className="flex items-center justify-around gap-2">
+              {[
+                { value: timeLeft.days, label: 'Days' },
+                { value: timeLeft.hours, label: 'Hours' },
+                { value: timeLeft.minutes, label: 'Minutes' },
+                { value: timeLeft.seconds, label: 'Seconds' },
+              ].map((u, i) => (
+                <div key={u.label} className="flex items-center gap-2 xs:gap-3">
+                  <CountUnit value={u.value} label={u.label} />
+                  {i < 3 && (
+                    <motion.span
+                      className="text-2xl xs:text-3xl font-bold mb-4"
+                      style={{ color: 'rgba(0,212,255,0.5)', fontFamily: 'var(--font-display)' }}
+                      animate={{ opacity: [1, 0.2, 1] }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                    >
+                      :
+                    </motion.span>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </motion.div>
 
-        {/* CTA Buttons */}
-        <motion.div variants={itemVariants} className="mt-10 flex flex-col sm:flex-row gap-4 sm:gap-6" style={{ willChange: 'transform, opacity' }}>
-          <motion.div whileTap={{ scale: 0.93 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}>
-            <Link href="/register" className="btn-primary flex items-center justify-center gap-2 px-8 py-4 rounded-full font-semibold" style={{ WebkitTapHighlightColor: 'transparent', fontFamily: 'var(--font-heading)', letterSpacing: '0.08em' }}>
+        {/* ══ CTA Buttons ══ */}
+        <motion.div variants={item} className="flex flex-col xs:flex-row gap-3 xs:gap-4 w-full max-w-xs xs:max-w-sm">
+          <motion.div
+            className="flex-1"
+            whileHover={{ scale: 1.04, y: -3 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+          >
+            <Link
+              href="/register"
+              className="btn-primary w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-base"
+              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.08em', WebkitTapHighlightColor: 'transparent' }}
+            >
               Register Now
-              <ArrowRight size={20} />
+              <motion.div
+                animate={{ x: [0, 4, 0] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <ArrowRight size={18} />
+              </motion.div>
             </Link>
           </motion.div>
-          <motion.div whileTap={{ scale: 0.93 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}>
-            <Link href="/events" className="btn-glass flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-[#00d4ff]/20 bg-[#00d4ff]/5 backdrop-blur-sm hover:bg-[#00d4ff]/10 transition-colors" style={{ WebkitTapHighlightColor: 'transparent', fontFamily: 'var(--font-heading)', letterSpacing: '0.08em' }}>
+
+          <motion.div
+            className="flex-1"
+            whileHover={{ scale: 1.04, y: -3 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+          >
+            <Link
+              href="/events"
+              className="btn-glass w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-base"
+              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.08em', WebkitTapHighlightColor: 'transparent' }}
+            >
               Explore Events
             </Link>
           </motion.div>
         </motion.div>
       </motion.div>
 
+      {/* ── Scroll indicator ── */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[#00d4ff]/50"
-        animate={{ y: [0, 8, 0] }}
-        transition={{ repeat: Infinity, duration: 1.5 }}
-        style={{ willChange: 'transform, opacity' }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
+        animate={{ opacity: [0.4, 0.9, 0.4], y: [0, 6, 0] }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <ChevronDown size={32} />
+        <span className="text-[9px] text-white/30 uppercase tracking-widest" style={{ fontFamily: 'var(--font-heading)' }}>Scroll</span>
+        <ChevronDown size={22} className="text-[#00d4ff]/50" />
       </motion.div>
     </section>
   );
