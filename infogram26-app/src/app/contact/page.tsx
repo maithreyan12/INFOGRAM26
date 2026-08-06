@@ -113,7 +113,26 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-white mb-1">Call Us</h3>
-                  <a href="tel:+919876543210" className="text-slate-300 hover:text-primary-400 transition-colors">+91 987 654 3210</a>
+                  <a href="tel:+914172267387" className="text-slate-300 hover:text-primary-400 transition-colors">+91 4172 267387</a>
+                </div>
+              </div>
+
+              <div className="glass-card p-6 flex items-center gap-4 rounded-2xl border border-pink-500/20 hover:border-pink-500/40 bg-pink-500/5 transition-colors">
+                <div className="w-12 h-12 rounded-full bg-pink-500/20 flex items-center justify-center shrink-0">
+                  <svg className="w-6 h-6 text-pink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white mb-1">Follow Us on Instagram</h3>
+                  <a 
+                    href="https://www.instagram.com/infogram_2k26?utm_source=qr&igsh=N2JqNW5zOWF0cHIw" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-pink-400 hover:text-pink-300 font-semibold transition-colors text-sm"
+                  >
+                    @infogram_2k26 &rarr;
+                  </a>
                 </div>
               </div>
             </div>

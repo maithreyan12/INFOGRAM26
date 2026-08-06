@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { 
   LayoutDashboard, Calendar, Users, CreditCard, Image as ImageIcon, 
-  Star, UserCheck, Bell, Settings, Home, LogOut, Menu, X 
+  Star, UserCheck, Bell, Settings, Home, LogOut, Menu, X, ShieldAlert 
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -23,21 +23,27 @@ const NAV_LINKS = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, isAdmin, signOut } = useAuth();
+  const { user, adminUser, loading, isAdmin, isOrganizer, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!loading && !isAdmin) {
-      router.replace('/admin-login');
+    if (!loading) {
+      if (isOrganizer) {
+        // Redirect organizers attempting to access Super Admin panel
+        router.replace('/organizer/dashboard');
+      } else if (!isAdmin) {
+        router.replace('/admin-login');
+      }
     }
-  }, [loading, isAdmin, router]);
+  }, [loading, isAdmin, isOrganizer, router]);
 
   if (loading || !isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-950 text-white p-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mb-4"></div>
+        <p className="text-gray-400 text-sm">Verifying Admin Permissions...</p>
       </div>
     );
   }
@@ -64,22 +70,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       `}>
         <div className="p-6 border-b border-gray-800">
           <h1 className="text-2xl font-bold gradient-text tracking-wider text-center">INFOGRAM'26</h1>
-          <div className="mt-2 text-center text-xs font-semibold text-purple-400 bg-purple-900/30 py-1 rounded-full border border-purple-500/30">
-            ADMIN PANEL
+          <div className="mt-2 text-center text-xs font-semibold text-purple-400 bg-purple-900/30 py-1 px-3 rounded-full border border-purple-500/30 flex items-center justify-center gap-1">
+            <ShieldAlert className="w-3.5 h-3.5" /> SUPER ADMIN PORTAL
           </div>
         </div>
 
         {user && (
           <div className="p-4 border-b border-gray-800 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-purple-900/50 border border-purple-500/40 flex items-center justify-center shrink-0">
               {user.photoURL ? (
                 <Image src={user.photoURL} alt="Avatar" width={40} height={40} />
               ) : (
-                <UserCheck className="w-6 h-6 m-2 text-gray-400" />
+                <span className="font-bold text-purple-300">{user.displayName?.charAt(0) || 'A'}</span>
               )}
             </div>
             <div className="overflow-hidden text-sm">
-              <p className="font-semibold truncate">{user.displayName}</p>
+              <p className="font-semibold truncate text-white">{user.displayName || 'Super Admin'}</p>
               <p className="text-gray-400 text-xs truncate">{user.email}</p>
             </div>
           </div>
@@ -97,7 +103,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
                       isActive 
-                        ? 'bg-purple-600 text-white font-semibold sidebar-link active' 
+                        ? 'bg-purple-600 text-white font-semibold sidebar-link active shadow-lg shadow-purple-600/20' 
                         : 'text-gray-400 hover:bg-gray-800 hover:text-white sidebar-link'
                     }`}
                   >
@@ -113,16 +119,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-4 border-t border-gray-800 space-y-2">
           <Link 
             href="/"
-            className="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+            className="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors text-sm"
           >
-            <Home className="w-5 h-5" />
-            Back to Home
+            <Home className="w-4 h-4" />
+            Back to Public Site
           </Link>
           <button 
             onClick={handleSignOut}
-            className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-red-400 hover:bg-red-900/30 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-red-400 hover:bg-red-900/30 transition-colors text-sm font-medium"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-4 h-4" />
             Sign Out
           </button>
         </div>

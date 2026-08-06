@@ -3,139 +3,327 @@ export const dynamic = 'force-dynamic';
 
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, UserCheck, Calendar, MapPin, Clock, Tag } from 'lucide-react';
+import { useEventStore } from '@/store/eventStore';
+import type { Event, EventCategory } from '@/types';
 
 export default function EventsPage() {
+  const { events, organizers, addEvent, updateEvent, deleteEvent } = useEventStore();
   const [showModal, setShowModal] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+
+  // Form fields state
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState<EventCategory>('technical');
+  const [description, setDescription] = useState('');
+  const [venue, setVenue] = useState('');
+  const [date, setDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [registrationFee, setRegistrationFee] = useState<number>(0);
+  const [maxParticipants, setMaxParticipants] = useState<number>(100);
+  const [organizerUid, setOrganizerUid] = useState('');
+
+  const openCreateModal = () => {
+    setEditingEvent(null);
+    setName('');
+    setCategory('technical');
+    setDescription('');
+    setVenue('');
+    setDate('');
+    setStartTime('09:00');
+    setEndTime('17:00');
+    setRegistrationFee(0);
+    setMaxParticipants(100);
+    setOrganizerUid(organizers[0]?.uid || '');
+    setShowModal(true);
+  };
+
+  const openEditModal = (evt: Event) => {
+    setEditingEvent(evt);
+    setName(evt.name);
+    setCategory(evt.category);
+    setDescription(evt.description);
+    setVenue(evt.venue);
+    setDate(evt.date);
+    setStartTime(evt.startTime);
+    setEndTime(evt.endTime);
+    setRegistrationFee(evt.registrationFee);
+    setMaxParticipants(evt.maxParticipants);
+    setOrganizerUid(evt.organizerUid || '');
+    setShowModal(true);
+  };
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    const assignedOrg = organizers.find((o) => o.uid === organizerUid);
+
+    if (editingEvent) {
+      updateEvent(editingEvent.id, {
+        name,
+        category,
+        description,
+        venue,
+        date,
+        startTime,
+        endTime,
+        registrationFee,
+        maxParticipants,
+        organizerUid,
+        organizerName: assignedOrg?.displayName || 'Unassigned',
+      });
+    } else {
+      addEvent({
+        slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        name,
+        category,
+        description,
+        rules: ['Follow symposium conduct policy'],
+        venue: venue || 'IT Block',
+        date: date || '2026-10-15',
+        startTime: startTime || '09:00',
+        endTime: endTime || '17:00',
+        registrationDeadline: date || '2026-10-12',
+        registrationFee,
+        maxParticipants,
+        coordinatorName: 'Staff Coordinator',
+        organizerName: assignedOrg?.displayName || 'Unassigned',
+        contactNumber: assignedOrg?.phone || '+91 9876543210',
+        status: 'upcoming',
+        organizerUid,
+        isFeatured: true,
+      });
+    }
+    setShowModal(false);
+  };
 
   return (
     <AdminLayout>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white">Events Management</h1>
-          <p className="text-gray-400 mt-1">Create and manage symposium events</p>
+          <p className="text-gray-400 mt-1">Create events and assign dedicated Event Admins (Organizers)</p>
         </div>
         <button 
-          onClick={() => setShowModal(true)}
-          className="btn-primary flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-white font-medium"
+          onClick={openCreateModal}
+          className="btn-primary flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-5 py-2.5 rounded-xl text-white font-medium shadow-lg shadow-purple-600/30 transition-all transform hover:scale-105"
         >
           <Plus className="w-5 h-5" /> Create New Event
         </button>
       </div>
 
-      <div className="glass-card bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+      {/* Events Table */}
+      <div className="glass-card bg-white/5 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-300">
-            <thead className="text-xs uppercase bg-white/5 border-b border-white/10 text-gray-400">
+            <thead className="text-xs uppercase bg-white/5 border-b border-white/10 text-gray-400 font-semibold tracking-wider">
               <tr>
                 <th className="px-6 py-4">Event Name</th>
                 <th className="px-6 py-4">Category</th>
-                <th className="px-6 py-4">Date</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Registrations</th>
+                <th className="px-6 py-4">Date & Venue</th>
+                <th className="px-6 py-4">Assigned Event Admin</th>
+                <th className="px-6 py-4">Fee</th>
+                <th className="px-6 py-4 text-center">Registrations</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {/* Dummy Data */}
-              <tr className="hover:bg-white/5 transition-colors">
-                <td className="px-6 py-4 font-medium text-white">Hackathon 2026</td>
-                <td className="px-6 py-4">Technical</td>
-                <td className="px-6 py-4">Oct 15, 2026</td>
-                <td className="px-6 py-4">
-                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30 badge-live">Live</span>
-                </td>
-                <td className="px-6 py-4">145 / 200</td>
-                <td className="px-6 py-4 text-right space-x-3">
-                  <button className="text-blue-400 hover:text-blue-300"><Edit2 className="w-4 h-4 inline" /></button>
-                  <button className="text-red-400 hover:text-red-300"><Trash2 className="w-4 h-4 inline" /></button>
-                </td>
-              </tr>
-              <tr className="hover:bg-white/5 transition-colors">
-                <td className="px-6 py-4 font-medium text-white">BGMI Tournament</td>
-                <td className="px-6 py-4">Gaming</td>
-                <td className="px-6 py-4">Oct 16, 2026</td>
-                <td className="px-6 py-4">
-                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 badge-upcoming">Upcoming</span>
-                </td>
-                <td className="px-6 py-4">80 / 100</td>
-                <td className="px-6 py-4 text-right space-x-3">
-                  <button className="text-blue-400 hover:text-blue-300"><Edit2 className="w-4 h-4 inline" /></button>
-                  <button className="text-red-400 hover:text-red-300"><Trash2 className="w-4 h-4 inline" /></button>
-                </td>
-              </tr>
+              {events.map((evt) => {
+                const org = organizers.find((o) => o.uid === evt.organizerUid || o.assignedEventId === evt.id);
+                return (
+                  <tr key={evt.id} className="hover:bg-white/5 transition-colors">
+                    <td className="px-6 py-4 font-semibold text-white">
+                      <div className="flex items-center gap-2">
+                        <Tag className="w-4 h-4 text-purple-400" />
+                        <span>{evt.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 capitalize">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
+                        evt.category === 'technical' 
+                          ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
+                          : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                      }`}>
+                        {evt.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-xs space-y-1">
+                      <div className="flex items-center gap-1.5 text-gray-300">
+                        <Calendar className="w-3.5 h-3.5 text-purple-400" /> {evt.date}
+                      </div>
+                      <div className="flex items-center gap-1.5 text-gray-400">
+                        <MapPin className="w-3.5 h-3.5 text-gray-500" /> {evt.venue}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {org ? (
+                        <div className="flex items-center gap-2 bg-purple-950/40 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-lg text-xs font-medium w-fit">
+                          <UserCheck className="w-4 h-4 text-purple-400 shrink-0" />
+                          <div>
+                            <p className="font-semibold text-white">{org.displayName}</p>
+                            <p className="text-[10px] text-purple-300/70">{org.email}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
+                          Unassigned
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 font-semibold text-white">
+                      {evt.registrationFee > 0 ? `₹${evt.registrationFee}` : 'Free'}
+                    </td>
+                    <td className="px-6 py-4 text-center font-medium">
+                      <span className="bg-gray-800 px-3 py-1 rounded-full border border-gray-700 text-xs">
+                        {evt.registeredCount} / {evt.maxParticipants}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <button 
+                        onClick={() => openEditModal(evt)} 
+                        className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
+                        title="Edit Event & Admin"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => deleteEvent(evt.id)} 
+                        className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg transition-all"
+                        title="Delete Event"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
 
+      {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-3xl my-8 relative flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-2xl my-8 relative flex flex-col max-h-[90vh] shadow-2xl">
             <div className="p-6 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-gray-900 z-10 rounded-t-2xl">
-              <h2 className="text-2xl font-bold text-white">Create New Event</h2>
+              <h2 className="text-xl font-bold text-white">
+                {editingEvent ? 'Edit Event & Assigned Admin' : 'Create New Event'}
+              </h2>
               <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white">
                 <X className="w-6 h-6" />
               </button>
             </div>
             
-            <div className="p-6 overflow-y-auto space-y-6 flex-1">
+            <form onSubmit={handleSave} className="p-6 overflow-y-auto space-y-6 flex-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2 form-label">Event Name</label>
-                  <input type="text" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white form-input" placeholder="e.g., Code Debugging" />
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Event Name *</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500" 
+                    placeholder="e.g. AI Prompt Engineering"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2 form-label">Category</label>
-                  <select className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white form-input">
-                    <option>Technical</option>
-                    <option>Non-Technical</option>
-                    <option>Gaming</option>
-                    <option>Workshop</option>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Category *</label>
+                  <select 
+                    value={category} 
+                    onChange={(e) => setCategory(e.target.value as EventCategory)} 
+                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="technical">Technical</option>
+                    <option value="non-technical">Non-Technical</option>
                   </select>
                 </div>
+                
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-400 mb-2 form-label">Description</label>
-                  <textarea rows={4} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white form-input" placeholder="Event details..."></textarea>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2 form-label">Date</label>
-                  <input type="date" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white form-input" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2 form-label">Time</label>
-                  <div className="flex gap-2">
-                    <input type="time" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white form-input" />
-                    <span className="self-center text-gray-500">to</span>
-                    <input type="time" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white form-input" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2 form-label">Registration Fee (₹)</label>
-                  <input type="number" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white form-input" defaultValue="0" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2 form-label">Max Participants</label>
-                  <input type="number" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white form-input" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2 form-label">Assign Organizer</label>
-                  <select className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white form-input">
-                    <option>Select Organizer...</option>
-                    <option>Organizer 1</option>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Assign Dedicated Event Admin (Organizer) *</label>
+                  <select 
+                    value={organizerUid} 
+                    onChange={(e) => setOrganizerUid(e.target.value)} 
+                    className="w-full bg-purple-950/40 border border-purple-500/40 rounded-xl px-4 py-2.5 text-purple-200 focus:outline-none focus:border-purple-400 font-medium"
+                  >
+                    <option value="">-- Select an Event Admin --</option>
+                    {organizers.map((org) => (
+                      <option key={org.uid} value={org.uid}>
+                        {org.displayName} ({org.email})
+                      </option>
+                    ))}
                   </select>
+                  <p className="text-xs text-purple-400/70 mt-1">
+                    Only this assigned Event Admin will have management access to this event in their organizer dashboard.
+                  </p>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                  <textarea 
+                    rows={3} 
+                    value={description} 
+                    onChange={(e) => setDescription(e.target.value)} 
+                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500" 
+                    placeholder="Event objectives and highlights..."
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2 form-label">Banner Image</label>
-                  <input type="file" accept="image/*" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-1.5 text-gray-400 form-input" />
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Venue</label>
+                  <input 
+                    type="text" 
+                    value={venue} 
+                    onChange={(e) => setVenue(e.target.value)} 
+                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500" 
+                    placeholder="e.g. IT Lab 2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Date</label>
+                  <input 
+                    type="date" 
+                    value={date} 
+                    onChange={(e) => setDate(e.target.value)} 
+                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Registration Fee (₹)</label>
+                  <input 
+                    type="number" 
+                    value={registrationFee} 
+                    onChange={(e) => setRegistrationFee(Number(e.target.value))} 
+                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Max Capacity</label>
+                  <input 
+                    type="number" 
+                    value={maxParticipants} 
+                    onChange={(e) => setMaxParticipants(Number(e.target.value))} 
+                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500" 
+                  />
                 </div>
               </div>
-            </div>
-            
-            <div className="p-6 border-t border-gray-800 flex justify-end gap-4 sticky bottom-0 bg-gray-900 rounded-b-2xl">
-              <button onClick={() => setShowModal(false)} className="px-6 py-2 rounded-lg font-medium text-gray-300 hover:bg-gray-800">Cancel</button>
-              <button className="px-6 py-2 rounded-lg font-medium bg-purple-600 hover:bg-purple-700 text-white">Save Event</button>
-            </div>
+              
+              <div className="pt-4 border-t border-gray-800 flex justify-end gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  className="px-5 py-2.5 rounded-xl font-medium text-gray-300 hover:bg-gray-800 transition-all text-sm"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-6 py-2.5 rounded-xl font-medium bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-600/30 transition-all text-sm"
+                >
+                  {editingEvent ? 'Save Changes' : 'Create Event'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
