@@ -27,13 +27,20 @@ function BlastLetter({ char, index, total }: { char: string; index: number; tota
         stiffness: 120,
         damping: 14,
       }}
-      className="inline-block"
-      style={{ willChange: 'transform' }}
+      style={{
+        willChange: 'transform',
+        display: 'inline-block',
+        background: 'linear-gradient(180deg, #ffffff 0%, #00d4ff 65%, #0097c7 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+      }}
     >
       {char}
     </motion.span>
   );
 }
+
 
 // ── Shockwave ring ──
 function ShockwaveRing({ delay }: { delay: number }) {
@@ -272,11 +279,7 @@ export default function HeroSection() {
               fontSize: 'clamp(3.4rem, 19.5vw, 11rem)',
               letterSpacing: '-0.02em',
               lineHeight: 0.88,
-              background: 'linear-gradient(180deg, #ffffff 0%, #00d4ff 60%, #0097c7 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              textShadow: 'none',
+              color: 'transparent',
               filter: glitch ? 'hue-rotate(90deg)' : 'none',
               transition: 'filter 0.05s',
             }}
