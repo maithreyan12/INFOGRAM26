@@ -233,26 +233,26 @@ export default function HeroSection() {
           MAIN CONTENT
       ══════════════════════════════════════ */}
       <div className="relative z-10 w-full flex flex-col items-center text-center px-4"
-        style={{ paddingTop: 'max(80px, calc(env(safe-area-inset-top, 0px) + 80px))' }}>
+        style={{ paddingTop: 'max(70px, calc(env(safe-area-inset-top, 0px) + 70px))', paddingBottom: 60 }}>
 
         {/* College badge */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.6 }}
-          className="mb-5"
+          className="mb-2"
         >
           <div style={{
-            display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-            padding: '8px 18px', borderRadius: 100,
+            display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+            padding: '5px 14px', borderRadius: 100,
             background: 'rgba(0,0,0,0.5)',
             border: '1px solid rgba(0,212,255,0.2)',
             backdropFilter: 'blur(16px)',
           }}>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 8, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
               C. Abdul Hakeem College of Engineering &amp; Technology
             </span>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, color: '#00d4ff', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 700 }}>
+            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 9.5, color: '#00d4ff', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700 }}>
               Department of Information Technology
             </span>
           </div>
@@ -276,7 +276,7 @@ export default function HeroSection() {
             className={`relative font-black uppercase ${glitch ? 'glitch-effect' : ''}`}
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(3.4rem, 19.5vw, 11rem)',
+              fontSize: 'clamp(2.8rem, 16vw, 9rem)',
               letterSpacing: '-0.02em',
               lineHeight: 0.88,
               color: 'transparent',
@@ -304,7 +304,7 @@ export default function HeroSection() {
               className="font-black"
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(3.4rem, 19.5vw, 11rem)',
+                fontSize: 'clamp(2.8rem, 16vw, 9rem)',
                 lineHeight: 0.88,
                 letterSpacing: '-0.02em',
                 background: 'linear-gradient(180deg, #ffe566 0%, #ffd700 50%, #cc9900 100%)',
@@ -329,13 +329,13 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           transition={{ delay: 1.1, duration: 0.7 }}
-          className="mt-3 mb-1"
+          className="mt-1 mb-1"
         >
           <p style={{
             fontFamily: 'var(--font-heading)',
-            fontSize: 'clamp(0.7rem, 3.5vw, 1rem)',
-            color: 'rgba(255,255,255,0.7)',
-            letterSpacing: '0.18em',
+            fontSize: 'clamp(0.6rem, 2.8vw, 0.85rem)',
+            color: 'rgba(255,255,255,0.65)',
+            letterSpacing: '0.15em',
             textTransform: 'uppercase',
           }}>
             Where Innovation Earns Recognition
@@ -347,16 +347,16 @@ export default function HeroSection() {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 1.2, type: 'spring', stiffness: 200 }}
-          className="flex items-center gap-2 xs:gap-3 mt-3 mb-6"
+          className="flex items-center gap-2 mt-1 mb-3"
         >
           <div style={{ height: 1, width: 28, background: 'linear-gradient(90deg, transparent, rgba(255,215,0,0.8))' }} />
           <motion.span
             style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(1rem, 5vw, 1.6rem)',
+              fontSize: 'clamp(0.9rem, 4.5vw, 1.4rem)',
               fontWeight: 900,
               color: '#ffd700',
-              letterSpacing: '0.08em',
+              letterSpacing: '0.06em',
             }}
             animate={{ opacity: [0.8, 1, 0.8] }}
             transition={{ duration: 2, repeat: Infinity }}
@@ -371,15 +371,15 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 30, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 1.3, type: 'spring', stiffness: 150, damping: 18 }}
-          className="w-full mb-6"
-          style={{ maxWidth: 360 }}
+          className="w-full mb-3"
+          style={{ maxWidth: 340 }}
         >
           <div style={{
             background: 'linear-gradient(135deg, rgba(0,212,255,0.07) 0%, rgba(0,0,0,0.5) 100%)',
             border: '1px solid rgba(0,212,255,0.25)',
             borderTop: '1px solid rgba(0,212,255,0.5)',
-            borderRadius: 20,
-            padding: '18px 12px',
+            borderRadius: 16,
+            padding: '12px 8px',
             backdropFilter: 'blur(24px)',
             boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.05) inset',
             position: 'relative',
@@ -412,7 +412,7 @@ export default function HeroSection() {
                         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                         style={{
                           fontFamily: 'var(--font-display)',
-                          fontSize: 'clamp(1.6rem, 8vw, 2.8rem)',
+                          fontSize: 'clamp(1.3rem, 6.5vw, 2.2rem)',
                           fontWeight: 900,
                           color: '#00d4ff',
                           textShadow: '0 0 25px rgba(0,212,255,0.8)',
@@ -434,7 +434,7 @@ export default function HeroSection() {
                   </div>
                   {i < 3 && (
                     <motion.span
-                      style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: 'rgba(0,212,255,0.4)', marginBottom: 14, marginLeft: 4, marginRight: 4 }}
+                      style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'rgba(0,212,255,0.4)', marginBottom: 12, marginLeft: 2, marginRight: 2 }}
                       animate={{ opacity: [1, 0.1, 1] }}
                       transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                     >:</motion.span>
@@ -450,7 +450,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.5, duration: 0.6 }}
-          style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 320 }}
+          style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', maxWidth: 300 }}
         >
           {/* Primary — Register */}
           <motion.div
@@ -460,8 +460,8 @@ export default function HeroSection() {
           >
             <Link href="/register" style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              padding: '16px 32px',
-              borderRadius: 16,
+              padding: '13px 28px',
+              borderRadius: 14,
               background: 'linear-gradient(135deg, #00d4ff 0%, #0097c7 50%, #005b8e 100%)',
               border: '1px solid rgba(100,240,255,0.5)',
               color: 'white',
@@ -489,8 +489,8 @@ export default function HeroSection() {
           >
             <Link href="/events" style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: '16px 32px',
-              borderRadius: 16,
+              padding: '13px 28px',
+              borderRadius: 14,
               background: 'rgba(255,255,255,0.05)',
               border: '1px solid rgba(255,255,255,0.15)',
               borderTop: '1px solid rgba(255,255,255,0.25)',
@@ -509,9 +509,6 @@ export default function HeroSection() {
             </Link>
           </motion.div>
         </motion.div>
-
-        {/* Bottom padding for scroll */}
-        <div style={{ height: 48 }} />
       </div>
 
       {/* ── Scroll indicator ── */}
