@@ -77,10 +77,10 @@ export default function AnnouncementsSection() {
   return (
     <section className="section-padding container-xl mx-auto px-4 max-w-4xl">
       <div className="mb-10">
-        <span className="section-badge inline-block px-4 py-1 rounded-full bg-white/10 border border-white/20 text-white text-sm font-semibold mb-4">
+        <span className="section-badge inline-block px-4 py-1 rounded-full bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-[#00d4ff] text-sm font-semibold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
           Latest Announcements
         </span>
-        <h2 className="text-3xl md:text-4xl font-bold text-white">Stay Updated</h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>Stay Updated</h2>
       </div>
 
       <motion.div 

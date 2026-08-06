@@ -33,6 +33,13 @@ export default function ContactPage() {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     try {
+      if (!db) {
+        alert("Firebase is not configured. Message received in offline/mock mode.");
+        setIsSuccess(true);
+        reset();
+        setTimeout(() => setIsSuccess(false), 5000);
+        return;
+      }
       await addDoc(collection(db, 'contacts'), {
         ...data,
         createdAt: new Date().toISOString(),

@@ -59,6 +59,10 @@ export default function RegisterPage() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
+        if (!db) {
+          setEvents(demoEvents);
+          return;
+        }
         const eventsSnapshot = await getDocs(collection(db, 'events'));
         if (eventsSnapshot.empty) {
           setEvents(demoEvents);
@@ -131,6 +135,12 @@ export default function RegisterPage() {
     if (!idFile || selectedEvents.length === 0) return;
     setIsSubmitting(true);
     try {
+      if (!db || !storage) {
+        alert("Firebase is not configured. Running in offline/mock mode.");
+        setUploadProgress(100);
+        router.push(`/payment?regId=mock_reg_123`);
+        return;
+      }
       setUploadProgress(25);
       const storageRef = ref(storage, `college-ids/${Date.now()}-${idFile.name}`);
       await uploadBytes(storageRef, idFile);

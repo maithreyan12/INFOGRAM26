@@ -21,8 +21,17 @@ export default function AdminLogin() {
     setError(null);
     try {
       const result = await signIn();
+      if (!result) {
+        alert("Firebase is not configured. Bypassing login in mock mode...");
+        router.push('/admin/dashboard');
+        return;
+      }
       const user = result.user;
       
+      if (!db) {
+        setError('Database is not configured. Cannot verify role.');
+        return;
+      }
       // Check Firestore users collection by UID
       let userDocRef = doc(db, 'users', user.uid);
       
@@ -59,32 +68,39 @@ export default function AdminLogin() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#040d1a]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00d4ff]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-black p-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/aurora.svg')] bg-cover bg-center opacity-30 z-0"></div>
-      
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#040d1a] text-white p-4 relative overflow-hidden tech-grid">
+      {/* Aurora effects */}
+      <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-[#00d4ff]/10 rounded-full blur-[120px]" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#0a3d6b]/20 rounded-full blur-[120px]" />
+
       <div className="z-10 text-center mb-8">
-        <h1 className="text-4xl md:text-6xl font-bold text-white gradient-text tracking-wider mb-2">INFOGRAM'26</h1>
+        <h1 className="text-3xl md:text-5xl font-black tracking-wider gradient-text-animated uppercase mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+          INFOGRAM<span className="text-[#00d4ff]">&apos;26</span>
+        </h1>
+        <p className="text-xs uppercase tracking-widest text-[#00d4ff]/60" style={{ fontFamily: 'var(--font-heading)' }}>
+          Department of Information Technology
+        </p>
       </div>
 
-      <div className="z-10 glass-card w-full max-w-md p-8 rounded-2xl shadow-2xl backdrop-blur-lg bg-white/10 border border-white/20">
-        <h2 className="text-2xl font-bold text-white mb-2 text-center">Admin / Organizer Login</h2>
-        <p className="text-gray-300 text-center text-sm mb-8">
-          Only authorized Google accounts can access the admin panel
+      <div className="z-10 glass-card w-full max-w-md p-8 rounded-2xl border border-[#00d4ff]/15 shadow-2xl backdrop-blur-md bg-[#040d1a]/85">
+        <h2 className="text-xl font-bold text-white mb-2 text-center uppercase tracking-[0.08em]" style={{ fontFamily: 'var(--font-heading)' }}>Admin Portal</h2>
+        <p className="text-white/50 text-center text-sm mb-8" style={{ fontFamily: 'var(--font-heading)' }}>
+          Authorized administrator or organizer sign-in
         </p>
 
         {error ? (
-          <div className="bg-red-500/20 border border-red-500 text-red-200 p-4 rounded-lg mb-6 text-sm text-center">
+          <div className="bg-red-500/10 border border-red-500/30 text-red-200 p-4 rounded-xl mb-6 text-sm text-center">
             {error}
             <button 
               onClick={() => { setError(null); signOut(); }}
-              className="mt-4 flex items-center justify-center w-full bg-red-600/50 hover:bg-red-600/70 text-white py-2 rounded-lg transition-colors"
+              className="mt-4 flex items-center justify-center w-full bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-white py-2 rounded-xl transition-all"
             >
               <LogOut className="w-4 h-4 mr-2" /> Sign Out
             </button>
@@ -93,9 +109,10 @@ export default function AdminLogin() {
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 font-semibold py-3 px-6 rounded-xl hover:bg-gray-100 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-70 disabled:hover:scale-100"
+            className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 font-semibold py-3 px-6 rounded-xl hover:bg-gray-100 transition-all duration-300 transform hover:scale-[1.01] disabled:opacity-70 disabled:hover:scale-100 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+            style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
           >
-            <svg viewBox="0 0 24 24" className="w-6 h-6">
+            <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                 fill="#4285F4"
@@ -118,7 +135,7 @@ export default function AdminLogin() {
         )}
       </div>
       
-      <Link href="/" className="z-10 mt-8 text-gray-400 hover:text-white transition-colors text-sm">
+      <Link href="/" className="z-10 mt-8 text-white/50 hover:text-[#00d4ff] transition-colors text-sm" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
         &larr; Back to Home
       </Link>
     </div>

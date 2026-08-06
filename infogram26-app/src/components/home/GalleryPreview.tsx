@@ -45,12 +45,12 @@ export default function GalleryPreview() {
     <section className="section-padding container-xl mx-auto px-4">
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
         <div>
-          <span className="section-badge inline-block px-4 py-1 rounded-full bg-white/10 border border-white/20 text-white text-sm font-semibold mb-4">
+          <span className="section-badge inline-block px-4 py-1 rounded-full bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-[#00d4ff] text-sm font-semibold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
             Gallery
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white">Memories from Past</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>Memories from Past</h2>
         </div>
-        <Link href="/gallery" className="btn-glass px-6 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-white transition-colors shrink-0">
+        <Link href="/gallery" className="btn-glass px-6 py-2 rounded-full border border-[#00d4ff]/20 bg-[#00d4ff]/5 hover:bg-[#00d4ff]/10 text-white transition-colors shrink-0" style={{ fontFamily: 'var(--font-heading)' }}>
           View Full Gallery
         </Link>
       </div>

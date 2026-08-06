@@ -1,14 +1,14 @@
 'use client';
 
-import { motion, useInView, useSpring, useTransform } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { useRef, useEffect, useState } from 'react';
 import { Calendar, Users, Building, Trophy } from 'lucide-react';
 
 const stats = [
-  { id: 1, label: 'Events', value: 20, suffix: '+', icon: Calendar, color: 'text-sky-400', bg: 'bg-sky-400/10', border: 'border-sky-400/20' },
-  { id: 2, label: 'Participants', value: 500, suffix: '+', icon: Users, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-400/20' },
-  { id: 3, label: 'Sponsors', value: 10, suffix: '+', icon: Building, color: 'text-pink-400', bg: 'bg-pink-400/10', border: 'border-pink-400/20' },
-  { id: 4, label: 'Prize Pool', value: 50000, prefix: '₹', suffix: '+', icon: Trophy, color: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'border-yellow-400/20' },
+  { id: 1, label: 'Events', value: 15, suffix: '+', icon: Calendar, color: 'text-[#00d4ff]', bg: 'bg-[#00d4ff]/10', border: 'border-[#00d4ff]/20' },
+  { id: 2, label: 'Participants', value: 500, suffix: '+', icon: Users, color: 'text-[#00d4ff]', bg: 'bg-[#00d4ff]/10', border: 'border-[#00d4ff]/20' },
+  { id: 3, label: 'Sponsors', value: 10, suffix: '+', icon: Building, color: 'text-[#ffd700]', bg: 'bg-[#ffd700]/10', border: 'border-[#ffd700]/20' },
+  { id: 4, label: 'Prize Pool', value: 50000, prefix: '₹', suffix: '+', icon: Trophy, color: 'text-[#ffd700]', bg: 'bg-[#ffd700]/10', border: 'border-[#ffd700]/20' },
 ];
 
 function AnimatedCounter({ value, prefix = '', suffix = '' }: { value: number; prefix?: string; suffix?: string }) {
@@ -60,15 +60,15 @@ export default function StatsSection() {
                   damping: 24,
                 }}
                 style={{ willChange: 'transform, opacity', WebkitTapHighlightColor: 'transparent' }}
-                className="glass-card p-4 sm:p-6 md:p-8 rounded-2xl flex flex-col items-center text-center cursor-default select-none"
+                className="glass-card p-4 sm:p-6 md:p-8 rounded-2xl flex flex-col items-center text-center cursor-default select-none border border-[#00d4ff]/10"
               >
                 <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl ${stat.bg} border ${stat.border} flex items-center justify-center mb-3 sm:mb-4`}>
                   <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
                 </div>
-                <div className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-1 ${stat.color}`}>
+                <div className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-1 ${stat.color}`} style={{ fontFamily: 'var(--font-display)' }}>
                   <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
                 </div>
-                <p className="text-[10px] sm:text-xs text-white/50 font-semibold uppercase tracking-widest">
+                <p className="text-[10px] sm:text-xs text-white/50 font-semibold uppercase tracking-widest" style={{ fontFamily: 'var(--font-heading)' }}>
                   {stat.label}
                 </p>
               </motion.div>

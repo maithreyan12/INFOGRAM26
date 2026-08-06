@@ -25,11 +25,6 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           // Allow smooth scroll
           { key: "X-DNS-Prefetch-Control", value: "on" },
-          // Cache static assets aggressively
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
         ],
       },
       {
@@ -37,7 +32,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, s-maxage=10, stale-while-revalidate=59",
+            value: "no-store, must-revalidate",
           },
         ],
       },

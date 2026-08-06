@@ -60,10 +60,10 @@ export default function SponsorsSection() {
   return (
     <section className="section-padding overflow-hidden py-20 bg-black/40">
       <div className="container-xl mx-auto px-4 text-center mb-12">
-        <span className="section-badge inline-block px-4 py-1 rounded-full bg-white/10 border border-white/20 text-white text-sm font-semibold mb-4">
+        <span className="section-badge inline-block px-4 py-1 rounded-full bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-[#00d4ff] text-sm font-semibold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
           Our Sponsors
         </span>
-        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Trusted by Leading Organizations</h2>
+        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'var(--font-display)' }}>Trusted by Leading Organizations</h2>
       </div>
 
       <div className="relative flex overflow-x-hidden w-full group py-8">

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Outfit } from 'next/font/google';
+import { Inter, Outfit, Orbitron, Rajdhani } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
 
@@ -13,6 +13,20 @@ const outfit = Outfit({
   subsets: ['latin'],
   variable: '--font-outfit',
   display: 'swap',
+});
+
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  variable: '--font-orbitron',
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800', '900'],
+});
+
+const rajdhani = Rajdhani({
+  subsets: ['latin'],
+  variable: '--font-rajdhani',
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
 });
 
 export const metadata: Metadata = {
@@ -66,8 +80,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable}`} suppressHydrationWarning>
-      <body className="antialiased bg-[#030712] text-white">
+    <html lang="en" className={`${inter.variable} ${outfit.variable} ${orbitron.variable} ${rajdhani.variable}`} suppressHydrationWarning>
+      <body className="antialiased bg-[#040d1a] text-white">
         {/* Aurora Background — global, behind everything */}
         <div className="aurora-bg" aria-hidden="true">
           <div
@@ -75,7 +89,7 @@ export default function RootLayout({
             style={{
               width: '70vw',
               height: '70vw',
-              background: 'radial-gradient(circle, #0ea5e9 0%, transparent 70%)',
+              background: 'radial-gradient(circle, #00d4ff 0%, transparent 70%)',
               top: '-20%',
               right: '-20%',
               filter: 'blur(80px)',
@@ -90,7 +104,7 @@ export default function RootLayout({
             style={{
               width: '60vw',
               height: '60vw',
-              background: 'radial-gradient(circle, #1d4ed8 0%, transparent 70%)',
+              background: 'radial-gradient(circle, #0a3d6b 0%, transparent 70%)',
               bottom: '-20%',
               left: '-15%',
               filter: 'blur(80px)',
@@ -105,7 +119,7 @@ export default function RootLayout({
             style={{
               width: '40vw',
               height: '40vw',
-              background: 'radial-gradient(circle, #7c3aed 0%, transparent 70%)',
+              background: 'radial-gradient(circle, #00d4ff 0%, transparent 70%)',
               top: '40%',
               left: '30%',
               filter: 'blur(100px)',
