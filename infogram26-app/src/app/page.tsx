@@ -5,6 +5,7 @@ import SponsorsSection from '@/components/home/SponsorsSection';
 import GalleryPreview from '@/components/home/GalleryPreview';
 import StatsSection from '@/components/home/StatsSection';
 import VideoSection from '@/components/home/VideoSection';
+import MusicPlayer from '@/components/home/MusicPlayer';
 import PublicLayout from '@/components/layout/PublicLayout';
 
 export const metadata = {
@@ -23,6 +24,12 @@ export default function Home() {
       <FeaturedEvents />
       <SponsorsSection />
       <GalleryPreview />
+      {/* Floating background music player — place bg-music.mp3 in /public/ */}
+      <MusicPlayer
+        src="/bg-music.mp3"
+        songName="Vaathi Coming"
+        artist="Vijay · Master (2021)"
+      />
     </PublicLayout>
   );
 }
