@@ -43,14 +43,14 @@ export default function GalleryPreview() {
 
   return (
     <section className="section-padding container-xl mx-auto px-4">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
         <div>
-          <span className="section-badge inline-block px-4 py-1 rounded-full bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-[#00d4ff] text-sm font-semibold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+          <span className="section-badge inline-block px-4 py-1 rounded-full bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-[#00d4ff] text-xs font-semibold mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
             Gallery
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>Memories from Past</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>Memories from Past</h2>
         </div>
-        <Link href="/gallery" className="btn-glass px-6 py-2 rounded-full border border-[#00d4ff]/20 bg-[#00d4ff]/5 hover:bg-[#00d4ff]/10 text-white transition-colors shrink-0" style={{ fontFamily: 'var(--font-heading)' }}>
+        <Link href="/gallery" className="btn-glass px-5 py-2 rounded-full border border-[#00d4ff]/20 bg-[#00d4ff]/5 hover:bg-[#00d4ff]/10 text-white text-sm transition-colors shrink-0" style={{ fontFamily: 'var(--font-heading)' }}>
           View Full Gallery
         </Link>
       </div>

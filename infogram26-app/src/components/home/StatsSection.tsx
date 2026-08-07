@@ -41,7 +41,7 @@ function AnimatedCounter({ value, prefix = '', suffix = '' }: { value: number; p
 
 export default function StatsSection() {
   return (
-    <section className="relative z-20 -mt-16 sm:-mt-20 section-padding">
+    <section className="relative z-10 section-padding">
       <div className="container-xl mx-auto px-4">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {stats.map((stat, i) => {

@@ -219,10 +219,10 @@ export default function VideoSection() {
         transition={{ duration: 0.5, delay: 0.7 }}
         className="flex flex-wrap justify-center gap-2 mt-8"
       >
-        {['#INFOGRAM26', '#NationalLevelSymposium', '#CAHCET', '#ITDept', '#TechFest'].map((tag) => (
+        {['#INFOGRAM26', '#NationalLevel', '#CAHCET', '#ITDept', '#TechFest'].map((tag) => (
           <span
             key={tag}
-            className="px-3 py-1 rounded-full text-xs font-semibold text-[#00d4ff]/70 border border-[#00d4ff]/15 bg-[#00d4ff]/5"
+            className="px-3 py-1 rounded-full text-xs font-semibold text-[#00d4ff]/70 border border-[#00d4ff]/15 bg-[#00d4ff]/5 whitespace-nowrap"
             style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.04em' }}
           >
             {tag}
