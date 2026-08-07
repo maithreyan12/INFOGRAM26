@@ -9,13 +9,13 @@ import {
 } from 'lucide-react';
 
 const revealVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
 const staggerContainer: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.12 } },
+  visible: { transition: { staggerChildren: 0.1 } },
 };
 
 const ugPrograms = [
@@ -39,8 +39,8 @@ const facilities = [
   { icon: Users, label: "Boys' & Girls' Hostels" },
   { icon: Globe, label: 'Transport Facilities' },
   { icon: Trophy, label: 'Sports Grounds' },
-  { icon: Microscope, label: 'Auditorium & Seminar Halls' },
-  { icon: Star, label: 'Placement & Training Cell' },
+  { icon: Microscope, label: 'Auditorium & Halls' },
+  { icon: Star, label: 'Placement & Training' },
   { icon: Building, label: 'Cafeteria' },
 ];
 
@@ -54,36 +54,50 @@ const studentActivities = [
   'Entrepreneurship Activities',
 ];
 
+/* ── Reusable section header ── */
+function SectionBadge({ label }: { label: string }) {
+  return (
+    <span className="inline-block mb-3 px-4 py-1 rounded-full text-sky-400 bg-sky-400/10 border border-sky-400/20 text-xs tracking-widest uppercase font-semibold">
+      {label}
+    </span>
+  );
+}
+
+/* ── Card header row: icon + title always on ONE line ── */
+function CardHeader({ icon: Icon, title, color = 'text-sky-400', bg = 'bg-sky-400/10' }: {
+  icon: React.ElementType; title: string; color?: string; bg?: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <div className={`w-8 h-8 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+        <Icon className={`w-4 h-4 ${color}`} />
+      </div>
+      <h3 className="text-base sm:text-lg font-bold text-white leading-tight">{title}</h3>
+    </div>
+  );
+}
+
 export default function AboutPage() {
   return (
     <PublicLayout>
-      <div className="min-h-screen text-white pb-24">
+      <div className="min-h-screen text-white pb-20">
 
         {/* ── PAGE HERO ── */}
-        <section className="relative pt-32 pb-20 flex flex-col items-center justify-center overflow-hidden">
+        <section className="relative pt-28 pb-14 flex flex-col items-center justify-center overflow-hidden">
           <div className="absolute inset-0 bg-sky-900/10 blur-3xl z-0" />
-          <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-sky-500/10 rounded-full blur-[120px] float-animation" />
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px] float-animation" style={{ animationDelay: '2s' }} />
-
           <div className="container-xl relative z-10 text-center px-4">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-            >
+            <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
               <motion.div variants={revealVariants}>
-                <span className="inline-block section-badge mb-4 px-4 py-1 rounded-full text-sky-400 bg-sky-400/10 border border-sky-400/20 text-xs tracking-widest uppercase font-semibold">
-                  Home / About
-                </span>
+                <SectionBadge label="Home / About" />
               </motion.div>
               <motion.h1
                 variants={revealVariants}
-                className="text-5xl md:text-7xl font-black gradient-text mb-6 tracking-tight"
+                className="text-3xl sm:text-5xl md:text-7xl font-black gradient-text mb-4 tracking-tight"
               >
                 About INFOGRAM&apos;26
               </motion.h1>
-              <motion.p variants={revealVariants} className="text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
-                Discover the legacy, the vision, and the passion that drives Tamil Nadu&apos;s premier national-level technical symposium.
+              <motion.p variants={revealVariants} className="text-base sm:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
+                Discover the legacy, vision, and passion behind Tamil Nadu&apos;s premier national-level technical symposium.
               </motion.p>
             </motion.div>
           </div>
@@ -92,56 +106,58 @@ export default function AboutPage() {
         {/* ── ABOUT COLLEGE ── */}
         <section className="section-padding container-xl px-4">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
+            initial="hidden" whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
             variants={revealVariants}
-            className="glass-card p-8 md:p-12 rounded-3xl"
+            className="glass-card p-5 sm:p-10 rounded-3xl"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               {/* Left: Text */}
               <div>
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-xl bg-sky-400/10 flex items-center justify-center">
-                    <Building className="w-5 h-5 text-sky-400" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 rounded-xl bg-sky-400/10 flex items-center justify-center shrink-0">
+                    <Building className="w-4 h-4 text-sky-400" />
                   </div>
-                  <h2 className="text-3xl font-bold">About the College</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold">About the College</h2>
                 </div>
-                <p className="text-white/70 leading-relaxed mb-4">
-                  C. Abdul Hakeem College of Engineering &amp; Technology (CAHCET) is a private, self-financing engineering college located in Hakeem Nagar, Melvisharam, Ranipet District, Tamil Nadu. It was established in <strong className="text-white">1998</strong> by the <strong className="text-white">Melvisharam Muslim Educational Society (MMES)</strong> — founded in 1918 by Nawab C. Abdul Hakeem.
+                <p className="text-white/70 leading-relaxed mb-3 text-sm sm:text-base">
+                  C. Abdul Hakeem College of Engineering & Technology (CAHCET) is a private engineering college
+                  located in Hakeem Nagar, Melvisharam, Ranipet District, Tamil Nadu. Established in{' '}
+                  <strong className="text-white">1998</strong> by the{' '}
+                  <strong className="text-white">Melvisharam Muslim Educational Society (MMES)</strong>.
                 </p>
-                <p className="text-white/70 leading-relaxed mb-6">
-                  The institution is affiliated with <strong className="text-white">Anna University, Chennai</strong>, approved by <strong className="text-white">AICTE</strong>, and stands as a premier minority institution committed to academic excellence and industry-ready graduates. The college proudly follows its motto: <em className="text-sky-400 font-semibold">"Enter to Learn, Leave to Serve."</em>
+                <p className="text-white/70 leading-relaxed mb-5 text-sm sm:text-base">
+                  Affiliated with <strong className="text-white">Anna University, Chennai</strong> and approved
+                  by <strong className="text-white">AICTE</strong>. Motto:{' '}
+                  <em className="text-sky-400 font-semibold">&quot;Enter to Learn, Leave to Serve.&quot;</em>
                 </p>
-
-                {/* Contact strip */}
-                <div className="space-y-2 text-sm">
+                <div className="space-y-2 text-xs sm:text-sm">
                   <div className="flex items-start gap-2 text-white/60">
-                    <MapPin className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+                    <MapPin className="w-3.5 h-3.5 text-sky-400 shrink-0 mt-0.5" />
                     <span>Hakeem Nagar, Melvisharam, Ranipet District, Tamil Nadu – 632 509</span>
                   </div>
                   <div className="flex items-center gap-2 text-white/60">
-                    <Phone className="w-4 h-4 text-sky-400 shrink-0" />
+                    <Phone className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                     <span>+91 4172 267387</span>
                   </div>
                   <div className="flex items-center gap-2 text-white/60">
-                    <Mail className="w-4 h-4 text-sky-400 shrink-0" />
+                    <Mail className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                     <span>info@cahcet.edu.in</span>
                   </div>
                 </div>
               </div>
 
               {/* Right: Stats grid */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { icon: BookOpen, value: '1998', label: 'Established' },
                   { icon: Award, value: 'AICTE', label: 'Approved' },
                   { icon: GraduationCap, value: '10+', label: 'Programs' },
                   { icon: Users, value: 'Anna Univ.', label: 'Affiliated To' },
                 ].map(({ icon: Icon, value, label }) => (
-                  <div key={label} className="glass-card p-5 rounded-2xl flex flex-col items-center text-center">
-                    <Icon className="w-6 h-6 text-sky-400 mb-2" />
-                    <span className="text-xl font-bold text-white leading-tight">{value}</span>
+                  <div key={label} className="glass-card p-4 rounded-2xl flex flex-col items-center text-center">
+                    <Icon className="w-5 h-5 text-sky-400 mb-2" />
+                    <span className="text-base sm:text-xl font-bold text-white leading-tight">{value}</span>
                     <span className="text-xs text-white/50 mt-1">{label}</span>
                   </div>
                 ))}
@@ -152,37 +168,20 @@ export default function AboutPage() {
 
         {/* ── COURSES OFFERED ── */}
         <section className="section-padding container-xl px-4">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
-            variants={revealVariants}
-            className="text-center mb-10"
-          >
-            <span className="section-badge inline-block mb-3 px-4 py-1 rounded-full text-sky-400 bg-sky-400/10 border border-sky-400/20 text-xs tracking-widest uppercase font-semibold">
-              Academics
-            </span>
-            <h2 className="text-4xl font-bold gradient-text">Courses Offered</h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={revealVariants}
+            className="text-center mb-8">
+            <SectionBadge label="Academics" />
+            <h2 className="text-2xl sm:text-4xl font-bold gradient-text">Courses Offered</h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* UG Programs */}
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={revealVariants}
-              className="glass-card p-8 rounded-3xl"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-9 h-9 rounded-xl bg-sky-400/10 flex items-center justify-center">
-                  <GraduationCap className="w-5 h-5 text-sky-400" />
-                </div>
-                <h3 className="text-xl font-bold">Undergraduate (UG)</h3>
-              </div>
-              <ul className="space-y-3">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
+              variants={revealVariants} className="glass-card p-5 sm:p-7 rounded-3xl">
+              <CardHeader icon={GraduationCap} title="Undergraduate (UG)" />
+              <ul className="space-y-2.5">
                 {ugPrograms.map((prog) => (
-                  <li key={prog} className="flex items-start gap-3 text-white/70 text-sm">
+                  <li key={prog} className="flex items-start gap-2.5 text-white/70 text-sm">
                     <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
                     <span>{prog}</span>
                   </li>
@@ -191,23 +190,13 @@ export default function AboutPage() {
             </motion.div>
 
             {/* PG + Placements */}
-            <div className="flex flex-col gap-8">
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={revealVariants}
-                className="glass-card p-8 rounded-3xl"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-9 h-9 rounded-xl bg-purple-400/10 flex items-center justify-center">
-                    <Award className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <h3 className="text-xl font-bold">Postgraduate (PG)</h3>
-                </div>
-                <ul className="space-y-3">
+            <div className="flex flex-col gap-5">
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
+                variants={revealVariants} className="glass-card p-5 sm:p-7 rounded-3xl">
+                <CardHeader icon={Award} title="Postgraduate (PG)" color="text-purple-400" bg="bg-purple-400/10" />
+                <ul className="space-y-2.5">
                   {pgPrograms.map((prog) => (
-                    <li key={prog} className="flex items-start gap-3 text-white/70 text-sm">
+                    <li key={prog} className="flex items-start gap-2.5 text-white/70 text-sm">
                       <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                       <span>{prog}</span>
                     </li>
@@ -215,20 +204,19 @@ export default function AboutPage() {
                 </ul>
               </motion.div>
 
-              {/* Placements highlight */}
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
+              {/* Placements */}
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
                 variants={revealVariants}
-                className="glass-card p-8 rounded-3xl border border-sky-400/20 bg-sky-400/5"
-              >
+                className="glass-card p-5 sm:p-7 rounded-3xl border border-sky-400/20 bg-sky-400/5">
                 <div className="flex items-center gap-3 mb-3">
-                  <Trophy className="w-6 h-6 text-yellow-400" />
-                  <h3 className="text-xl font-bold">Placements</h3>
+                  <Trophy className="w-5 h-5 text-yellow-400 shrink-0" />
+                  <h3 className="text-base sm:text-lg font-bold">Placements</h3>
                 </div>
                 <p className="text-white/70 text-sm leading-relaxed">
-                  The UG Batch of 2026 achieved <strong className="text-sky-400">100% placement</strong> with students placed across multiple departments through campus recruitment. The institution reports strong industry engagement with top recruiters across IT, Core Engineering, and Management sectors.
+                  The UG Batch of 2026 achieved{' '}
+                  <strong className="text-sky-400">100% placement</strong> with students placed across
+                  multiple departments through campus recruitment. Strong industry engagement with top
+                  recruiters across IT, Core Engineering, and Management sectors.
                 </p>
               </motion.div>
             </div>
@@ -237,40 +225,44 @@ export default function AboutPage() {
 
         {/* ── ABOUT DEPARTMENT ── */}
         <section className="section-padding container-xl px-4">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={revealVariants}
-            className="glass-card p-8 md:p-12 rounded-3xl"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-              <div className="order-2 lg:order-1 grid grid-cols-2 gap-4">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
+            variants={revealVariants} className="glass-card p-5 sm:p-10 rounded-3xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              {/* Stats grid */}
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { icon: Target, value: 'B.Tech IT', label: 'Flagship Program' },
                   { icon: Users, value: '15+', label: 'Expert Faculty' },
                   { icon: Laptop, value: '6+', label: 'State-of-art Labs' },
                   { icon: GraduationCap, value: '500+', label: 'Alumni Network' },
                 ].map(({ icon: Icon, value, label }) => (
-                  <div key={label} className="glass-card p-5 rounded-2xl flex flex-col items-center text-center">
-                    <Icon className="w-6 h-6 text-sky-400 mb-2" />
-                    <span className="text-lg font-bold text-white leading-tight">{value}</span>
-                    <span className="text-xs text-white/50 mt-1">{label}</span>
+                  <div key={label} className="glass-card p-4 rounded-2xl flex flex-col items-center text-center">
+                    <Icon className="w-5 h-5 text-sky-400 mb-2" />
+                    <span className="text-base sm:text-lg font-bold text-white leading-tight">{value}</span>
+                    <span className="text-xs text-white/50 mt-1 leading-tight">{label}</span>
                   </div>
                 ))}
               </div>
-              <div className="order-1 lg:order-2">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-xl bg-sky-400/10 flex items-center justify-center">
-                    <Laptop className="w-5 h-5 text-sky-400" />
+
+              {/* Text */}
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 rounded-xl bg-sky-400/10 flex items-center justify-center shrink-0">
+                    <Laptop className="w-4 h-4 text-sky-400" />
                   </div>
-                  <h2 className="text-3xl font-bold">Department of IT</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold">Department of IT</h2>
                 </div>
-                <p className="text-white/70 leading-relaxed mb-4">
-                  The Department of Information Technology at CAHCET offers the <strong className="text-white">B.Tech Information Technology</strong> program, designed to produce industry-ready professionals skilled in software development, networking, data science, and AI-driven technologies.
+                <p className="text-white/70 leading-relaxed mb-3 text-sm sm:text-base">
+                  The Department of Information Technology at CAHCET offers the{' '}
+                  <strong className="text-white">B.Tech Information Technology</strong> program, designed to
+                  produce industry-ready professionals skilled in software development, networking, data science,
+                  and AI-driven technologies.
                 </p>
-                <p className="text-white/70 leading-relaxed">
-                  With state-of-the-art laboratories, a highly qualified faculty team, and strong industry partnerships, the department fosters hands-on learning and research culture. It is the proud organizer of <strong className="text-sky-400">INFOGRAM&apos;26</strong> — the annual National Level Technical Symposium.
+                <p className="text-white/70 leading-relaxed text-sm sm:text-base">
+                  With state-of-the-art laboratories and strong industry partnerships, the department fosters
+                  hands-on learning. It is the proud organizer of{' '}
+                  <strong className="text-sky-400">INFOGRAM&apos;26</strong> — the annual National Level
+                  Technical Symposium.
                 </p>
               </div>
             </div>
@@ -279,34 +271,22 @@ export default function AboutPage() {
 
         {/* ── CAMPUS FACILITIES ── */}
         <section className="section-padding container-xl px-4">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={revealVariants}
-            className="text-center mb-10"
-          >
-            <span className="section-badge inline-block mb-3 px-4 py-1 rounded-full text-sky-400 bg-sky-400/10 border border-sky-400/20 text-xs tracking-widest uppercase font-semibold">
-              Infrastructure
-            </span>
-            <h2 className="text-4xl font-bold gradient-text">Campus Facilities</h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
+            variants={revealVariants} className="text-center mb-8">
+            <SectionBadge label="Infrastructure" />
+            <h2 className="text-2xl sm:text-4xl font-bold gradient-text">Campus Facilities</h2>
           </motion.div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
             variants={staggerContainer}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"
-          >
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
             {facilities.map(({ icon: Icon, label }) => (
               <motion.div
-                key={label}
-                variants={revealVariants}
-                className="glass-card p-5 rounded-2xl flex flex-col items-center text-center hover:border-sky-400/30 transition-all"
+                key={label} variants={revealVariants}
+                className="glass-card p-4 rounded-2xl flex flex-col items-center text-center hover:border-sky-400/30 transition-all"
               >
-                <div className="w-10 h-10 rounded-xl bg-sky-400/10 flex items-center justify-center mb-3">
-                  <Icon className="w-5 h-5 text-sky-400" />
+                <div className="w-9 h-9 rounded-xl bg-sky-400/10 flex items-center justify-center mb-2">
+                  <Icon className="w-4 h-4 text-sky-400" />
                 </div>
                 <span className="text-xs text-white/70 leading-tight">{label}</span>
               </motion.div>
@@ -316,52 +296,40 @@ export default function AboutPage() {
 
         {/* ── ABOUT SYMPOSIUM ── */}
         <section className="section-padding container-xl px-4">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
             variants={revealVariants}
-            className="glass-card p-10 md:p-16 rounded-3xl text-center border border-sky-400/10 bg-sky-400/5 max-w-4xl mx-auto"
-          >
-            <span className="section-badge inline-block mb-4 px-4 py-1 rounded-full text-sky-400 bg-sky-400/10 border border-sky-400/20 text-xs tracking-widest uppercase font-semibold">
-              2026 Edition
-            </span>
-            <h2 className="text-4xl md:text-5xl font-black gradient-text mb-6">About INFOGRAM&apos;26</h2>
-            <p className="text-lg text-white/70 leading-relaxed">
-              INFOGRAM&apos;26 is the annual <strong className="text-white">National Level Technical Symposium</strong> organized by the Department of Information Technology, CAHCET. This prestigious event brings together brilliant minds from engineering colleges across the nation to compete, collaborate, and celebrate technological innovation — blending technical brilliance with creative expression.
+            className="glass-card p-6 sm:p-12 rounded-3xl text-center border border-sky-400/10 bg-sky-400/5 max-w-3xl mx-auto">
+            <SectionBadge label="2026 Edition" />
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-black gradient-text mb-4 mt-1">
+              About INFOGRAM&apos;26
+            </h2>
+            <p className="text-sm sm:text-lg text-white/70 leading-relaxed">
+              INFOGRAM&apos;26 is the annual{' '}
+              <strong className="text-white">National Level Technical Symposium</strong> organized by the
+              Department of Information Technology, CAHCET. This prestigious event brings together brilliant
+              minds from engineering colleges across the nation to compete, collaborate, and celebrate
+              technological innovation — blending technical brilliance with creative expression.
             </p>
           </motion.div>
         </section>
 
         {/* ── STUDENT ACTIVITIES ── */}
         <section className="section-padding container-xl px-4">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={revealVariants}
-            className="text-center mb-10"
-          >
-            <span className="section-badge inline-block mb-3 px-4 py-1 rounded-full text-sky-400 bg-sky-400/10 border border-sky-400/20 text-xs tracking-widest uppercase font-semibold">
-              Student Life
-            </span>
-            <h2 className="text-4xl font-bold gradient-text">Student Activities</h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
+            variants={revealVariants} className="text-center mb-8">
+            <SectionBadge label="Student Life" />
+            <h2 className="text-2xl sm:text-4xl font-bold gradient-text">Student Activities</h2>
           </motion.div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
             variants={staggerContainer}
-            className="flex flex-wrap justify-center gap-4"
-          >
+            className="flex flex-wrap justify-center gap-3">
             {studentActivities.map((activity) => (
               <motion.div
-                key={activity}
-                variants={revealVariants}
-                className="glass-card px-6 py-3 rounded-full flex items-center gap-2 text-sm font-medium hover:border-sky-400/40 transition-all"
+                key={activity} variants={revealVariants}
+                className="glass-card px-4 py-2.5 rounded-full flex items-center gap-2 text-sm font-medium hover:border-sky-400/40 transition-all"
               >
-                <Star className="w-4 h-4 text-sky-400" />
+                <Star className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                 {activity}
               </motion.div>
             ))}
@@ -369,21 +337,14 @@ export default function AboutPage() {
         </section>
 
         {/* ── MISSION / VISION / OBJECTIVES ── */}
-        <section className="section-padding container-xl px-4 pb-4">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={revealVariants}
-            className="text-center mb-10"
-          >
-            <span className="section-badge inline-block mb-3 px-4 py-1 rounded-full text-sky-400 bg-sky-400/10 border border-sky-400/20 text-xs tracking-widest uppercase font-semibold">
-              Our Purpose
-            </span>
-            <h2 className="text-4xl font-bold gradient-text">Mission, Vision &amp; Objectives</h2>
+        <section className="section-padding container-xl px-4">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
+            variants={revealVariants} className="text-center mb-8">
+            <SectionBadge label="Our Purpose" />
+            <h2 className="text-2xl sm:text-4xl font-bold gradient-text">Mission, Vision &amp; Objectives</h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
               {
                 icon: Target,
@@ -418,18 +379,17 @@ export default function AboutPage() {
             ].map(({ icon: Icon, title, color, bg, content, list }, i) => (
               <motion.div
                 key={title}
-                initial="hidden"
-                whileInView="visible"
+                initial="hidden" whileInView="visible"
                 viewport={{ once: true }}
                 variants={revealVariants}
-                transition={{ delay: i * 0.1 }}
-                className="glass-card p-8 rounded-3xl"
+                transition={{ delay: i * 0.08 }}
+                className="glass-card p-5 sm:p-7 rounded-3xl"
               >
-                <div className={`w-12 h-12 rounded-2xl ${bg} flex items-center justify-center mb-5`}>
-                  <Icon className={`w-6 h-6 ${color}`} />
+                <div className={`w-10 h-10 rounded-2xl ${bg} flex items-center justify-center mb-4`}>
+                  <Icon className={`w-5 h-5 ${color}`} />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">{title}</h3>
-                {content && <p className="text-white/70 leading-relaxed">{content}</p>}
+                <h3 className="text-lg sm:text-xl font-bold mb-3">{title}</h3>
+                {content && <p className="text-white/70 leading-relaxed text-sm sm:text-base">{content}</p>}
                 {list && (
                   <ul className="space-y-2">
                     {list.map((item) => (
@@ -446,21 +406,23 @@ export default function AboutPage() {
         </section>
 
         {/* ── PARENT ORG BANNER ── */}
-        <section className="container-xl px-4 py-16">
+        <section className="container-xl px-4 py-10">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
             variants={revealVariants}
-            className="glass-card p-8 md:p-10 rounded-3xl flex flex-col md:flex-row items-center gap-8 border border-white/10"
+            className="glass-card p-5 sm:p-8 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center gap-5 border border-white/10"
           >
-            <div className="w-16 h-16 rounded-2xl bg-sky-400/10 flex items-center justify-center shrink-0">
-              <Globe className="w-8 h-8 text-sky-400" />
+            <div className="w-12 h-12 rounded-2xl bg-sky-400/10 flex items-center justify-center shrink-0">
+              <Globe className="w-6 h-6 text-sky-400" />
             </div>
             <div>
-              <h3 className="text-xl font-bold mb-2">Parent Organization — MMES</h3>
+              <h3 className="text-base sm:text-xl font-bold mb-2">Parent Organization — MMES</h3>
               <p className="text-white/70 text-sm leading-relaxed">
-                CAHCET is managed by the <strong className="text-white">Melvisharam Muslim Educational Society (MMES)</strong>, founded in <strong className="text-white">1918</strong> by Nawab C. Abdul Hakeem. MMES manages several schools and higher education institutions across the region, with a longstanding legacy of quality education and community service in Tamil Nadu.
+                CAHCET is managed by the{' '}
+                <strong className="text-white">Melvisharam Muslim Educational Society (MMES)</strong>, founded
+                in <strong className="text-white">1918</strong> by Nawab C. Abdul Hakeem. MMES manages several
+                schools and higher education institutions across the region, with a longstanding legacy of
+                quality education and community service in Tamil Nadu.
               </p>
             </div>
           </motion.div>
