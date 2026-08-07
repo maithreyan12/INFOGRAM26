@@ -85,7 +85,7 @@ export default function RootLayout({
         {/* Aurora Background — global, behind everything */}
         <div className="aurora-bg" aria-hidden="true">
           <div
-            className="absolute rounded-full"
+            className="absolute rounded-full aurora-blob-1"
             style={{
               width: '70vw',
               height: '70vw',
@@ -93,14 +93,13 @@ export default function RootLayout({
               top: '-20%',
               right: '-20%',
               filter: 'blur(80px)',
-              opacity: 0.12,
-              animation: 'aurora-1 20s ease-in-out infinite',
+              opacity: 0.1,
               willChange: 'transform',
               transform: 'translateZ(0)',
             }}
           />
           <div
-            className="absolute rounded-full"
+            className="absolute rounded-full aurora-blob-2"
             style={{
               width: '60vw',
               height: '60vw',
@@ -108,23 +107,7 @@ export default function RootLayout({
               bottom: '-20%',
               left: '-15%',
               filter: 'blur(80px)',
-              opacity: 0.1,
-              animation: 'aurora-2 25s ease-in-out infinite',
-              willChange: 'transform',
-              transform: 'translateZ(0)',
-            }}
-          />
-          <div
-            className="absolute rounded-full"
-            style={{
-              width: '40vw',
-              height: '40vw',
-              background: 'radial-gradient(circle, #00d4ff 0%, transparent 70%)',
-              top: '40%',
-              left: '30%',
-              filter: 'blur(100px)',
-              opacity: 0.05,
-              animation: 'aurora-3 30s ease-in-out infinite',
+              opacity: 0.08,
               willChange: 'transform',
               transform: 'translateZ(0)',
             }}

@@ -334,17 +334,53 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
+@media (max-width: 768px) {
+  /* ── Mobile glass blur: 32px → 6px (massive GPU savings) ── */
+  .glass-card {
+    backdrop-filter: saturate(130%) blur(6px) !important;
+    -webkit-backdrop-filter: saturate(130%) blur(6px) !important;
+  }
+  /* Disable expensive shimmer paint on mobile */
+  .glass-card::after { display: none !important; }
+
+  /* Disable aurora animations on mobile — they repaint every frame during scroll */
+  .aurora-blob-1 { animation: none !important; }
+  .aurora-blob-2 { animation: none !important; }
+  .aurora-bg::before { animation: none !important; }
+  .aurora-bg::after  { animation: none !important; }
+
+  /* content-visibility: auto skips rendering off-screen sections entirely */
+  section {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 420px;
+  }
+
+  /* Disable float animations on mobile */
+  .float-animation { animation: none !important; }
+
+  /* Faster glass transitions on mobile */
+  .glass-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+}
+
 @media (max-width: 640px) {
   .glass-card {
     border-radius: 18px;
-    backdrop-filter: saturate(160%) blur(20px);
-    -webkit-backdrop-filter: saturate(160%) blur(20px);
+    backdrop-filter: saturate(120%) blur(4px) !important;
+    -webkit-backdrop-filter: saturate(120%) blur(4px) !important;
   }
   .glass-card:hover { transform: none; }
   .glass-card:active {
-    transform: scale(0.96);
-    transition: transform 0.1s var(--ease-smooth);
+    transform: scale(0.97);
+    transition: transform 0.08s ease;
   }
+}
+
+/* Desktop aurora animations via CSS (blobs have no animation attr now) */
+@media (min-width: 769px) {
+  .aurora-blob-1 { animation: aurora-1 22s ease-in-out infinite; }
+  .aurora-blob-2 { animation: aurora-2 28s ease-in-out infinite; }
 }
 
 
