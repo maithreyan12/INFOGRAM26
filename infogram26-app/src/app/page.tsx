@@ -4,6 +4,7 @@ import LiveBanner from '@/components/home/LiveBanner';
 import SponsorsSection from '@/components/home/SponsorsSection';
 import GalleryPreview from '@/components/home/GalleryPreview';
 import StatsSection from '@/components/home/StatsSection';
+import VideoSection from '@/components/home/VideoSection';
 import PublicLayout from '@/components/layout/PublicLayout';
 
 export const metadata = {
@@ -17,6 +18,7 @@ export default function Home() {
     <PublicLayout>
       <LiveBanner />
       <HeroSection />
+      <VideoSection />
       <StatsSection />
       <FeaturedEvents />
       <SponsorsSection />
