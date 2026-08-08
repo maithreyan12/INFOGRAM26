@@ -377,7 +377,15 @@ export default function EventsPage() {
         if (snapshot.empty) {
           setEvents(demoEvents);
         } else {
-          const eventsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
+          const eventsData = snapshot.docs.map(doc => {
+            const data = doc.data() as Event;
+            const demoMatch = demoEvents.find(e => e.slug === data.slug);
+            return { 
+              id: doc.id, 
+              ...data,
+              bannerUrl: data.bannerUrl || demoMatch?.bannerUrl
+            };
+          });
           setEvents(eventsData);
         }
       } catch (error) {

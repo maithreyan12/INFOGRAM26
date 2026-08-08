@@ -374,7 +374,13 @@ export default function EventDetailPage() {
         const snapshot = await getDocs(q);
         
         if (!snapshot.empty) {
-          setEvent({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as Event);
+          const data = snapshot.docs[0].data() as Event;
+          const demoMatch = demoEvents.find(e => e.slug === slug);
+          setEvent({ 
+            id: snapshot.docs[0].id, 
+            ...data,
+            bannerUrl: data.bannerUrl || demoMatch?.bannerUrl
+          });
         } else {
           // Fallback to demo data
           const demoEvent = demoEvents.find(e => e.slug === slug);
