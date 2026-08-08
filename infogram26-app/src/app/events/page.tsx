@@ -241,12 +241,28 @@ export default function EventsPage() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const initialList = storeEvents.length > 0 ? storeEvents : demoEvents;
+        const initialList = demoEvents.map(demo => {
+          const normDemoSlug = demo.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const storeMatch = storeEvents.find(
+            s => s.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normDemoSlug || s.id === demo.id
+          );
+          if (storeMatch) {
+            return {
+              ...demo,
+              registeredCount: storeMatch.registeredCount ?? demo.registeredCount,
+              bannerUrl: storeMatch.bannerUrl || demo.bannerUrl,
+              status: storeMatch.status || demo.status,
+            };
+          }
+          return demo;
+        });
+
         if (!db) {
           setEvents(initialList);
           setLoading(false);
           return;
         }
+
         const eventsRef = collection(db, 'events');
         const snapshot = await getDocs(eventsRef);
         if (snapshot.empty) {
@@ -276,7 +292,7 @@ export default function EventsPage() {
         }
       } catch (error) {
         console.error("Error fetching events:", error);
-        setEvents(storeEvents.length > 0 ? storeEvents : demoEvents);
+        setEvents(demoEvents);
       } finally {
         setLoading(false);
       }

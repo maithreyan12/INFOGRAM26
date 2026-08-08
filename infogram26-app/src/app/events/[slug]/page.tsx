@@ -245,13 +245,13 @@ export default function EventDetailPage() {
       try {
         const normSlug = rawSlug ? rawSlug.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
         
-        // 1. Find official local brochure event
-        let localEvent = storeEvents.find(
+        // 1. Always resolve base event from official demoEvents list to guarantee 100% brochure accuracy
+        let localEvent = demoEvents.find(
           e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug || e.id === rawSlug
         );
 
         if (!localEvent) {
-          localEvent = demoEvents.find(
+          localEvent = storeEvents.find(
             e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug || e.id === rawSlug
           );
         }
@@ -294,9 +294,7 @@ export default function EventDetailPage() {
       } catch (error) {
         console.error("Error fetching event:", error);
         const normSlug = rawSlug ? rawSlug.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
-        const fallback = storeEvents.find(
-          e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug
-        ) || demoEvents.find(
+        const fallback = demoEvents.find(
           e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug
         );
         setEvent(fallback || null);
