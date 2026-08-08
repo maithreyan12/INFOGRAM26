@@ -377,8 +377,8 @@ export default function EventDetailPage() {
           const data = snapshot.docs[0].data() as Event;
           const demoMatch = demoEvents.find(e => e.slug === slug);
           setEvent({ 
-            id: snapshot.docs[0].id, 
             ...data,
+            id: snapshot.docs[0].id, 
             bannerUrl: data.bannerUrl || demoMatch?.bannerUrl
           });
         } else {

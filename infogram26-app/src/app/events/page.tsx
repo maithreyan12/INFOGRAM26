@@ -381,8 +381,8 @@ export default function EventsPage() {
             const data = doc.data() as Event;
             const demoMatch = demoEvents.find(e => e.slug === data.slug);
             return { 
-              id: doc.id, 
               ...data,
+              id: doc.id, 
               bannerUrl: data.bannerUrl || demoMatch?.bannerUrl
             };
           });
