@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { Calendar, MapPin, IndianRupee, Clock, Users, Phone, AlertCircle, ArrowLeft, Trophy } from 'lucide-react';
 import { Event } from '@/types';
-import { db } from '@/lib/firebase/config';
+import { db, isFirebaseConfigured } from '@/lib/firebase/config';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
 import { useEventStore } from '@/store/eventStore';
@@ -261,7 +261,7 @@ export default function EventDetailPage() {
         let resultEvent = localEvent ? { ...localEvent } : null;
 
         // 2. Check Firebase if configured for live metrics
-        if (db) {
+        if (db && isFirebaseConfigured) {
           try {
             const eventsRef = collection(db, 'events');
             const snapshot = await getDocs(eventsRef);

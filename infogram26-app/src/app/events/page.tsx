@@ -6,7 +6,7 @@ import PublicLayout from '@/components/layout/PublicLayout';
 import EventCard from '@/components/events/EventCard';
 import { Search } from 'lucide-react';
 import { Event } from '@/types';
-import { db } from '@/lib/firebase/config';
+import { db, isFirebaseConfigured } from '@/lib/firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
 
 import { useEventStore } from '@/store/eventStore';
@@ -257,7 +257,7 @@ export default function EventsPage() {
           return demo;
         });
 
-        if (!db) {
+        if (!db || !isFirebaseConfigured) {
           setEvents(initialList);
           setLoading(false);
           return;
