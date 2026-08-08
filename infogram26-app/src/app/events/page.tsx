@@ -120,6 +120,7 @@ const demoEvents: Event[] = [
     coordinatorName: 'Naveeth Khan',
     organizerName: 'IT Association',
     contactNumber: '9360257573',
+    bannerUrl: '/events/open-source.jpeg',
     status: 'upcoming',
     isFeatured: true,
     createdAt: new Date(),

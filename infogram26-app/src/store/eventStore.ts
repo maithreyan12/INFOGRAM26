@@ -73,6 +73,7 @@ const INITIAL_EVENTS: Event[] = [
     venue: 'IT Lab 4', date: '2026-08-22', startTime: '11:00', endTime: '14:00',
     registrationDeadline: '2026-08-20', registrationFee: 150, maxParticipants: 30, registeredCount: 0,
     coordinatorName: 'Naveeth Khan', organizerName: 'IT Association', contactNumber: '9360257573',
+    bannerUrl: '/events/open-source.jpeg',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
   {

@@ -33,14 +33,18 @@ export default function EventCard({ event }: EventCardProps) {
       className="h-full"
     >
       <div className="glass-card rounded-2xl overflow-hidden flex flex-col h-full">
-        {/* Banner gradient */}
+        {/* Banner gradient / Image */}
         <div
           className={`h-28 sm:h-32 relative flex-shrink-0 ${
-            isTechnical
-              ? 'bg-gradient-to-br from-sky-600/50 via-blue-500/30 to-indigo-600/30'
-              : 'bg-gradient-to-br from-purple-600/50 via-fuchsia-500/30 to-pink-600/30'
+            event.bannerUrl 
+              ? 'bg-cover bg-center' 
+              : isTechnical
+                ? 'bg-gradient-to-br from-sky-600/50 via-blue-500/30 to-indigo-600/30'
+                : 'bg-gradient-to-br from-purple-600/50 via-fuchsia-500/30 to-pink-600/30'
           }`}
+          style={event.bannerUrl ? { backgroundImage: `url('${event.bannerUrl}')` } : {}}
         >
+          {event.bannerUrl && <div className="absolute inset-0 bg-black/40" />}
           {/* Top-left category label */}
           <div className="absolute top-3 left-3">
             <span

@@ -121,6 +121,7 @@ const demoEvents: Event[] = [
     coordinatorName: 'Naveeth Khan',
     organizerName: 'IT Association',
     contactNumber: '9360257573',
+    bannerUrl: '/events/open-source.jpeg',
     status: 'upcoming',
     isFeatured: true,
     createdAt: new Date(),
@@ -430,8 +431,15 @@ export default function EventDetailPage() {
     <PublicLayout>
       <div className="min-h-screen bg-black text-white pb-24">
         {/* Banner */}
-        <div className={`w-full h-64 md:h-80 relative ${isTechnical ? 'bg-gradient-to-br from-blue-900 via-blue-800 to-sky-900' : 'bg-gradient-to-br from-purple-900 via-purple-800 to-fuchsia-900'}`}>
-          <div className="absolute inset-0 bg-black/40"></div>
+        <div 
+          className={`w-full h-64 md:h-80 relative ${
+            event.bannerUrl 
+              ? 'bg-cover bg-center' 
+              : isTechnical ? 'bg-gradient-to-br from-blue-900 via-blue-800 to-sky-900' : 'bg-gradient-to-br from-purple-900 via-purple-800 to-fuchsia-900'
+          }`}
+          style={event.bannerUrl ? { backgroundImage: `url('${event.bannerUrl}')` } : {}}
+        >
+          <div className={`absolute inset-0 ${event.bannerUrl ? 'bg-black/60' : 'bg-black/40'}`}></div>
           <div className="container-xl h-full relative z-10 px-4 flex flex-col justify-end pb-8">
             <Link href="/events" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors w-fit group">
               <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
