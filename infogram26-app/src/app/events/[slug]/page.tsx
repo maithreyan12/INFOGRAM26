@@ -98,6 +98,7 @@ const demoEvents: Event[] = [
     coordinatorName: 'Thameem',
     organizerName: 'IT Association',
     contactNumber: '9361900720',
+    bannerUrl: '/events/codestorm.jpeg',
     status: 'upcoming',
     isFeatured: true,
     createdAt: new Date(),

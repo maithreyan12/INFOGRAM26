@@ -64,6 +64,7 @@ const INITIAL_EVENTS: Event[] = [
     venue: 'IT Lab 3', date: '2026-08-22', startTime: '09:00', endTime: '16:00',
     registrationDeadline: '2026-08-20', registrationFee: 200, maxParticipants: 40, registeredCount: 0,
     coordinatorName: 'Thameem', organizerName: 'IT Association', contactNumber: '9361900720',
+    bannerUrl: '/events/codestorm.jpeg',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
   {
