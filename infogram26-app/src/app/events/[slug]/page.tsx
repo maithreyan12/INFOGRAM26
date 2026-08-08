@@ -10,400 +10,286 @@ import { Event } from '@/types';
 import { db } from '@/lib/firebase/config';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
-const demoEvents: Event[] = [
-  {
-    id: 'tech-1',
-    slug: 'techtalks',
-    name: 'TechTalks',
-    category: 'technical',
-    description: 'Present your innovative ideas and research papers. Share your knowledge with the technical community and get feedback from industry experts.',
-    rules: ['Teams of 1-3 allowed', 'PPT presentation required', 'Time limit: 8 minutes presentation + 2 mins Q&A', 'Topic must be from emerging technology domains'],
-    registrationFee: 150,
-    maxParticipants: 50,
-    registeredCount: 12,
-    date: '2026-08-22',
-    startTime: '09:30',
-    endTime: '12:30',
-    registrationDeadline: '2026-08-20',
-    venue: 'IT Block, Seminar Hall',
-    coordinatorName: 'Naveeth Khan',
-    organizerName: 'IT Association',
-    contactNumber: '9360257573',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'tech-2',
-    slug: 'bytebattle',
-    name: 'ByteBattle',
-    category: 'technical',
-    description: 'A competitive programming contest that tests your algorithmic problem-solving speed and accuracy.',
-    rules: ['Individual participation only', 'C, C++, Java, Python allowed', '3 problems to solve in 2 hours', 'No internet access allowed'],
-    registrationFee: 100,
-    maxParticipants: 100,
-    registeredCount: 45,
-    date: '2026-08-22',
-    startTime: '10:00',
-    endTime: '12:00',
-    registrationDeadline: '2026-08-20',
-    venue: 'IT Lab 1',
-    coordinatorName: 'Farish Sharif',
-    organizerName: 'IT Association',
-    contactNumber: '9487233290',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'tech-3',
-    slug: 'pixelcraft',
-    name: 'PixelCraft',
-    category: 'technical',
-    description: 'Design and develop responsive websites. Show off your UI/UX and frontend engineering skills.',
-    rules: ['Individual or pairs', 'HTML/CSS/JS or Figma mockup', 'Theme will be revealed on-spot', 'Time limit: 2.5 hours'],
-    registrationFee: 150,
-    maxParticipants: 50,
-    registeredCount: 22,
-    date: '2026-08-22',
-    startTime: '13:00',
-    endTime: '15:30',
-    registrationDeadline: '2026-08-20',
-    venue: 'IT Lab 2',
-    coordinatorName: 'Kafil Ahmed',
-    organizerName: 'IT Association',
-    contactNumber: '8940210491',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'tech-4',
-    slug: 'codestorm',
-    name: 'CodeStorm',
-    category: 'technical',
-    description: 'A team-based hackathon-style challenge to build innovative software solutions addressing local or global problems.',
-    rules: ['Teams of 2-4 members', 'Any tech stack allowed', 'Problem statements provided at start', 'Working prototype/Demo required'],
-    registrationFee: 200,
-    maxParticipants: 40,
-    registeredCount: 18,
-    date: '2026-08-22',
-    startTime: '09:00',
-    endTime: '16:00',
-    registrationDeadline: '2026-08-20',
-    venue: 'IT Lab 3',
-    coordinatorName: 'Thameem',
-    organizerName: 'IT Association',
-    contactNumber: '9361900720',
-    bannerUrl: '/events/codestorm.jpeg',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'tech-5',
-    slug: 'open-source',
-    name: 'Open Source',
-    category: 'technical',
-    description: 'Showcase your open source contributions, custom GitHub projects, or innovative software/hardware solutions to the panel.',
-    rules: ['Teams of 1-3 members', 'Working project model required', 'GitHub repository link must be provided', 'Presentation time: 8 minutes'],
-    registrationFee: 150,
-    maxParticipants: 30,
-    registeredCount: 10,
-    date: '2026-08-22',
-    startTime: '11:00',
-    endTime: '14:00',
-    registrationDeadline: '2026-08-20',
-    venue: 'IT Lab 4',
-    coordinatorName: 'Naveeth Khan',
-    organizerName: 'IT Association',
-    contactNumber: '9360257573',
-    bannerUrl: '/events/open-source.jpeg',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'tech-6',
-    slug: 'hackforge',
-    name: 'HackForge',
-    category: 'technical',
-    description: 'Solve debugging challenges, configure virtual environments, and build rapid setups under strict timelines.',
-    rules: ['Individual participation', 'Pre-configured bugs must be resolved', 'Maximum 90 minutes', 'Score based on speed and completion'],
-    registrationFee: 100,
-    maxParticipants: 60,
-    registeredCount: 25,
-    date: '2026-08-22',
-    startTime: '14:00',
-    endTime: '15:30',
-    registrationDeadline: '2026-08-20',
-    venue: 'IT Lab 5',
-    coordinatorName: 'Farish Sharif',
-    organizerName: 'IT Association',
-    contactNumber: '9487233290',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'nontech-1',
-    slug: 'mind-matrix',
-    name: 'Mind Matrix',
-    category: 'non-technical',
-    description: 'The ultimate general knowledge and pop culture quiz competition to test your speed, trivia, and memory.',
-    rules: ['Teams of 2 members', 'Written prelims followed by stage finals', 'No electronic devices allowed', 'Quick buzzer rounds'],
-    registrationFee: 100,
-    maxParticipants: 80,
-    registeredCount: 52,
-    date: '2026-08-22',
-    startTime: '10:00',
-    endTime: '12:00',
-    registrationDeadline: '2026-08-20',
-    venue: 'Mini Auditorium',
-    coordinatorName: 'Kafil Ahmed',
-    organizerName: 'IT Association',
-    contactNumber: '8940210491',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'nontech-2',
-    slug: 'battleverse',
-    name: 'BattleVerse',
-    category: 'non-technical',
-    description: 'Step into the gaming arena and face off against rivals in popular multiplayer combat matches.',
-    rules: ['Individual or team depending on game', 'Own device/controllers recommended for mobile games', 'Knockout format', 'Strict fair-play rules'],
-    registrationFee: 150,
-    maxParticipants: 120,
-    registeredCount: 78,
-    date: '2026-08-22',
-    startTime: '09:30',
-    endTime: '16:00',
-    registrationDeadline: '2026-08-20',
-    venue: 'Seminar Hall 2',
-    coordinatorName: 'Thameem',
-    organizerName: 'IT Association',
-    contactNumber: '9361900720',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'nontech-3',
-    slug: 'flavour-fusion',
-    name: 'Flavour Fusion',
-    category: 'non-technical',
-    description: 'A culinary challenge to prepare and present delicious recipes without fire or stove cooking.',
-    rules: ['Teams of 2 members', 'No flame/fire allowed', 'Bring your own raw ingredients', 'Time limit: 60 minutes for preparation'],
-    registrationFee: 150,
-    maxParticipants: 40,
-    registeredCount: 15,
-    date: '2026-08-22',
-    startTime: '11:00',
-    endTime: '12:30',
-    registrationDeadline: '2026-08-20',
-    venue: 'College Courtyard',
-    coordinatorName: 'Naveeth Khan',
-    organizerName: 'IT Association',
-    contactNumber: '9360257573',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'nontech-4',
-    slug: 'framecraft',
-    name: 'FrameCraft',
-    category: 'non-technical',
-    description: 'Capture the spirit and vibrant atmosphere of INFOGRAM\'26 inside the campus boundaries.',
-    rules: ['Individual participation', 'Photos must be taken on event day within campus', 'No heavy digital manipulation', 'Submit best 3 frames by 15:30'],
-    registrationFee: 100,
-    maxParticipants: 50,
-    registeredCount: 18,
-    date: '2026-08-22',
-    startTime: '09:00',
-    endTime: '15:30',
-    registrationDeadline: '2026-08-20',
-    venue: 'Campus Wide',
-    coordinatorName: 'Farish Sharif',
-    organizerName: 'IT Association',
-    contactNumber: '9487233290',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'nontech-5',
-    slug: 'quest-x',
-    name: 'Quest X',
-    category: 'non-technical',
-    description: 'Solve mysterious puzzles, crack complex codes, and hunt for hidden checkpoints across the college campus.',
-    rules: ['Teams of 3-5 members', 'Campus-bound search area', 'Do not move/disturb checkpoint markers', 'Solve clues in correct sequence'],
-    registrationFee: 200,
-    maxParticipants: 40,
-    registeredCount: 30,
-    date: '2026-08-22',
-    startTime: '13:30',
-    endTime: '15:30',
-    registrationDeadline: '2026-08-20',
-    venue: 'Main Campus Grounds',
-    coordinatorName: 'Kafil Ahmed',
-    organizerName: 'IT Association',
-    contactNumber: '8940210491',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'nontech-6',
-    slug: 'artistry',
-    name: 'Artistry',
-    category: 'non-technical',
-    description: 'Showcase your fine art talent in drawing, sketching, painting, or creative craft illustration.',
-    rules: ['Individual participation', 'Theme announced at start', 'Bring your own canvas/colors (sheets provided)', 'Duration: 2 hours'],
-    registrationFee: 100,
-    maxParticipants: 40,
-    registeredCount: 14,
-    date: '2026-08-22',
-    startTime: '10:00',
-    endTime: '12:00',
-    registrationDeadline: '2026-08-20',
-    venue: 'Drawing Hall',
-    coordinatorName: 'Thameem',
-    organizerName: 'IT Association',
-    contactNumber: '9361900720',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'nontech-7',
-    slug: 'reel-it-feel-it',
-    name: 'Reel It Feel It',
-    category: 'non-technical',
-    description: 'Create engaging, high-energy reels or short videos showcasing the fun, highlights, and energy of the symposium.',
-    rules: ['Individual or teams', 'Video length: 30-60 seconds', 'Must incorporate INFOGRAM\'26 logo or banners', 'Submit by 16:00'],
-    registrationFee: 100,
-    maxParticipants: 50,
-    registeredCount: 20,
-    date: '2026-08-22',
-    startTime: '09:00',
-    endTime: '16:00',
-    registrationDeadline: '2026-08-20',
-    venue: 'Campus Wide',
-    coordinatorName: 'Naveeth Khan',
-    organizerName: 'IT Association',
-    contactNumber: '9360257573',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'nontech-8',
-    slug: 'mic-drop',
-    name: 'Mic Drop',
-    category: 'non-technical',
-    description: 'An open-mic performance contest for solo singing, stand-up comedy, or inspirational speech.',
-    rules: ['Individual performance', 'Time limit: 4 minutes', 'No offensive content or language', 'Karaoke tracks allowed for singing'],
-    registrationFee: 100,
-    maxParticipants: 30,
-    registeredCount: 15,
-    date: '2026-08-22',
-    startTime: '13:00',
-    endTime: '15:00',
-    registrationDeadline: '2026-08-20',
-    venue: 'Mini Auditorium',
-    coordinatorName: 'Farish Sharif',
-    organizerName: 'IT Association',
-    contactNumber: '9487233290',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'nontech-9',
-    slug: 'funfiesta',
-    name: 'FunFiesta',
-    category: 'non-technical',
-    description: 'A collection of exciting, high-energy mini-games and spots for all attendees to join and win instant prizes.',
-    rules: ['Spot registration/entry', 'Various simple challenges', 'Instant gifts and badges', 'Open throughout the day'],
-    registrationFee: 50,
-    maxParticipants: 300,
-    registeredCount: 110,
-    date: '2026-08-22',
-    startTime: '09:30',
-    endTime: '16:00',
-    registrationDeadline: '2026-08-20',
-    venue: 'Main Lawn',
-    coordinatorName: 'Kafil Ahmed',
-    organizerName: 'IT Association',
-    contactNumber: '8940210491',
-    status: 'upcoming',
-    isFeatured: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-];
+import { useEventStore } from '@/store/eventStore';
 
+const demoEvents: Event[] = [
+  // ── TECHNICAL ──
+  {
+    id: 'tech-1', slug: 'tech-talks', name: 'Tech Talks', category: 'technical',
+    description: 'Present your innovative ideas and research papers to a panel of industry experts.',
+    rules: [
+      'Maximum of 2 members | ₹100 per head',
+      'Submit a soft copy of the paper prior to presentation.',
+      'Teams are allotted 5 minutes to present, followed by 2 minutes for questions.',
+      'Topics: Quantum Computing, Generative AI, Cybersecurity, or any IT domain topic.'
+    ],
+    venue: 'IT Block, Seminar Hall', date: '2026-08-22', startTime: '09:30', endTime: '12:30',
+    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 50, registeredCount: 0,
+    coordinatorName: 'Mohammed Dhaniyal & Masood Nawaz', organizerName: 'IT Association', contactNumber: '7010155779, 9944410994',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'tech-2', slug: 'clash-of-minds', name: 'Clash of Minds', category: 'technical',
+    description: 'Test your technical knowledge and debate skills on on-the-spot topics.',
+    rules: [
+      'Maximum of 2 members | ₹50 per head',
+      'On-the-spot topic: One member speaks for the topic and the other speaks against it.',
+      'Time limit: 6 minutes per team to present.'
+    ],
+    venue: 'IT Lab 1', date: '2026-08-22', startTime: '10:00', endTime: '12:00',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 100, registeredCount: 0,
+    coordinatorName: 'Amirtha Varshini & Keerthana', organizerName: 'IT Association', contactNumber: '9597010159, 9629909942',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'tech-3', slug: 'codestorm', name: 'CodeStorm', category: 'technical',
+    description: 'Two-round coding challenge testing speed, accuracy, and problem-solving skills.',
+    rules: [
+      'Maximum of 2 members | ₹50 per head',
+      'Round 1: 20 questions in 30 minutes.',
+      'Round 2: Solve 5 coding questions in 1 hour using any programming language.',
+      'Computers will be provided.'
+    ],
+    venue: 'IT Lab 2', date: '2026-08-22', startTime: '09:00', endTime: '16:00',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 40, registeredCount: 0,
+    coordinatorName: 'Mohammed Irfan & Thoufeeque Ahmed', organizerName: 'IT Association', contactNumber: '9042469482, 9150654995',
+    bannerUrl: '/events/codestorm.jpeg',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'tech-4', slug: 'pixel-craft', name: 'Pixel Craft', category: 'technical',
+    description: 'Design and develop responsive websites. Show off your UI/UX and frontend skills.',
+    rules: [
+      'Maximum of 2 members | ₹100 per head',
+      'Participants must bring their own laptops. No templates will be provided.',
+      'Topics will be given on the spot.'
+    ],
+    venue: 'IT Lab 3', date: '2026-08-22', startTime: '13:00', endTime: '15:30',
+    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 50, registeredCount: 0,
+    coordinatorName: 'Mathin S & Manikandan T', organizerName: 'IT Association', contactNumber: '6381880659, 8825940089',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'tech-5', slug: 'open-source', name: 'Open Source', category: 'technical',
+    description: 'Single 90-minute round to find, fix, and improve a given codebase using GitHub workflow.',
+    rules: [
+      'Maximum of 2 members | ₹100 per head',
+      'Single 90-minute round: Find, fix, and improve a given codebase.',
+      'Complete open-source workflow: Fork → Code → Commit → Push → Pull Request.',
+      'Bring a laptop with Git, GitHub access, and required coding tools.'
+    ],
+    venue: 'IT Lab 4', date: '2026-08-22', startTime: '11:00', endTime: '14:00',
+    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 30, registeredCount: 0,
+    coordinatorName: 'Saheem & Zahid', organizerName: 'IT Association', contactNumber: '9489016294, 7639412328',
+    bannerUrl: '/events/open-source.jpeg',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'tech-6', slug: 'byte-battle', name: 'Byte Battle', category: 'technical',
+    description: 'Fast-paced technical contest testing your knowledge.',
+    rules: [
+      'Maximum of 2 members | ₹50 per head',
+      'Participants should bring mobile phone.',
+      'Use of AI and extra gadgets is strictly prohibited.'
+    ],
+    venue: 'IT Lab 5', date: '2026-08-22', startTime: '10:00', endTime: '12:00',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 100, registeredCount: 0,
+    coordinatorName: 'Ezhilarasan & Dinesh Babu', organizerName: 'IT Association', contactNumber: '9080249831, 6374468780',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'tech-7', slug: 'hack-force', name: 'Hack Force', category: 'technical',
+    description: 'Open innovation pitching contest across two rapid evaluation rounds.',
+    rules: [
+      'Maximum of 3 members (Individual / 2-3 members) | ₹100 per head',
+      'Open innovation event featuring two rounds.',
+      'Round 1: 5-minute prototype pitch.',
+      'Round 2: 1-minute final pitch.'
+    ],
+    venue: 'IT Lab 6', date: '2026-08-22', startTime: '14:00', endTime: '15:30',
+    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 60, registeredCount: 0,
+    coordinatorName: 'Kashif', organizerName: 'IT Association', contactNumber: '6380028607',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  // ── NON-TECHNICAL ──
+  {
+    id: 'nontech-1', slug: 'mind-matrix', name: 'Mind Matrix', category: 'non-technical',
+    description: 'Connect displayed images on screen to solve non-technical trivia and puzzles.',
+    rules: [
+      'Maximum of 2 members | ₹50 per head',
+      'Answer non-technical questions/hints by connecting images displayed on screen.'
+    ],
+    venue: 'Mini Auditorium', date: '2026-08-22', startTime: '10:00', endTime: '12:00',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 80, registeredCount: 0,
+    coordinatorName: 'Naushin & Hema Malini', organizerName: 'IT Association', contactNumber: '7358170392, 7418575021',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'nontech-2', slug: 'flavour-fusion', name: 'Flavour Fusion', category: 'non-technical',
+    description: 'No-fire culinary contest focusing on taste, presentation, and cleanliness.',
+    rules: [
+      'Maximum of 4 members | ₹50 per head',
+      'Pre-cooked food is not allowed; bring your own raw ingredients and supplies.',
+      'Judging criteria: Food taste, presentation, cleanliness of area, and number of dishes prepared.'
+    ],
+    venue: 'College Courtyard', date: '2026-08-22', startTime: '11:00', endTime: '12:30',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 40, registeredCount: 0,
+    coordinatorName: 'Jeevitha & Poorna Sree', organizerName: 'IT Association', contactNumber: '9384505002, 9600889789',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'nontech-3', slug: 'quest-x', name: 'Quest X', category: 'non-technical',
+    description: 'Team treasure hunt across campus following sequential clues.',
+    rules: [
+      'Maximum of 4 members | ₹50 per head',
+      'Follow clues in sequential order — no skipping allowed.',
+      'Teams must stay together throughout the hunt.',
+      'First team to locate the treasure wins.'
+    ],
+    venue: 'Main Campus Grounds', date: '2026-08-22', startTime: '13:30', endTime: '15:30',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 40, registeredCount: 0,
+    coordinatorName: 'Shyam Sundar & Maithreyan', organizerName: 'IT Association', contactNumber: '9345837870, 9342706675',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'nontech-4', slug: 'battle-verse', name: 'Battle Verse', category: 'non-technical',
+    description: 'Battle Royale gaming tournament with strict fair-play guidelines.',
+    rules: [
+      'Maximum of 4 members | ₹160 per team or ₹50 per person (Solo)',
+      'Only Battle Royale (BR) matches are permitted.',
+      'Character skills and emotes are strictly prohibited (emotes result in disqualification). Gun skins are allowed.',
+      'Skirmishes or quarrels will result in immediate elimination.',
+      'Winners (1st and 2nd) selected based on Booyah, Chicken Dinner, and Runner-up standings.'
+    ],
+    venue: 'Seminar Hall 2', date: '2026-08-22', startTime: '09:30', endTime: '16:00',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 120, registeredCount: 0,
+    coordinatorName: 'Meshak & Sanjay V', organizerName: 'IT Association', contactNumber: '6383598812, 6382143386',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'nontech-5', slug: 'frame-craft', name: 'Frame Craft', category: 'non-technical',
+    description: 'On-spot photography contest inside campus matching the theme.',
+    rules: [
+      'Maximum of 1 member | ₹50 per head',
+      'Topics will be provided on the spot.',
+      'Only mobile photos taken inside the college campus matching the theme are accepted.'
+    ],
+    venue: 'Campus Wide', date: '2026-08-22', startTime: '09:00', endTime: '15:30',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 50, registeredCount: 0,
+    coordinatorName: 'Jeysha & Siddharth', organizerName: 'IT Association', contactNumber: '9345110882, 8925441089',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'nontech-6', slug: 'fun-fiesta', name: 'Fun Fiesta', category: 'non-technical',
+    description: 'High-energy mini-games and spot challenges with instant prizes.',
+    rules: [
+      'Maximum of 4 members | ₹50 per head',
+      'Spot entry mini-games and challenges throughout the day.'
+    ],
+    venue: 'Main Lawn', date: '2026-08-22', startTime: '09:30', endTime: '16:00',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 300, registeredCount: 0,
+    coordinatorName: 'Jaffreen & Talha', organizerName: 'IT Association', contactNumber: '9344814392, 8610117244',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'nontech-7', slug: 'artistry', name: 'Artistry', category: 'non-technical',
+    description: 'Fine art and creative illustration contest.',
+    rules: [
+      'Maximum of 1 member | ₹50 per head',
+      'Participants must bring their own required materials.',
+      'Phones and reference materials are strictly prohibited.'
+    ],
+    venue: 'Drawing Hall', date: '2026-08-22', startTime: '10:00', endTime: '12:00',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 40, registeredCount: 0,
+    coordinatorName: 'Haniya Nikhat & Harshitha', organizerName: 'IT Association', contactNumber: '8248478615, 9629136470',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'nontech-8', slug: 'mic-drop', name: 'Mic Drop', category: 'non-technical',
+    description: 'Open-mic contest for solo singing, poetry, or stand-up comedy.',
+    rules: [
+      '₹50 per head',
+      'Strictly for singing, poetry, comedy, etc.',
+      'Dancing and heavy acts are not permitted.'
+    ],
+    venue: 'Mini Auditorium', date: '2026-08-22', startTime: '13:00', endTime: '15:00',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 30, registeredCount: 0,
+    coordinatorName: 'Garnet & Heena', organizerName: 'IT Association', contactNumber: '6374139336, 8072672922',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+  {
+    id: 'nontech-9', slug: 'reel-it-feel-it', name: 'Reel It Feel It', category: 'non-technical',
+    description: 'Short mobile video/reel contest on an on-the-spot topic inside campus.',
+    rules: [
+      'Maximum of 2 members | ₹50 per head',
+      'On-the-spot topic will be provided.',
+      'Only videos shot on mobile phones inside the college campus matching the topic are permitted.'
+    ],
+    venue: 'Campus Wide', date: '2026-08-22', startTime: '09:00', endTime: '16:00',
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 50, registeredCount: 0,
+    coordinatorName: 'Naveeth Khan & Faizal Ahmed', organizerName: 'IT Association', contactNumber: '9360257573, 9003710032',
+    status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
+  },
+];
 
 export default function EventDetailPage() {
   const params = useParams();
-  const slug = params.slug as string;
+  const rawSlug = params.slug as string;
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const { events: storeEvents } = useEventStore();
 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const eventsRef = collection(db, 'events');
-        const q = query(eventsRef, where('slug', '==', slug));
-        const snapshot = await getDocs(q);
+        const normSlug = rawSlug ? rawSlug.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
         
-        if (!snapshot.empty) {
-          const data = snapshot.docs[0].data() as Event;
-          const demoMatch = demoEvents.find(e => e.slug === slug);
-          setEvent({ 
-            ...data,
-            id: snapshot.docs[0].id, 
-            bannerUrl: data.bannerUrl || demoMatch?.bannerUrl
-          });
-        } else {
-          // Fallback to demo data
-          const demoEvent = demoEvents.find(e => e.slug === slug);
-          if (demoEvent) {
-            setEvent(demoEvent);
+        // 1. First check Zustand store
+        let foundEvent = storeEvents.find(
+          e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug || e.id === rawSlug
+        );
+
+        if (!foundEvent) {
+          foundEvent = demoEvents.find(
+            e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug || e.id === rawSlug
+          );
+        }
+
+        // 2. Check Firebase if configured
+        if (db) {
+          const eventsRef = collection(db, 'events');
+          const q = query(eventsRef, where('slug', '==', rawSlug));
+          const snapshot = await getDocs(q);
+          if (!snapshot.empty) {
+            const data = snapshot.docs[0].data() as Event;
+            foundEvent = {
+              ...data,
+              id: snapshot.docs[0].id,
+              bannerUrl: data.bannerUrl || foundEvent?.bannerUrl
+            };
           }
         }
+
+        setEvent(foundEvent || null);
       } catch (error) {
         console.error("Error fetching event:", error);
-        const demoEvent = demoEvents.find(e => e.slug === slug);
-        if (demoEvent) {
-          setEvent(demoEvent);
-        }
+        const normSlug = rawSlug ? rawSlug.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+        const fallback = storeEvents.find(
+          e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug
+        ) || demoEvents.find(
+          e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug
+        );
+        setEvent(fallback || null);
       } finally {
         setLoading(false);
       }
     };
 
-    if (slug) {
+    if (rawSlug) {
       fetchEvent();
     }
-  }, [slug]);
+  }, [rawSlug, storeEvents]);
 
   if (loading) {
     return (
@@ -482,9 +368,6 @@ export default function EventDetailPage() {
                 <p className="text-gray-300 leading-relaxed text-lg">
                   {event.description}
                 </p>
-                <p className="text-gray-300 leading-relaxed mt-4">
-                  Join us for an exciting opportunity to showcase your skills and compete with the best. This event is designed to challenge your limits and provide a platform for networking and learning. Bring your A-game and stand a chance to win exciting prizes and certificates.
-                </p>
               </motion.div>
 
               <motion.div 
@@ -495,14 +378,19 @@ export default function EventDetailPage() {
               >
                 <h2 className="text-2xl font-bold mb-4 flex items-center">
                   <Trophy className="w-6 h-6 mr-3 text-blue-400" />
-                  Rules & Guidelines
+                  Rules &amp; Guidelines
                 </h2>
-                <ul className="space-y-4 text-gray-300 list-decimal list-inside">
-                  <li>Participants must carry their valid college ID cards.</li>
-                  <li>Decision of the judges will be final and binding.</li>
-                  <li>Use of unfair means will lead to immediate disqualification.</li>
-                  <li>Teams must report 30 minutes before the scheduled start time.</li>
-                  <li>Bring your own laptops/equipment if specified by coordinators.</li>
+                <ul className="space-y-3 text-gray-300">
+                  {event.rules && event.rules.length > 0 ? (
+                    event.rules.map((rule, idx) => (
+                      <li key={idx} className="flex items-start gap-3 text-base leading-relaxed">
+                        <span className="text-[#00d4ff] font-bold shrink-0">{idx + 1}.</span>
+                        <span>{rule}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-gray-400">Standard symposium rules apply.</li>
+                  )}
                 </ul>
               </motion.div>
 
@@ -513,12 +401,32 @@ export default function EventDetailPage() {
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
                 <div className="glass-card p-6 rounded-2xl">
-                  <div className="text-sm text-gray-400 mb-1">Event Coordinator</div>
-                  <div className="text-lg font-semibold text-white">{event.coordinatorName}</div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-[#00d4ff] mb-2">Student Coordinators</div>
+                  <div className="text-lg font-bold text-white mb-1">{event.coordinatorName}</div>
+                  {event.contactNumber && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {event.contactNumber.split(',').map((num, i) => {
+                        const cleanNum = num.trim();
+                        return (
+                          <a
+                            key={i}
+                            href={`tel:+91${cleanNum}`}
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-[#00d4ff] hover:bg-[#00d4ff]/20 transition-colors"
+                          >
+                            <Phone className="w-3 h-3" />
+                            {cleanNum}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
                 <div className="glass-card p-6 rounded-2xl">
-                  <div className="text-sm text-gray-400 mb-1">Student Organizer</div>
-                  <div className="text-lg font-semibold text-white">{event.organizerName}</div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-purple-400 mb-2">Organizing Department</div>
+                  <div className="text-base font-bold text-white mb-1">
+                    {event.organizerName || 'Department of IT & Info Club'}
+                  </div>
+                  <div className="text-xs text-white/50">C. Abdul Hakeem College of Engg. &amp; Tech.</div>
                 </div>
               </motion.div>
             </div>

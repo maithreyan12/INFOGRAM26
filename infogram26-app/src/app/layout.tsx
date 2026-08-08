@@ -1,18 +1,20 @@
 import type { Metadata } from 'next';
-import { Inter, Outfit, Orbitron, Rajdhani } from 'next/font/google';
+import { Plus_Jakarta_Sans, Outfit, Orbitron, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
 
-const inter = Inter({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-jakarta',
   display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
 });
 
 const outfit = Outfit({
   subsets: ['latin'],
   variable: '--font-outfit',
   display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
 });
 
 const orbitron = Orbitron({
@@ -22,12 +24,21 @@ const orbitron = Orbitron({
   weight: ['400', '500', '600', '700', '800', '900'],
 });
 
-const rajdhani = Rajdhani({
+const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
-  variable: '--font-rajdhani',
+  variable: '--font-space-grotesk',
   display: 'swap',
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700'],
 });
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover' as const,
+  themeColor: '#020810',
+};
 
 export const metadata: Metadata = {
   title: {
@@ -80,7 +91,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} ${orbitron.variable} ${rajdhani.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${plusJakartaSans.variable} ${outfit.variable} ${orbitron.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
       <body className="antialiased bg-[#040d1a] text-white">
         {/* Aurora Background — global, behind everything */}
         <div className="aurora-bg" aria-hidden="true">

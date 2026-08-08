@@ -89,10 +89,10 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold text-white mb-2">College Address</h3>
                   <p className="text-slate-300 leading-relaxed">
-                    Department of Information Technology<br />
+                    Department of Information Technology, Info Club<br />
                     C. Abdul Hakeem College of Engineering & Technology<br />
-                    Melvisharam, Vellore District<br />
-                    Tamil Nadu - 632 509
+                    Hakeem Nagar, Melvisharam - 632 509<br />
+                    Ranipet District, Tamil Nadu
                   </p>
                 </div>
               </div>

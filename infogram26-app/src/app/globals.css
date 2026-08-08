@@ -45,9 +45,10 @@
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
     --glass-shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 212, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.2);
 
-    /* Fonts */
-    --font-display: var(--font-orbitron), 'Orbitron', monospace;
-    --font-heading: var(--font-rajdhani), 'Rajdhani', sans-serif;
+    /* Premium Futuristic Typography */
+    --font-display: var(--font-orbitron), 'Orbitron', system-ui, sans-serif;
+    --font-heading: var(--font-space-grotesk), var(--font-outfit), 'Space Grotesk', sans-serif;
+    --font-body: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
 
     /* Radii */
     --radius-sm: 10px;
@@ -247,24 +248,23 @@
     rgba(255, 255, 255, 0.04) 40%,
     rgba(0, 212, 255, 0.03) 100%
   );
-  backdrop-filter: saturate(200%) blur(32px) brightness(1.06);
-  -webkit-backdrop-filter: saturate(200%) blur(32px) brightness(1.06);
+  backdrop-filter: saturate(150%) blur(14px);
+  -webkit-backdrop-filter: saturate(150%) blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-top: 1px solid rgba(255, 255, 255, 0.26);
   border-left: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow:
-    0 8px 40px rgba(0, 0, 0, 0.5),
-    0 2px 6px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+    0 8px 30px rgba(0, 0, 0, 0.4),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
   border-radius: 22px;
   transition:
-    transform 0.45s var(--spring),
-    box-shadow 0.35s var(--ease-smooth),
+    transform 0.3s var(--ease-smooth),
+    box-shadow 0.3s var(--ease-smooth),
     background 0.3s var(--ease-smooth),
     border-color 0.3s var(--ease-smooth);
-  will-change: transform;
-  transform: translateZ(0);
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
   position: relative;
   overflow: hidden;
 }
@@ -546,28 +546,28 @@
   content: '';
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.15;
-  will-change: transform;
-  transform: translateZ(0);
+  filter: blur(40px);
+  opacity: 0.12;
+  transform: translate3d(0,0,0);
+  backface-visibility: hidden;
 }
 
 .aurora-bg::before {
-  width: 70vw;
-  height: 70vw;
+  width: 60vw;
+  height: 60vw;
   background: radial-gradient(circle, #00d4ff 0%, transparent 70%);
   top: -20%;
   right: -20%;
-  animation: aurora-1 20s ease-in-out infinite;
+  animation: aurora-1 25s ease-in-out infinite;
 }
 
 .aurora-bg::after {
-  width: 60vw;
-  height: 60vw;
+  width: 50vw;
+  height: 50vw;
   background: radial-gradient(circle, #0a3d6b 0%, transparent 70%);
   bottom: -20%;
   left: -15%;
-  animation: aurora-2 25s ease-in-out infinite;
+  animation: aurora-2 30s ease-in-out infinite;
 }
 
 @media (max-width: 640px) {

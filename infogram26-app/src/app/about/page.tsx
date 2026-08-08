@@ -121,14 +121,13 @@ export default function AboutPage() {
                   <h2 className="text-xl sm:text-2xl font-bold">About the College</h2>
                 </div>
                 <p className="text-white/70 leading-relaxed mb-3 text-sm sm:text-base">
-                  C. Abdul Hakeem College of Engineering & Technology (CAHCET) is a private engineering college
+                  C. Abdul Hakeem College of Engineering & Technology (CAHCET) is a premier engineering institution
                   located in Hakeem Nagar, Melvisharam, Ranipet District, Tamil Nadu. Established in{' '}
                   <strong className="text-white">1998</strong> by the{' '}
                   <strong className="text-white">Melvisharam Muslim Educational Society (MMES)</strong>.
                 </p>
                 <p className="text-white/70 leading-relaxed mb-5 text-sm sm:text-base">
-                  Affiliated with <strong className="text-white">Anna University, Chennai</strong> and approved
-                  by <strong className="text-white">AICTE</strong>. Motto:{' '}
+                  Affiliated to <strong className="text-white">Anna University</strong>, Approved by <strong className="text-white">AICTE</strong>, Listed in <strong className="text-white">2(F) & 12(B)</strong> Sections of UGC, certified by <strong className="text-white">TÜV SÜD ISO 21001</strong>, and recognized by <strong className="text-white">Institution&apos;s Innovation Council</strong>. Motto:{' '}
                   <em className="text-sky-400 font-semibold">&quot;Enter to Learn, Leave to Serve.&quot;</em>
                 </p>
                 <div className="space-y-2 text-xs sm:text-sm">
@@ -303,10 +302,13 @@ export default function AboutPage() {
             <h2 className="text-2xl sm:text-3xl md:text-5xl font-black gradient-text mb-4 mt-1">
               About INFOGRAM&apos;26
             </h2>
+            <p className="text-xs uppercase tracking-[0.25em] text-[#00d4ff] font-bold mb-4">
+              &quot;WHERE INNOVATION EARNS RECOGNITION&quot;
+            </p>
             <p className="text-sm sm:text-lg text-white/70 leading-relaxed">
               INFOGRAM&apos;26 is the annual{' '}
-              <strong className="text-white">National Level Technical Symposium</strong> organized by the
-              Department of Information Technology, CAHCET. This prestigious event brings together brilliant
+              <strong className="text-white">National Level Technical Symposium</strong> hosted by the
+              Department of Information Technology and Info Club at C. Abdul Hakeem College of Engineering & Technology (CAHCET). On <strong className="text-white">August 22, 2026</strong>, this prestigious event brings together brilliant
               minds from engineering colleges across the nation to compete, collaborate, and celebrate
               technological innovation — blending technical brilliance with creative expression.
             </p>

@@ -82,14 +82,11 @@ export default function HeroSection() {
           : 1 - (p.life - 20) / (p.maxLife - 20);
         ctx.globalAlpha = alpha * 0.9;
         ctx.fillStyle = p.gold ? '#ffd700' : '#00d4ff';
-        ctx.shadowBlur = 6;
-        ctx.shadowColor = p.gold ? '#ffd700' : '#00d4ff';
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
       frameId = requestAnimationFrame(loop);
     };
     loop();
@@ -203,17 +200,9 @@ export default function HeroSection() {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              textShadow: 'none',
+              textShadow: '0 0 30px rgba(0,212,255,0.4)',
               transform: 'translateZ(0)',      /* GPU layer */
             }}
-            animate={{
-              filter: [
-                'drop-shadow(0 0 12px rgba(0,212,255,0.5))',
-                'drop-shadow(0 0 28px rgba(0,212,255,0.9))',
-                'drop-shadow(0 0 12px rgba(0,212,255,0.5))',
-              ],
-            }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
           >
             INFOGRAM
           </motion.h1>

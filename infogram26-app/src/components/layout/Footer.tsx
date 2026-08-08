@@ -33,14 +33,14 @@ const contactPersons = [
   { name: 'Naveeth Khan', phone: '9360257573' },
   { name: 'Farish Sharif', phone: '9487233290' },
   { name: 'Kafil Ahmed', phone: '8940210491' },
-  { name: 'Thameem', phone: '9361900720' },
+  { name: 'MD Thameem', phone: '9361900720' },
 ];
 
 const officials = [
-  { title: 'Chief Patron', names: ['Janab Dr.S.Ziauddeen Ahmed, Chairman', 'Janab V.M.Rizwanullah Saheb, Correspondent'] },
-  { title: 'Patron', names: ['Dr. M. Sasikumar, Principal', 'Dr. A Md. Muzaffar Hussain, Vice Principal'] },
+  { title: 'Chief Patron', names: ['Janab Dr. S. Ziauddeen Ahmed, Chairman', 'Janab V. Mohammed Rizwanullah, Correspondent'] },
+  { title: 'Patron', names: ['Dr. M. Sasikumar, Principal', 'Dr. A. Md Muzaffar Hussain, Vice-Principal'] },
   { title: 'HOD', names: ['Dr. S. Umamaheswari, Prof & Head/IT'] },
-  { title: 'Convenor', names: ['Er.M.Mohamed Rafee, AP/IT', 'Er. I Abdulla, AP/IT'] },
+  { title: 'Convenors', names: ['Mr. M. Mohamed Rafee, AP/IT', 'Mr. I. Abdulla, AP/IT'] },
   { title: 'Student Coordinators', names: ['Final Year IT Students'] },
 ];
 
