@@ -23,7 +23,7 @@ const demoEvents: Event[] = [
       'Topics: Quantum Computing, Generative AI, Cybersecurity, or any IT domain topic.'
     ],
     venue: 'IT Block, Seminar Hall', date: '2026-08-22', startTime: '09:30', endTime: '12:30',
-    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 50, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Mohammed Dhaniyal & Masood Nawaz', organizerName: 'IT Association', contactNumber: '7010155779, 9944410994',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -36,7 +36,7 @@ const demoEvents: Event[] = [
       'Time limit: 6 minutes per team to present.'
     ],
     venue: 'IT Lab 1', date: '2026-08-22', startTime: '10:00', endTime: '12:00',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 100, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Amirtha Varshini & Keerthana', organizerName: 'IT Association', contactNumber: '9597010159, 9629909942',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -50,7 +50,7 @@ const demoEvents: Event[] = [
       'Computers will be provided.'
     ],
     venue: 'IT Lab 2', date: '2026-08-22', startTime: '09:00', endTime: '16:00',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 40, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Mohammed Irfan & Thoufeeque Ahmed', organizerName: 'IT Association', contactNumber: '9042469482, 9150654995',
     bannerUrl: '/events/codestorm.jpeg',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
@@ -64,7 +64,7 @@ const demoEvents: Event[] = [
       'Topics will be given on the spot.'
     ],
     venue: 'IT Lab 3', date: '2026-08-22', startTime: '13:00', endTime: '15:30',
-    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 50, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Mathin S & Manikandan T', organizerName: 'IT Association', contactNumber: '6381880659, 8825940089',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -78,7 +78,7 @@ const demoEvents: Event[] = [
       'Bring a laptop with Git, GitHub access, and required coding tools.'
     ],
     venue: 'IT Lab 4', date: '2026-08-22', startTime: '11:00', endTime: '14:00',
-    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 30, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Saheem & Zahid', organizerName: 'IT Association', contactNumber: '9489016294, 7639412328',
     bannerUrl: '/events/open-source.jpeg',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
@@ -92,7 +92,7 @@ const demoEvents: Event[] = [
       'Use of AI and extra gadgets is strictly prohibited.'
     ],
     venue: 'IT Lab 5', date: '2026-08-22', startTime: '10:00', endTime: '12:00',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 100, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Ezhilarasan & Dinesh Babu', organizerName: 'IT Association', contactNumber: '9080249831, 6374468780',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -106,7 +106,7 @@ const demoEvents: Event[] = [
       'Round 2: 1-minute final pitch.'
     ],
     venue: 'IT Lab 6', date: '2026-08-22', startTime: '14:00', endTime: '15:30',
-    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 60, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 100, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Kashif', organizerName: 'IT Association', contactNumber: '6380028607',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -119,7 +119,7 @@ const demoEvents: Event[] = [
       'Answer non-technical questions/hints by connecting images displayed on screen.'
     ],
     venue: 'Mini Auditorium', date: '2026-08-22', startTime: '10:00', endTime: '12:00',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 80, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Naushin & Hema Malini', organizerName: 'IT Association', contactNumber: '7358170392, 7418575021',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -132,7 +132,7 @@ const demoEvents: Event[] = [
       'Judging criteria: Food taste, presentation, cleanliness of area, and number of dishes prepared.'
     ],
     venue: 'College Courtyard', date: '2026-08-22', startTime: '11:00', endTime: '12:30',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 40, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Jeevitha & Poorna Sree', organizerName: 'IT Association', contactNumber: '9384505002, 9600889789',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -146,7 +146,7 @@ const demoEvents: Event[] = [
       'First team to locate the treasure wins.'
     ],
     venue: 'Main Campus Grounds', date: '2026-08-22', startTime: '13:30', endTime: '15:30',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 40, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Shyam Sundar & Maithreyan', organizerName: 'IT Association', contactNumber: '9345837870, 9342706675',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -161,7 +161,7 @@ const demoEvents: Event[] = [
       'Winners (1st and 2nd) selected based on Booyah, Chicken Dinner, and Runner-up standings.'
     ],
     venue: 'Seminar Hall 2', date: '2026-08-22', startTime: '09:30', endTime: '16:00',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 120, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Meshak & Sanjay V', organizerName: 'IT Association', contactNumber: '6383598812, 6382143386',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -174,7 +174,7 @@ const demoEvents: Event[] = [
       'Only mobile photos taken inside the college campus matching the theme are accepted.'
     ],
     venue: 'Campus Wide', date: '2026-08-22', startTime: '09:00', endTime: '15:30',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 50, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Jeysha & Siddharth', organizerName: 'IT Association', contactNumber: '9345110882, 8925441089',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -186,7 +186,7 @@ const demoEvents: Event[] = [
       'Spot entry mini-games and challenges throughout the day.'
     ],
     venue: 'Main Lawn', date: '2026-08-22', startTime: '09:30', endTime: '16:00',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 300, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Jaffreen & Talha', organizerName: 'IT Association', contactNumber: '9344814392, 8610117244',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -199,7 +199,7 @@ const demoEvents: Event[] = [
       'Phones and reference materials are strictly prohibited.'
     ],
     venue: 'Drawing Hall', date: '2026-08-22', startTime: '10:00', endTime: '12:00',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 40, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Haniya Nikhat & Harshitha', organizerName: 'IT Association', contactNumber: '8248478615, 9629136470',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -212,7 +212,7 @@ const demoEvents: Event[] = [
       'Dancing and heavy acts are not permitted.'
     ],
     venue: 'Mini Auditorium', date: '2026-08-22', startTime: '13:00', endTime: '15:00',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 30, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Garnet & Heena', organizerName: 'IT Association', contactNumber: '6374139336, 8072672922',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
@@ -225,7 +225,7 @@ const demoEvents: Event[] = [
       'Only videos shot on mobile phones inside the college campus matching the topic are permitted.'
     ],
     venue: 'Campus Wide', date: '2026-08-22', startTime: '09:00', endTime: '16:00',
-    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 50, registeredCount: 0,
+    registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
     coordinatorName: 'Naveeth Khan & Faizal Ahmed', organizerName: 'IT Association', contactNumber: '9360257573, 9003710032',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
