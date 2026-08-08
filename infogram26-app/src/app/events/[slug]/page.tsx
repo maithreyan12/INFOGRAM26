@@ -246,14 +246,16 @@ export default function EventDetailPage() {
         const normSlug = rawSlug ? rawSlug.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
         
         // 1. Always resolve base event from official demoEvents list to guarantee 100% brochure accuracy
-        let localEvent = demoEvents.find(
-          e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug || e.id === rawSlug
-        );
+        let localEvent = demoEvents.find(e => {
+          const eNorm = e.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+          return eNorm === normSlug || e.id === rawSlug;
+        });
 
         if (!localEvent) {
-          localEvent = storeEvents.find(
-            e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug || e.id === rawSlug
-          );
+          localEvent = storeEvents.find(e => {
+            const eNorm = e.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+            return eNorm === normSlug || e.id === rawSlug;
+          });
         }
 
         let resultEvent = localEvent ? { ...localEvent } : null;
@@ -266,22 +268,28 @@ export default function EventDetailPage() {
             if (!snapshot.empty) {
               const firestoreMatch = snapshot.docs.find(doc => {
                 const data = doc.data();
-                const dNorm = (data.slug || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                const dNorm = (data.slug || doc.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
                 return dNorm === normSlug || doc.id === rawSlug || doc.id === localEvent?.id;
               });
 
               if (firestoreMatch) {
                 const dbData = firestoreMatch.data() as Event;
-                if (resultEvent) {
+                const dbSlugNorm = (dbData.slug || firestoreMatch.id).toLowerCase().replace(/[^a-z0-9]/g, '');
+                
+                // Always map to official brochure definition from demoEvents
+                const brochureMatch = demoEvents.find(e => {
+                  const eNorm = e.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+                  return eNorm === dbSlugNorm || eNorm === normSlug || e.id === firestoreMatch.id;
+                }) || localEvent;
+
+                if (brochureMatch) {
                   resultEvent = {
-                    ...resultEvent,
+                    ...brochureMatch,
                     id: firestoreMatch.id,
-                    registeredCount: dbData.registeredCount ?? resultEvent.registeredCount,
-                    bannerUrl: dbData.bannerUrl || resultEvent.bannerUrl,
-                    status: dbData.status || resultEvent.status,
+                    registeredCount: dbData.registeredCount ?? brochureMatch.registeredCount,
+                    bannerUrl: dbData.bannerUrl || brochureMatch.bannerUrl,
+                    status: dbData.status || brochureMatch.status,
                   };
-                } else {
-                  resultEvent = { ...dbData, id: firestoreMatch.id };
                 }
               }
             }
