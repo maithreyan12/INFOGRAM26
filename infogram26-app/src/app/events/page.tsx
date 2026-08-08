@@ -252,14 +252,25 @@ export default function EventsPage() {
         if (snapshot.empty) {
           setEvents(initialList);
         } else {
-          const eventsData = snapshot.docs.map(doc => {
-            const data = doc.data() as Event;
-            const demoMatch = initialList.find(e => e.slug === data.slug);
-            return { 
-              ...data,
-              id: doc.id, 
-              bannerUrl: data.bannerUrl || demoMatch?.bannerUrl
-            };
+          const eventsData = initialList.map(localEv => {
+            const normLocalSlug = localEv.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const firestoreMatch = snapshot.docs.find(doc => {
+              const d = doc.data();
+              const dNorm = (d.slug || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+              return dNorm === normLocalSlug || doc.id === localEv.id;
+            });
+
+            if (firestoreMatch) {
+              const dbData = firestoreMatch.data() as Event;
+              return {
+                ...localEv,
+                id: firestoreMatch.id,
+                registeredCount: dbData.registeredCount ?? localEv.registeredCount,
+                bannerUrl: dbData.bannerUrl || localEv.bannerUrl,
+                status: dbData.status || localEv.status,
+              };
+            }
+            return localEv;
           });
           setEvents(eventsData);
         }

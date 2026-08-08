@@ -245,33 +245,52 @@ export default function EventDetailPage() {
       try {
         const normSlug = rawSlug ? rawSlug.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
         
-        // 1. First check Zustand store
-        let foundEvent = storeEvents.find(
+        // 1. Find official local brochure event
+        let localEvent = storeEvents.find(
           e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug || e.id === rawSlug
         );
 
-        if (!foundEvent) {
-          foundEvent = demoEvents.find(
+        if (!localEvent) {
+          localEvent = demoEvents.find(
             e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normSlug || e.id === rawSlug
           );
         }
 
-        // 2. Check Firebase if configured
+        let resultEvent = localEvent ? { ...localEvent } : null;
+
+        // 2. Check Firebase if configured for live metrics
         if (db) {
-          const eventsRef = collection(db, 'events');
-          const q = query(eventsRef, where('slug', '==', rawSlug));
-          const snapshot = await getDocs(q);
-          if (!snapshot.empty) {
-            const data = snapshot.docs[0].data() as Event;
-            foundEvent = {
-              ...data,
-              id: snapshot.docs[0].id,
-              bannerUrl: data.bannerUrl || foundEvent?.bannerUrl
-            };
+          try {
+            const eventsRef = collection(db, 'events');
+            const snapshot = await getDocs(eventsRef);
+            if (!snapshot.empty) {
+              const firestoreMatch = snapshot.docs.find(doc => {
+                const data = doc.data();
+                const dNorm = (data.slug || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                return dNorm === normSlug || doc.id === rawSlug || doc.id === localEvent?.id;
+              });
+
+              if (firestoreMatch) {
+                const dbData = firestoreMatch.data() as Event;
+                if (resultEvent) {
+                  resultEvent = {
+                    ...resultEvent,
+                    id: firestoreMatch.id,
+                    registeredCount: dbData.registeredCount ?? resultEvent.registeredCount,
+                    bannerUrl: dbData.bannerUrl || resultEvent.bannerUrl,
+                    status: dbData.status || resultEvent.status,
+                  };
+                } else {
+                  resultEvent = { ...dbData, id: firestoreMatch.id };
+                }
+              }
+            }
+          } catch (err) {
+            console.error("Firestore error:", err);
           }
         }
 
-        setEvent(foundEvent || null);
+        setEvent(resultEvent);
       } catch (error) {
         console.error("Error fetching event:", error);
         const normSlug = rawSlug ? rawSlug.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
