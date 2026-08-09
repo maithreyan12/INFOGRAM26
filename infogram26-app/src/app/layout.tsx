@@ -111,19 +111,19 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="shortcut icon" href="/favicon.ico" />
       </head>
-      <body className="antialiased bg-[#07080e] text-white">
+      <body className="antialiased bg-[#f8fafc] text-slate-900">
         {/* Aurora Background — global, behind everything */}
         <div className="aurora-bg" aria-hidden="true">
           <div
             className="absolute rounded-full aurora-blob-1"
             style={{
-              width: '70vw',
-              height: '70vw',
-              background: 'radial-gradient(circle, #a855f7 0%, transparent 70%)',
-              top: '-20%',
-              right: '-20%',
+              width: '75vw',
+              height: '75vw',
+              background: 'radial-gradient(circle, rgba(244,114,182,0.22) 0%, rgba(192,132,252,0.18) 50%, transparent 70%)',
+              top: '-15%',
+              left: '-15%',
               filter: 'blur(90px)',
-              opacity: 0.14,
+              opacity: 0.85,
               willChange: 'transform',
               transform: 'translateZ(0)',
             }}
@@ -131,13 +131,13 @@ export default function RootLayout({
           <div
             className="absolute rounded-full aurora-blob-2"
             style={{
-              width: '60vw',
-              height: '60vw',
-              background: 'radial-gradient(circle, #10b981 0%, transparent 70%)',
-              bottom: '-20%',
-              left: '-15%',
+              width: '70vw',
+              height: '70vw',
+              background: 'radial-gradient(circle, rgba(56,189,248,0.25) 0%, rgba(52,211,153,0.20) 50%, transparent 70%)',
+              bottom: '-15%',
+              right: '-15%',
               filter: 'blur(90px)',
-              opacity: 0.12,
+              opacity: 0.8,
               willChange: 'transform',
               transform: 'translateZ(0)',
             }}

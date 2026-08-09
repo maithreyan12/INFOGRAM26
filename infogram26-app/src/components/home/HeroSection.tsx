@@ -246,9 +246,10 @@ export default function HeroSection() {
         <motion.p {...stagger(2)} style={{
           fontFamily: 'var(--font-heading)',
           fontSize: 'clamp(0.58rem, 2.8vw, 0.85rem)',
-          color: 'rgba(255,255,255,0.6)',
+          color: '#475569',
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
+          fontWeight: 700,
           marginTop: 8, marginBottom: 4,
         }}>
           Where Innovation Earns Recognition
@@ -256,15 +257,15 @@ export default function HeroSection() {
 
         {/* Date */}
         <motion.div {...stagger(3)} className="flex items-center gap-2" style={{ marginBottom: 10 }}>
-          <div style={{ height: 1, width: 24, background: 'linear-gradient(90deg,transparent,rgba(255,215,0,0.8))' }} />
+          <div style={{ height: 1.5, width: 24, background: 'linear-gradient(90deg,transparent,#d97706)' }} />
           <motion.span
-            style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(0.85rem, 4.2vw, 1.3rem)', fontWeight: 900, color: '#ffd700', letterSpacing: '0.06em' }}
-            animate={{ opacity: [0.75, 1, 0.75] }}
+            style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(0.85rem, 4.2vw, 1.3rem)', fontWeight: 900, color: '#d97706', letterSpacing: '0.06em' }}
+            animate={{ opacity: [0.8, 1, 0.8] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
             22nd August 2026
           </motion.span>
-          <div style={{ height: 1, width: 24, background: 'linear-gradient(90deg,rgba(255,215,0,0.8),transparent)' }} />
+          <div style={{ height: 1.5, width: 24, background: 'linear-gradient(90deg,#d97706,transparent)' }} />
         </motion.div>
 
         {/* ══ COUNTDOWN ══ */}
@@ -273,23 +274,22 @@ export default function HeroSection() {
           style={{ width: '100%', maxWidth: 340, marginBottom: 10 }}
         >
           <div style={{
-            background: 'linear-gradient(135deg,rgba(0,212,255,0.07),rgba(0,0,0,0.55))',
-            border: '1px solid rgba(0,212,255,0.28)',
-            borderTop: '1px solid rgba(0,212,255,0.55)',
-            borderRadius: 14,
+            background: 'rgba(255,255,255,0.75)',
+            border: '1px solid rgba(255,255,255,0.95)',
+            borderRadius: 18,
             padding: '10px 8px',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             position: 'relative',
-            boxShadow: '0 6px 30px rgba(0,0,0,0.4)',
+            boxShadow: '0 8px 30px rgba(15,23,42,0.06)',
             transform: 'translateZ(0)',
           }}>
             {/* Corner marks */}
             {[
-              { top: 5, left: 5, borderTop: '1.5px solid #00d4ff', borderLeft: '1.5px solid #00d4ff' },
-              { top: 5, right: 5, borderTop: '1.5px solid #00d4ff', borderRight: '1.5px solid #00d4ff' },
-              { bottom: 5, left: 5, borderBottom: '1.5px solid #ffd700', borderLeft: '1.5px solid #ffd700' },
-              { bottom: 5, right: 5, borderBottom: '1.5px solid #ffd700', borderRight: '1.5px solid #ffd700' },
+              { top: 5, left: 5, borderTop: '1.5px solid #7c3aed', borderLeft: '1.5px solid #7c3aed' },
+              { top: 5, right: 5, borderTop: '1.5px solid #7c3aed', borderRight: '1.5px solid #7c3aed' },
+              { bottom: 5, left: 5, borderBottom: '1.5px solid #d97706', borderLeft: '1.5px solid #d97706' },
+              { bottom: 5, right: 5, borderBottom: '1.5px solid #d97706', borderRight: '1.5px solid #d97706' },
             ].map((s, i) => <div key={i} className="absolute" style={{ ...s, width: 10, height: 10 }} />)}
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
@@ -310,34 +310,26 @@ export default function HeroSection() {
                         transition={{ duration: 0.2, ease: 'easeOut' }}
                         style={{
                           fontFamily: 'var(--font-display)',
-                          fontSize: 'clamp(1.2rem, 6vw, 2rem)',
+                          fontSize: 'clamp(1.15rem, 5vw, 1.6rem)',
                           fontWeight: 900,
-                          color: '#00d4ff',
-                          textShadow: '0 0 20px rgba(0,212,255,0.7)',
+                          color: '#0f172a',
                           lineHeight: 1,
-                          display: 'block',
-                          transform: 'translateZ(0)',
                         }}
                       >
                         {String(v).padStart(2, '0')}
                       </motion.span>
                     </AnimatePresence>
-                    <span style={{ fontFamily: 'var(--font-heading)', fontSize: 8, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em', textTransform: 'uppercase', marginTop: 3 }}>
+                    <span style={{ fontFamily: 'var(--font-heading)', fontSize: 9, color: '#64748b', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 3, fontWeight: 700 }}>
                       {l}
                     </span>
                   </div>
-                  {i < 3 && (
-                    <motion.span
-                      style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'rgba(0,212,255,0.4)', marginBottom: 10, marginLeft: 1, marginRight: 1, display: 'block' }}
-                      animate={{ opacity: [1, 0.15, 1] }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    >:</motion.span>
-                  )}
+                  {i < 3 && <span style={{ color: '#94a3b8', fontSize: 14, fontWeight: 700, margin: '0 2px', opacity: 0.6 }}>:</span>}
                 </div>
               ))}
             </div>
           </div>
         </motion.div>
+
 
         {/* ══ CTA BUTTONS ══ */}
         <motion.div
