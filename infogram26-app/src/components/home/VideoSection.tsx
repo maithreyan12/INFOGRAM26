@@ -102,18 +102,7 @@ export default function VideoSection() {
             transform: 'translate3d(0,0,0)',
           }}
         >
-          {/* Top Mac Bar */}
-          <div className="flex items-center justify-between px-4 py-3 bg-[#0a1b2d] border-b border-white/10 select-none">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-[#ff5f56] inline-block shadow-sm" />
-              <span className="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block shadow-sm" />
-              <span className="w-3 h-3 rounded-full bg-[#27c93f] inline-block shadow-sm" />
-            </div>
-            <div className="text-xs font-semibold tracking-wider text-white/60 font-mono uppercase">
-              INFOGRAM &apos;26
-            </div>
-            <div className="w-12" />
-          </div>
+
 
           {/* Video Container — Edge-to-Edge inside Mac Shell, zero black gaps */}
           <div className="relative w-full aspect-video bg-black overflow-hidden group">
