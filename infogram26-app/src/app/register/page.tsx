@@ -188,17 +188,14 @@ export default function RegisterPage() {
               ⚡ Registration Open
             </div>
             <h1
-              className="text-3xl sm:text-5xl font-black tracking-tight uppercase leading-none mb-3"
+              className={`text-3xl sm:text-5xl font-black tracking-tight uppercase leading-none mb-3 ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}
               style={{
                 fontFamily: 'var(--font-display)',
-                background: isDark
-                  ? 'linear-gradient(180deg, #ffffff 0%, #c084fc 50%, #38bdf8 100%)'
-                  : 'linear-gradient(180deg, #0f172a 0%, #6d28d9 55%, #059669 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                color: 'transparent',
-                display: 'inline-block',
+                textShadow: isDark 
+                  ? '0 0 20px rgba(192, 132, 252, 0.5)' 
+                  : '0 2px 8px rgba(15, 23, 42, 0.1)',
               }}
             >
               INFOGRAM&apos;26

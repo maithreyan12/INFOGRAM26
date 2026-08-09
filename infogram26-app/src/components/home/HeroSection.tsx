@@ -255,24 +255,15 @@ export default function HeroSection() {
             }}
           >
             <span
-              style={
-                isDark
-                  ? {
-                      background: 'linear-gradient(180deg, #ffffff 0%, #c084fc 50%, #38bdf8 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      color: 'transparent',
-                      display: 'inline-block',
-                      filter: 'drop-shadow(0 8px 30px rgba(192,132,252,0.35))',
-                    }
-                  : {
-                      color: '#0f172a',
-                      WebkitTextFillColor: '#0f172a',
-                      display: 'inline-block',
-                      filter: 'drop-shadow(0 2px 10px rgba(15,23,42,0.1))',
-                    }
-              }
+              className={`font-black tracking-tight leading-none ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}
+              style={{
+                color: isDark ? '#ffffff' : '#0f172a',
+                textShadow: isDark 
+                  ? '0 0 25px rgba(192, 132, 252, 0.6), 0 0 50px rgba(56, 189, 248, 0.3)' 
+                  : '0 2px 10px rgba(15, 23, 42, 0.12)',
+              }}
             >
               INFOGRAM
             </span>
@@ -294,12 +285,10 @@ export default function HeroSection() {
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 'clamp(2.5rem, 12vw, 8rem)',
-                color: isDark ? undefined : '#d97706',
-                WebkitTextFillColor: isDark ? 'transparent' : '#d97706',
-                background: isDark ? 'linear-gradient(180deg, #fef08a 0%, #f59e0b 50%, #b45309 100%)' : 'none',
-                WebkitBackgroundClip: isDark ? 'text' : undefined,
-                backgroundClip: isDark ? 'text' : undefined,
-                filter: isDark ? 'drop-shadow(0 0 16px rgba(245,158,11,0.55))' : 'drop-shadow(0 2px 8px rgba(217,119,6,0.25))',
+                color: isDark ? '#fcd34d' : '#d97706',
+                textShadow: isDark 
+                  ? '0 0 20px rgba(245, 158, 11, 0.7), 0 0 40px rgba(234, 179, 8, 0.4)' 
+                  : '0 2px 8px rgba(217, 119, 6, 0.3)',
               }}
             >
               &apos;26
