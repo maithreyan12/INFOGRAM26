@@ -202,54 +202,66 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* College Address — Dual Maps Navigation Card (Google Maps for Android + Apple Maps for iOS) */}
-              <div className={`p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 rounded-3xl border shadow-xl ${
+              {/* College Address — Spacious 2-Row Card with Perfect Maps Alignment */}
+              <div className={`p-6 sm:p-7 rounded-3xl border shadow-xl ${
                 isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
               }`}>
-                <div className="flex items-start gap-4">
+                {/* Header */}
+                <div className="flex items-center gap-3.5 mb-3">
                   <div className="w-11 h-11 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center shrink-0">
                     <Building className="w-5 h-5 text-red-500" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className={`font-black text-base ${isDark ? 'text-white' : 'text-slate-950'}`}>College Address</h3>
+                      <h3 className={`font-black text-lg ${isDark ? 'text-white' : 'text-slate-950'}`}>College Address</h3>
                       <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30 inline-flex items-center gap-1">
                         <Compass className="w-3 h-3 text-blue-400" /> Campus Navigation
                       </span>
                     </div>
-                    <p className={`font-bold text-xs sm:text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                      Department of Information Technology, Info Club<br />
-                      C. Abdul Hakeem College of Engineering &amp; Technology<br />
-                      Hakeem Nagar, Melvisharam – 632 509, Ranipet District, Tamil Nadu
-                    </p>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2.5 shrink-0 w-full sm:w-auto">
+                {/* Full-Width Spacious Address Text */}
+                <div className={`p-4 rounded-2xl border mb-5 ${
+                  isDark ? 'bg-slate-950/60 border-slate-800/80 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
+                }`}>
+                  <p className="font-black text-sm sm:text-base text-purple-400 mb-0.5">
+                    Department of Information Technology, Info Club
+                  </p>
+                  <p className={`font-black text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-950'}`}>
+                    C. Abdul Hakeem College of Engineering &amp; Technology
+                  </p>
+                  <p className="font-bold text-xs sm:text-sm text-slate-400 mt-1">
+                    Hakeem Nagar, Melvisharam – 632 509, Ranipet District, Tamil Nadu
+                  </p>
+                </div>
+
+                {/* Equal Aligned Maps Action Buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <a
                     href="https://www.google.com/maps/place/C.+Abdul+Hakeem+College+of+Engineering+%26+Technology,+Melvisharam,+Ranipet,+Tamil+Nadu+632509/data=!4m2!3m1!1s0x3bad35d34059d16f:0xb443fab6e00b313f"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 shadow-md transition-all active:scale-95 whitespace-nowrap group"
+                    className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-2xl font-black text-xs uppercase tracking-wider bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/20 transition-all active:scale-95 group"
                   >
                     <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335" />
-                      <circle cx="12" cy="9" r="2.5" fill="#FFFFFF" />
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#FFFFFF" />
+                      <circle cx="12" cy="9" r="2.5" fill="#EA4335" />
                     </svg>
                     <span>Google Maps</span>
-                    <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity" />
+                    <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
                   </a>
                   <a
                     href="https://maps.apple.com/p/~nwAp4fu74pyaQ"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-slate-950 hover:bg-slate-900 text-white border border-slate-800 shadow-md transition-all active:scale-95 whitespace-nowrap group"
+                    className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-2xl font-black text-xs uppercase tracking-wider bg-slate-950 hover:bg-slate-900 text-white border border-slate-700 shadow-lg transition-all active:scale-95 group"
                   >
                     <svg className="w-4 h-4 shrink-0 fill-current text-white" viewBox="0 0 24 24">
                       <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.32c.67-.82 1.13-1.96.99-3.1-.97.04-2.17.65-2.86 1.45-.61.71-1.15 1.87-.99 2.99 1.09.08 2.22-.53 2.86-1.34z" />
                     </svg>
                     <span>Apple Maps</span>
-                    <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity" />
+                    <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
                   </a>
                 </div>
               </div>
