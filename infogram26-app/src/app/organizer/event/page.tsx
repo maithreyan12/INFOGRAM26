@@ -19,6 +19,8 @@ export default function EventEditorPage() {
   const [venue, setVenue] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [coordinatorName, setCoordinatorName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   useEffect(() => {
@@ -28,6 +30,8 @@ export default function EventEditorPage() {
       setVenue(event.venue || '');
       setStartTime(event.startTime || '09:00');
       setEndTime(event.endTime || '17:00');
+      setCoordinatorName(event.coordinatorName || '');
+      setContactNumber(event.contactNumber || '');
     }
   }, [event]);
 
@@ -41,6 +45,8 @@ export default function EventEditorPage() {
       venue,
       startTime,
       endTime,
+      coordinatorName,
+      contactNumber,
     });
 
     setSavedSuccess(true);
@@ -78,6 +84,28 @@ export default function EventEditorPage() {
           <div className="glass-card bg-white/5 border border-white/10 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Basic Info</h2>
             <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Student Coordinators</label>
+                  <input 
+                    type="text" 
+                    value={coordinatorName} 
+                    onChange={(e) => setCoordinatorName(e.target.value)} 
+                    className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none text-sm" 
+                    placeholder="e.g. Mohammed Dhaniyal & Masood Nawaz"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Contact Numbers (Comma-separated)</label>
+                  <input 
+                    type="text" 
+                    value={contactNumber} 
+                    onChange={(e) => setContactNumber(e.target.value)} 
+                    className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none text-sm" 
+                    placeholder="e.g. 7010155779, 9944410994"
+                  />
+                </div>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Event Description</label>
                 <textarea 

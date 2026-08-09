@@ -21,7 +21,10 @@ export default function EventsPage() {
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [registrationFee, setRegistrationFee] = useState<number>(0);
-  const [maxParticipants, setMaxParticipants] = useState<number>(100);
+  const [maxParticipants, setMaxParticipants] = useState<number>(200);
+  const [coordinatorName, setCoordinatorName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
+  const [rules, setRules] = useState('');
   const [organizerUid, setOrganizerUid] = useState('');
 
   const openCreateModal = () => {
@@ -30,11 +33,14 @@ export default function EventsPage() {
     setCategory('technical');
     setDescription('');
     setVenue('');
-    setDate('');
+    setDate('2026-08-22');
     setStartTime('09:00');
     setEndTime('17:00');
-    setRegistrationFee(0);
-    setMaxParticipants(100);
+    setRegistrationFee(50);
+    setMaxParticipants(200);
+    setCoordinatorName('');
+    setContactNumber('');
+    setRules('');
     setOrganizerUid(organizers[0]?.uid || '');
     setShowModal(true);
   };
@@ -50,6 +56,9 @@ export default function EventsPage() {
     setEndTime(evt.endTime);
     setRegistrationFee(evt.registrationFee);
     setMaxParticipants(evt.maxParticipants);
+    setCoordinatorName(evt.coordinatorName || '');
+    setContactNumber(evt.contactNumber || '');
+    setRules(evt.rules?.join('\n') || '');
     setOrganizerUid(evt.organizerUid || '');
     setShowModal(true);
   };
@@ -57,6 +66,7 @@ export default function EventsPage() {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     const assignedOrg = organizers.find((o) => o.uid === organizerUid);
+    const parsedRules = rules.split('\n').filter((r) => r.trim().length > 0);
 
     if (editingEvent) {
       updateEvent(editingEvent.id, {
@@ -69,6 +79,9 @@ export default function EventsPage() {
         endTime,
         registrationFee,
         maxParticipants,
+        coordinatorName,
+        contactNumber,
+        rules: parsedRules.length > 0 ? parsedRules : editingEvent.rules,
         organizerUid,
         organizerName: assignedOrg?.displayName || 'Unassigned',
       });
@@ -78,17 +91,17 @@ export default function EventsPage() {
         name,
         category,
         description,
-        rules: ['Follow symposium conduct policy'],
+        rules: parsedRules.length > 0 ? parsedRules : ['Follow symposium conduct policy'],
         venue: venue || 'IT Block',
-        date: date || '2026-10-15',
+        date: date || '2026-08-22',
         startTime: startTime || '09:00',
         endTime: endTime || '17:00',
-        registrationDeadline: date || '2026-10-12',
+        registrationDeadline: date || '2026-08-20',
         registrationFee,
         maxParticipants,
-        coordinatorName: 'Staff Coordinator',
-        organizerName: assignedOrg?.displayName || 'Unassigned',
-        contactNumber: assignedOrg?.phone || '+91 9876543210',
+        coordinatorName: coordinatorName || 'Student Coordinator',
+        organizerName: assignedOrg?.displayName || 'IT Association',
+        contactNumber: contactNumber || '9360257573',
         status: 'upcoming',
         organizerUid,
         isFeatured: true,
@@ -259,6 +272,27 @@ export default function EventsPage() {
                   </p>
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Student Coordinators</label>
+                  <input 
+                    type="text" 
+                    value={coordinatorName} 
+                    onChange={(e) => setCoordinatorName(e.target.value)} 
+                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500" 
+                    placeholder="e.g. Mohammed Dhaniyal & Masood Nawaz"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Contact Numbers (Comma-separated)</label>
+                  <input 
+                    type="text" 
+                    value={contactNumber} 
+                    onChange={(e) => setContactNumber(e.target.value)} 
+                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500" 
+                    placeholder="e.g. 7010155779, 9944410994"
+                  />
+                </div>
+
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
                   <textarea 
@@ -267,6 +301,16 @@ export default function EventsPage() {
                     onChange={(e) => setDescription(e.target.value)} 
                     className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500" 
                     placeholder="Event objectives and highlights..."
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Rules & Guidelines (One per line)</label>
+                  <textarea 
+                    rows={4} 
+                    value={rules} 
+                    onChange={(e) => setRules(e.target.value)} 
+                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono text-sm" 
+                    placeholder="Rule 1&#10;Rule 2"
                   />
                 </div>
                 <div>
