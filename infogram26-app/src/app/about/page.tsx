@@ -1,49 +1,45 @@
-'use client'
+'use client';
 
 import { motion, Variants } from 'framer-motion';
-import PublicLayout from '@/components/layout/PublicLayout';
-import {
-  Award, BookOpen, Users, Building, Laptop, Target,
-  GraduationCap, MapPin, Phone, Mail, Wifi, Microscope,
-  Trophy, Lightbulb, Globe, CheckCircle2, Star, FlaskConical,
+import { 
+  Building, 
+  GraduationCap, 
+  Award, 
+  BookOpen, 
+  Users, 
+  Laptop, 
+  Target, 
+  Lightbulb, 
+  Trophy, 
+  CheckCircle2, 
+  Globe, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Star,
+  Monitor,
+  Wifi,
+  Home,
+  Bus,
+  Utensils
 } from 'lucide-react';
-
+import PublicLayout from '@/components/layout/PublicLayout';
 import { useTheme } from '@/context/ThemeContext';
-
-const revealVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
-};
-
-const staggerContainer: Variants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
-};
 
 const ugPrograms = [
   'B.E. Computer Science & Engineering',
-  'B.E. Computer Science & Engineering (AI & ML)',
   'B.Tech Information Technology',
-  'B.Tech Artificial Intelligence & Data Science',
   'B.E. Electronics & Communication Engineering',
   'B.E. Electrical & Electronics Engineering',
   'B.E. Mechanical Engineering',
   'B.E. Civil Engineering',
 ];
 
-const pgPrograms = ['MBA', 'MCA'];
-
-const facilities = [
-  { icon: Laptop, label: 'Smart Classrooms' },
-  { icon: FlaskConical, label: 'Modern Laboratories' },
-  { icon: BookOpen, label: 'Central Library' },
-  { icon: Wifi, label: 'Wi-Fi Campus' },
-  { icon: Users, label: "Boys' & Girls' Hostels" },
-  { icon: Globe, label: 'Transport Facilities' },
-  { icon: Trophy, label: 'Sports Grounds' },
-  { icon: Microscope, label: 'Auditorium & Halls' },
-  { icon: Star, label: 'Placement & Training' },
-  { icon: Building, label: 'Cafeteria' },
+const pgPrograms = [
+  'M.E. CAD / CAM',
+  'M.E. Communication Systems',
+  'MBA – Master of Business Administration',
+  'MCA – Master of Computer Applications',
 ];
 
 const studentActivities = [
@@ -56,31 +52,63 @@ const studentActivities = [
   'Entrepreneurship Activities',
 ];
 
-/* ── Reusable section header ── */
+const facilities = [
+  { icon: Monitor, label: 'Smart Classrooms' },
+  { icon: Laptop, label: 'Modern Laboratories' },
+  { icon: BookOpen, label: 'Central Library' },
+  { icon: Wifi, label: 'Wi-Fi Campus' },
+  { icon: Home, label: "Boys' & Girls' Hostels" },
+  { icon: Bus, label: 'Transport Facilities' },
+  { icon: Trophy, label: 'Sports Grounds' },
+  { icon: Building, label: 'Auditorium & Halls' },
+  { icon: Award, label: 'Placement & Training' },
+  { icon: Utensils, label: 'Cafeteria' },
+];
+
+const revealVariants: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] } },
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
 function SectionBadge({ label }: { label: string }) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   return (
-    <span className={`inline-block mb-3 px-4 py-1 rounded-full text-xs tracking-widest uppercase font-bold border ${
-      isDark ? 'bg-purple-500/10 border-purple-500/30 text-amber-300' : 'bg-sky-400/10 border-sky-400/20 text-sky-600'
-    }`}>
+    <span
+      className={`inline-block mb-3 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.16em] border ${
+        isDark ? 'bg-purple-500/10 border-purple-500/30 text-amber-300' : 'bg-[#7c3aed]/10 border-[#7c3aed]/25 text-[#7c3aed]'
+      }`}
+      style={{ fontFamily: 'var(--font-heading)' }}
+    >
       {label}
     </span>
   );
 }
 
-/* ── Card header row: icon + title ── */
-function CardHeader({ icon: Icon, title, color = 'text-[#7c3aed]', bg = 'bg-[#7c3aed]/10' }: { icon: any; title: string; color?: string; bg?: string }) {
+function CardHeader({
+  icon: Icon,
+  title,
+  color = 'text-[#7c3aed]',
+  bg = 'bg-[#7c3aed]/10',
+}: {
+  icon: React.ElementType;
+  title: string;
+  color?: string;
+  bg?: string;
+}) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   return (
     <div className="flex items-center gap-3 mb-4">
-      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-        isDark ? 'bg-purple-500/20 text-amber-300' : bg
-      }`}>
-        <Icon className={`w-4 h-4 ${isDark ? 'text-amber-300' : color}`} />
+      <div className={`w-9 h-9 rounded-2xl ${bg} flex items-center justify-center shrink-0`}>
+        <Icon className={`w-5 h-5 ${color}`} />
       </div>
-      <h3 className={`text-base sm:text-lg font-bold leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{title}</h3>
+      <h3 className={`text-base sm:text-xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>{title}</h3>
     </div>
   );
 }
@@ -91,32 +119,23 @@ export default function AboutPage() {
 
   return (
     <PublicLayout>
-      <div className={`min-h-screen pb-20 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-
-        {/* ── PAGE HERO ── */}
-        <section className="relative pt-28 pb-14 flex flex-col items-center justify-center overflow-hidden">
-          <div className="container-xl relative z-10 text-center px-4">
-            <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-              <motion.div variants={revealVariants}>
-                <SectionBadge label="Home / About" />
-              </motion.div>
-              <motion.h1
-                variants={revealVariants}
-                className={`text-3xl sm:text-5xl md:text-7xl font-black mb-4 tracking-tight uppercase ${
-                  isDark ? 'text-white' : 'text-slate-900'
-                }`}
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  textShadow: isDark 
-                    ? '0 0 20px rgba(192, 132, 252, 0.5)' 
-                    : '0 2px 8px rgba(15, 23, 42, 0.1)',
-                }}
-              >
-                About INFOGRAM&apos;26
-              </motion.h1>
-              <motion.p variants={revealVariants} className={`text-base sm:text-xl font-bold max-w-2xl mx-auto leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                Discover the legacy, vision, and passion behind Tamil Nadu&apos;s premier national-level technical symposium.
-              </motion.p>
+      <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-[#070913] text-white' : 'bg-[#f8fafc] text-slate-950'}`}>
+        
+        {/* ── HERO HEADER ── */}
+        <section className="pt-28 pb-12 sm:pt-36 sm:pb-16 text-center relative overflow-hidden">
+          <div className="container-xl mx-auto px-4 relative z-10 max-w-4xl">
+            <motion.div initial="hidden" animate="visible" variants={revealVariants}>
+              <span className={`inline-block mb-4 px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.16em] border ${
+                isDark ? 'bg-purple-500/10 border-purple-500/30 text-amber-300' : 'bg-[#7c3aed]/10 border-[#7c3aed]/25 text-[#7c3aed]'
+              }`}>
+                Institutional Legacy
+              </span>
+              <h1 className={`text-3xl sm:text-5xl md:text-6xl font-black uppercase mb-4 ${isDark ? 'text-white' : 'text-slate-950'}`} style={{ fontFamily: 'var(--font-display)' }}>
+                About CAHCET &amp; INFOGRAM
+              </h1>
+              <p className={`text-sm sm:text-lg max-w-2xl mx-auto font-black leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                Empowering technical minds since 1998 under the aegis of Melvisharam Muslim Educational Society (MMES).
+              </p>
             </motion.div>
           </div>
         </section>
@@ -127,38 +146,40 @@ export default function AboutPage() {
             initial="hidden" whileInView="visible"
             viewport={{ once: true, margin: '-60px' }}
             variants={revealVariants}
-            className="glass-card p-5 sm:p-10 rounded-3xl"
+            className={`p-6 sm:p-10 rounded-3xl border shadow-xl ${
+              isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
+            }`}
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               {/* Left: Text */}
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 rounded-xl bg-[#7c3aed]/10 flex items-center justify-center shrink-0">
-                    <Building className="w-4 h-4 text-[#7c3aed]" />
+                  <div className="w-9 h-9 rounded-2xl bg-[#7c3aed]/10 border border-[#7c3aed]/20 flex items-center justify-center shrink-0">
+                    <Building className="w-5 h-5 text-[#7c3aed]" />
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">About the College</h2>
+                  <h2 className={`text-xl sm:text-2xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>About the College</h2>
                 </div>
-                <p className="text-slate-700 font-medium leading-relaxed mb-3 text-sm sm:text-base">
-                  C. Abdul Hakeem College of Engineering & Technology (CAHCET) is a premier engineering institution
+                <p className={`font-bold leading-relaxed mb-3 text-sm sm:text-base ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                  C. Abdul Hakeem College of Engineering &amp; Technology (CAHCET) is a premier engineering institution
                   located in Hakeem Nagar, Melvisharam, Ranipet District, Tamil Nadu. Established in{' '}
-                  <strong className="text-slate-900">1998</strong> by the{' '}
-                  <strong className="text-slate-900">Melvisharam Muslim Educational Society (MMES)</strong>.
+                  <strong className={isDark ? 'text-amber-300' : 'text-[#7c3aed]'}>1998</strong> by the{' '}
+                  <strong className={isDark ? 'text-white' : 'text-slate-950'}>Melvisharam Muslim Educational Society (MMES)</strong>.
                 </p>
-                <p className="text-slate-700 font-medium leading-relaxed mb-5 text-sm sm:text-base">
-                  Affiliated to <strong className="text-slate-900">Anna University</strong>, Approved by <strong className="text-slate-900">AICTE</strong>, Listed in <strong className="text-slate-900">2(F) & 12(B)</strong> Sections of UGC, certified by <strong className="text-slate-900">TÜV SÜD ISO 21001</strong>, and recognized by <strong className="text-slate-900">Institution&apos;s Innovation Council</strong>. Motto:{' '}
-                  <em className="text-[#7c3aed] font-bold">&quot;Enter to Learn, Leave to Serve.&quot;</em>
+                <p className={`font-bold leading-relaxed mb-5 text-sm sm:text-base ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                  Affiliated to <strong className={isDark ? 'text-white' : 'text-slate-950'}>Anna University</strong>, Approved by <strong className={isDark ? 'text-white' : 'text-slate-950'}>AICTE</strong>, Listed in <strong className={isDark ? 'text-white' : 'text-slate-950'}>2(F) &amp; 12(B)</strong> Sections of UGC, certified by <strong className={isDark ? 'text-white' : 'text-slate-950'}>TÜV SÜD ISO 21001</strong>, and recognized by <strong className={isDark ? 'text-white' : 'text-slate-950'}>Institution&apos;s Innovation Council</strong>. Motto:{' '}
+                  <em className={isDark ? 'text-amber-300 font-black' : 'text-[#7c3aed] font-black'}>&quot;Enter to Learn, Leave to Serve.&quot;</em>
                 </p>
-                <div className="space-y-2 text-xs sm:text-sm">
-                  <div className="flex items-start gap-2 text-slate-600 font-semibold">
-                    <MapPin className="w-3.5 h-3.5 text-[#7c3aed] shrink-0 mt-0.5" />
+                <div className="space-y-2.5 text-xs sm:text-sm">
+                  <div className={`flex items-start gap-2.5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                    <MapPin className="w-4 h-4 text-[#7c3aed] shrink-0 mt-0.5" />
                     <span>Hakeem Nagar, Melvisharam, Ranipet District, Tamil Nadu – 632 509</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-600 font-semibold">
-                    <Phone className="w-3.5 h-3.5 text-[#7c3aed] shrink-0" />
+                  <div className={`flex items-center gap-2.5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                    <Phone className="w-4 h-4 text-[#7c3aed] shrink-0" />
                     <span>+91 4172 267387</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-600 font-semibold">
-                    <Mail className="w-3.5 h-3.5 text-[#7c3aed] shrink-0" />
+                  <div className={`flex items-center gap-2.5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                    <Mail className="w-4 h-4 text-[#7c3aed] shrink-0" />
                     <span>info@cahcet.edu.in</span>
                   </div>
                 </div>
@@ -172,10 +193,12 @@ export default function AboutPage() {
                   { icon: GraduationCap, value: '10+', label: 'Programs' },
                   { icon: Users, value: 'Anna Univ.', label: 'Affiliated To' },
                 ].map(({ icon: Icon, value, label }) => (
-                  <div key={label} className="glass-card p-4 rounded-2xl flex flex-col items-center text-center">
-                    <Icon className="w-5 h-5 text-[#7c3aed] mb-2" />
-                    <span className="text-base sm:text-xl font-bold text-slate-900 leading-tight">{value}</span>
-                    <span className="text-xs text-slate-600 font-semibold mt-1">{label}</span>
+                  <div key={label} className={`p-4 rounded-2xl flex flex-col items-center text-center border ${
+                    isDark ? 'bg-slate-950/80 border-purple-500/30 text-white' : 'bg-slate-50 border-slate-200 text-slate-950'
+                  }`}>
+                    <Icon className="w-6 h-6 text-[#7c3aed] mb-2" />
+                    <span className="text-base sm:text-xl font-black leading-tight">{value}</span>
+                    <span className={`text-xs font-black mt-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{label}</span>
                   </div>
                 ))}
               </div>
@@ -188,17 +211,19 @@ export default function AboutPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={revealVariants}
             className="text-center mb-8">
             <SectionBadge label="Academics" />
-            <h2 className="text-2xl sm:text-4xl font-bold gradient-text">Courses Offered</h2>
+            <h2 className={`text-2xl sm:text-4xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Courses Offered</h2>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* UG Programs */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
-              variants={revealVariants} className="glass-card p-5 sm:p-7 rounded-3xl">
+              variants={revealVariants} className={`p-6 sm:p-7 rounded-3xl border shadow-xl ${
+                isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
+              }`}>
               <CardHeader icon={GraduationCap} title="Undergraduate (UG)" />
-              <ul className="space-y-2.5">
+              <ul className="space-y-3">
                 {ugPrograms.map((prog) => (
-                  <li key={prog} className="flex items-start gap-2.5 text-slate-700 font-medium text-sm">
+                  <li key={prog} className={`flex items-start gap-2.5 font-bold text-sm ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                     <CheckCircle2 className="w-4 h-4 text-[#7c3aed] shrink-0 mt-0.5" />
                     <span>{prog}</span>
                   </li>
@@ -209,12 +234,14 @@ export default function AboutPage() {
             {/* PG + Placements */}
             <div className="flex flex-col gap-5">
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
-                variants={revealVariants} className="glass-card p-5 sm:p-7 rounded-3xl">
-                <CardHeader icon={Award} title="Postgraduate (PG)" color="text-teal-600" bg="bg-teal-500/10" />
-                <ul className="space-y-2.5">
+                variants={revealVariants} className={`p-6 sm:p-7 rounded-3xl border shadow-xl ${
+                  isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
+                }`}>
+                <CardHeader icon={Award} title="Postgraduate (PG)" color="text-teal-500" bg="bg-teal-500/10" />
+                <ul className="space-y-3">
                   {pgPrograms.map((prog) => (
-                    <li key={prog} className="flex items-start gap-2.5 text-slate-700 font-medium text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                    <li key={prog} className={`flex items-start gap-2.5 font-bold text-sm ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                      <CheckCircle2 className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
                       <span>{prog}</span>
                     </li>
                   ))}
@@ -224,14 +251,16 @@ export default function AboutPage() {
               {/* Placements */}
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
                 variants={revealVariants}
-                className="glass-card p-5 sm:p-7 rounded-3xl border border-[#7c3aed]/20 bg-[#7c3aed]/5">
+                className={`p-6 sm:p-7 rounded-3xl border shadow-xl ${
+                  isDark ? 'bg-slate-900/90 border-amber-500/40 text-white' : 'bg-white border-amber-300/60 text-slate-950'
+                }`}>
                 <div className="flex items-center gap-3 mb-3">
-                  <Trophy className="w-5 h-5 text-amber-500 shrink-0" />
-                  <h3 className="text-base sm:text-lg font-bold text-slate-900">Placements</h3>
+                  <Trophy className="w-5 h-5 text-amber-400 shrink-0" />
+                  <h3 className={`text-base sm:text-lg font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Placements</h3>
                 </div>
-                <p className="text-slate-700 font-medium text-sm leading-relaxed">
+                <p className={`font-bold text-sm leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                   The UG Batch of 2026 achieved{' '}
-                  <strong className="text-[#7c3aed] font-bold">100% placement</strong> with students placed across
+                  <strong className={isDark ? 'text-amber-300 font-black' : 'text-[#7c3aed] font-black'}>100% placement</strong> with students placed across
                   multiple departments through campus recruitment. Strong industry engagement with top
                   recruiters across IT, Core Engineering, and Management sectors.
                 </p>
@@ -243,7 +272,9 @@ export default function AboutPage() {
         {/* ── ABOUT DEPARTMENT ── */}
         <section className="section-padding container-xl px-4">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
-            variants={revealVariants} className="glass-card p-5 sm:p-10 rounded-3xl">
+            variants={revealVariants} className={`p-6 sm:p-10 rounded-3xl border shadow-xl ${
+              isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
+            }`}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               {/* Stats grid */}
               <div className="grid grid-cols-2 gap-3">
@@ -253,10 +284,12 @@ export default function AboutPage() {
                   { icon: Laptop, value: '6+', label: 'State-of-art Labs' },
                   { icon: GraduationCap, value: '500+', label: 'Alumni Network' },
                 ].map(({ icon: Icon, value, label }) => (
-                  <div key={label} className="glass-card p-4 rounded-2xl flex flex-col items-center text-center">
+                  <div key={label} className={`p-4 rounded-2xl flex flex-col items-center text-center border ${
+                    isDark ? 'bg-slate-950/80 border-purple-500/30 text-white' : 'bg-slate-50 border-slate-200 text-slate-950'
+                  }`}>
                     <Icon className="w-5 h-5 text-[#7c3aed] mb-2" />
-                    <span className="text-base sm:text-lg font-bold text-slate-900 leading-tight">{value}</span>
-                    <span className="text-xs text-slate-600 font-semibold mt-1 leading-tight">{label}</span>
+                    <span className="text-base sm:text-lg font-black leading-tight">{value}</span>
+                    <span className={`text-xs font-black mt-1 leading-tight ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{label}</span>
                   </div>
                 ))}
               </div>
@@ -264,21 +297,21 @@ export default function AboutPage() {
               {/* Text */}
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 rounded-xl bg-[#7c3aed]/10 flex items-center justify-center shrink-0">
-                    <Laptop className="w-4 h-4 text-[#7c3aed]" />
+                  <div className="w-9 h-9 rounded-2xl bg-[#7c3aed]/10 border border-[#7c3aed]/20 flex items-center justify-center shrink-0">
+                    <Laptop className="w-5 h-5 text-[#7c3aed]" />
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Department of IT</h2>
+                  <h2 className={`text-xl sm:text-2xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Department of IT</h2>
                 </div>
-                <p className="text-slate-700 font-medium leading-relaxed mb-3 text-sm sm:text-base">
+                <p className={`font-bold leading-relaxed mb-3 text-sm sm:text-base ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                   The Department of Information Technology at CAHCET offers the{' '}
-                  <strong className="text-slate-900">B.Tech Information Technology</strong> program, designed to
+                  <strong className={isDark ? 'text-amber-300 font-black' : 'text-slate-950 font-black'}>B.Tech Information Technology</strong> program, designed to
                   produce industry-ready professionals skilled in software development, networking, data science,
                   and AI-driven technologies.
                 </p>
-                <p className="text-slate-700 font-medium leading-relaxed text-sm sm:text-base">
+                <p className={`font-bold leading-relaxed text-sm sm:text-base ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                   With state-of-the-art laboratories and strong industry partnerships, the department fosters
                   hands-on learning. It is the proud organizer of{' '}
-                  <strong className="text-[#7c3aed] font-bold">INFOGRAM&apos;26</strong> — the annual National Level
+                  <strong className={isDark ? 'text-amber-300 font-black' : 'text-[#7c3aed] font-black'}>INFOGRAM&apos;26</strong> — the annual National Level
                   Technical Symposium.
                 </p>
               </div>
@@ -291,7 +324,7 @@ export default function AboutPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
             variants={revealVariants} className="text-center mb-8">
             <SectionBadge label="Infrastructure" />
-            <h2 className="text-2xl sm:text-4xl font-bold gradient-text">Campus Facilities</h2>
+            <h2 className={`text-2xl sm:text-4xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Campus Facilities</h2>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
@@ -300,12 +333,16 @@ export default function AboutPage() {
             {facilities.map(({ icon: Icon, label }) => (
               <motion.div
                 key={label} variants={revealVariants}
-                className="glass-card p-4 rounded-2xl flex flex-col items-center text-center hover:border-[#7c3aed]/30 transition-all"
+                className={`p-4 rounded-2xl flex flex-col items-center text-center border transition-all duration-200 ${
+                  isDark 
+                    ? 'bg-slate-900/90 border-purple-500/30 text-white hover:border-purple-400/60 shadow-lg' 
+                    : 'bg-white border-slate-200 text-slate-950 hover:border-[#7c3aed]/40 shadow-md'
+                }`}
               >
-                <div className="w-9 h-9 rounded-xl bg-[#7c3aed]/10 flex items-center justify-center mb-2">
-                  <Icon className="w-4 h-4 text-[#7c3aed]" />
+                <div className="w-10 h-10 rounded-2xl bg-[#7c3aed]/10 border border-[#7c3aed]/20 flex items-center justify-center mb-2.5">
+                  <Icon className={`w-5 h-5 ${isDark ? 'text-purple-300' : 'text-[#7c3aed]'}`} />
                 </div>
-                <span className="text-xs text-slate-700 font-bold leading-tight">{label}</span>
+                <span className={`text-xs font-black leading-tight ${isDark ? 'text-slate-100' : 'text-slate-950'}`}>{label}</span>
               </motion.div>
             ))}
           </motion.div>
@@ -315,18 +352,20 @@ export default function AboutPage() {
         <section className="section-padding container-xl px-4">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
             variants={revealVariants}
-            className="glass-card p-6 sm:p-12 rounded-3xl text-center border border-[#7c3aed]/10 bg-[#7c3aed]/5 max-w-3xl mx-auto">
+            className={`p-6 sm:p-12 rounded-3xl text-center border max-w-4xl mx-auto shadow-2xl ${
+              isDark ? 'bg-slate-900/95 border-purple-500/40 text-white' : 'bg-white border-slate-200 text-slate-950'
+            }`}>
             <SectionBadge label="2026 Edition" />
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-black gradient-text mb-4 mt-1">
+            <h2 className={`text-2xl sm:text-3xl md:text-5xl font-black mb-4 mt-1 ${isDark ? 'text-white' : 'text-slate-950'}`}>
               About INFOGRAM&apos;26
             </h2>
-            <p className="text-xs uppercase tracking-[0.25em] text-[#7c3aed] font-bold mb-4">
+            <p className={`text-xs uppercase tracking-[0.25em] font-black mb-4 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>
               &quot;WHERE INNOVATION EARNS RECOGNITION&quot;
             </p>
-            <p className="text-sm sm:text-lg text-slate-700 font-medium leading-relaxed">
+            <p className={`text-sm sm:text-lg font-black leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
               INFOGRAM&apos;26 is the annual{' '}
-              <strong className="text-slate-900">National Level Technical Symposium</strong> hosted by the
-              Department of Information Technology and Info Club at C. Abdul Hakeem College of Engineering & Technology (CAHCET). On <strong className="text-slate-900">August 22, 2026</strong>, this prestigious event brings together brilliant
+              <strong className={isDark ? 'text-amber-300 font-black' : 'text-[#7c3aed] font-black'}>National Level Technical Symposium</strong> hosted by the
+              Department of Information Technology and Info Club at C. Abdul Hakeem College of Engineering &amp; Technology (CAHCET). On <strong className={isDark ? 'text-white font-black' : 'text-slate-950 font-black'}>August 22, 2026</strong>, this prestigious event brings together brilliant
               minds from engineering colleges across the nation to compete, collaborate, and celebrate
               technological innovation — blending technical brilliance with creative expression.
             </p>
@@ -338,7 +377,7 @@ export default function AboutPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
             variants={revealVariants} className="text-center mb-8">
             <SectionBadge label="Student Life" />
-            <h2 className="text-2xl sm:text-4xl font-bold gradient-text">Student Activities</h2>
+            <h2 className={`text-2xl sm:text-4xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Student Activities</h2>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
@@ -347,9 +386,13 @@ export default function AboutPage() {
             {studentActivities.map((activity) => (
               <motion.div
                 key={activity} variants={revealVariants}
-                className="glass-card px-4 py-2.5 rounded-full flex items-center gap-2 text-sm font-bold text-slate-800 hover:border-[#7c3aed]/40 transition-all"
+                className={`px-4 py-2.5 rounded-full flex items-center gap-2 text-sm font-black border transition-all ${
+                  isDark 
+                    ? 'bg-slate-900/90 border-purple-500/40 text-amber-300 hover:border-amber-300/60' 
+                    : 'bg-white border-slate-200 text-[#7c3aed] hover:border-[#7c3aed]/40 shadow-sm'
+                }`}
               >
-                <Star className="w-3.5 h-3.5 text-[#7c3aed] shrink-0" />
+                <Star className="w-4 h-4 text-amber-400 shrink-0" />
                 {activity}
               </motion.div>
             ))}
@@ -361,7 +404,7 @@ export default function AboutPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
             variants={revealVariants} className="text-center mb-8">
             <SectionBadge label="Our Purpose" />
-            <h2 className="text-2xl sm:text-4xl font-bold gradient-text">Mission, Vision &amp; Objectives</h2>
+            <h2 className={`text-2xl sm:text-4xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Mission, Vision &amp; Objectives</h2>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -377,7 +420,7 @@ export default function AboutPage() {
               {
                 icon: Lightbulb,
                 title: 'Our Vision',
-                color: 'text-teal-600',
+                color: 'text-teal-500',
                 bg: 'bg-teal-500/10',
                 content: "To become India's most celebrated student-led technical symposium, recognized for academic excellence, innovation, and industry relevance.",
                 list: null,
@@ -385,7 +428,7 @@ export default function AboutPage() {
               {
                 icon: Award,
                 title: 'Our Objectives',
-                color: 'text-amber-600',
+                color: 'text-amber-500',
                 bg: 'bg-amber-500/10',
                 content: null,
                 list: [
@@ -403,17 +446,19 @@ export default function AboutPage() {
                 viewport={{ once: true }}
                 variants={revealVariants}
                 transition={{ delay: i * 0.08 }}
-                className="glass-card p-5 sm:p-7 rounded-3xl"
+                className={`p-6 sm:p-7 rounded-3xl border shadow-xl ${
+                  isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
+                }`}
               >
                 <div className={`w-10 h-10 rounded-2xl ${bg} flex items-center justify-center mb-4`}>
                   <Icon className={`w-5 h-5 ${color}`} />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3">{title}</h3>
-                {content && <p className="text-slate-700 font-medium leading-relaxed text-sm sm:text-base">{content}</p>}
+                <h3 className={`text-lg sm:text-xl font-black mb-3 ${isDark ? 'text-white' : 'text-slate-950'}`}>{title}</h3>
+                {content && <p className={`font-bold leading-relaxed text-sm sm:text-base ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>{content}</p>}
                 {list && (
-                  <ul className="space-y-2">
+                  <ul className="space-y-2.5">
                     {list.map((item) => (
-                      <li key={item} className="flex items-start gap-2 text-slate-700 font-medium text-sm">
+                      <li key={item} className={`flex items-start gap-2.5 font-bold text-sm ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                         <CheckCircle2 className={`w-4 h-4 ${color} shrink-0 mt-0.5`} />
                         {item}
                       </li>
@@ -430,17 +475,19 @@ export default function AboutPage() {
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true }}
             variants={revealVariants}
-            className="glass-card p-5 sm:p-8 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center gap-5 border border-slate-200"
+            className={`p-6 sm:p-8 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center gap-5 border shadow-xl ${
+              isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
+            }`}
           >
-            <div className="w-12 h-12 rounded-2xl bg-[#7c3aed]/10 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-[#7c3aed]/10 border border-[#7c3aed]/20 flex items-center justify-center shrink-0">
               <Globe className="w-6 h-6 text-[#7c3aed]" />
             </div>
             <div>
-              <h3 className="text-base sm:text-xl font-bold text-slate-900 mb-2">Parent Organization — MMES</h3>
-              <p className="text-slate-700 font-medium text-sm leading-relaxed">
+              <h3 className={`text-base sm:text-xl font-black mb-2 ${isDark ? 'text-white' : 'text-slate-950'}`}>Parent Organization — MMES</h3>
+              <p className={`font-bold text-sm leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                 CAHCET is managed by the{' '}
-                <strong className="text-slate-900">Melvisharam Muslim Educational Society (MMES)</strong>, founded
-                in <strong className="text-slate-900">1918</strong> by Nawab C. Abdul Hakeem. MMES manages several
+                <strong className={isDark ? 'text-amber-300 font-black' : 'text-slate-950 font-black'}>Melvisharam Muslim Educational Society (MMES)</strong>, founded
+                in <strong className={isDark ? 'text-white font-black' : 'text-slate-950 font-black'}>1918</strong> by Nawab C. Abdul Hakeem. MMES manages several
                 schools and higher education institutions across the region, with a longstanding legacy of
                 quality education and community service in Tamil Nadu.
               </p>
