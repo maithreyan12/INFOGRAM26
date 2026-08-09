@@ -10,7 +10,6 @@ const NAV_LINKS = [
   { name: 'About', path: '/about' },
   { name: 'Events', path: '/events' },
   { name: 'Register', path: '/register' },
-  { name: 'Gallery', path: '/gallery' },
   { name: 'Contact', path: '/contact' },
 ];
 

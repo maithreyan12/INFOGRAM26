@@ -2,7 +2,6 @@ import HeroSection from '@/components/home/HeroSection';
 import FeaturedEvents from '@/components/home/FeaturedEvents';
 import LiveBanner from '@/components/home/LiveBanner';
 import SponsorsSection from '@/components/home/SponsorsSection';
-import GalleryPreview from '@/components/home/GalleryPreview';
 import StatsSection from '@/components/home/StatsSection';
 import VideoSection from '@/components/home/VideoSection';
 import MusicPlayer from '@/components/home/MusicPlayer';
@@ -23,7 +22,6 @@ export default function Home() {
       <StatsSection />
       <FeaturedEvents />
       <SponsorsSection />
-      <GalleryPreview />
       {/* Floating background music player — place bg-music.mp3 in /public/ */}
       <MusicPlayer
         src="/bg-music.mp3"
