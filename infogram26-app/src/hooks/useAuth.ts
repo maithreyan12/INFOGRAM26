@@ -83,7 +83,7 @@ export function useAuth() {
         if (firebaseUser) {
           setUser(firebaseUser);
           const emailLower = firebaseUser.email?.toLowerCase() || '';
-          const isSuperAdminEmail = emailLower === 'maithreyan2006@gmail.com' || emailLower.includes('admin');
+          const isSuperAdminEmail = emailLower === 'maithreyan2006@gmail.com' || emailLower === 'infoappziio@gmail.com' || emailLower.includes('admin') || emailLower.includes('appziio');
 
           try {
             if (db) {

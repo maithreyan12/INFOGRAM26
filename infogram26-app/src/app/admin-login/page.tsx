@@ -22,7 +22,9 @@ export default function AdminLogin() {
         try {
           const result = await signIn();
           if (result && result.user) {
-            loginAsDemoSuperAdmin(result.user.email || 'maithreyan2006@gmail.com', result.user.displayName || 'Maithreyan D');
+            const email = result.user.email || 'infoappziio@gmail.com';
+            const name = result.user.displayName || 'Appziio Super Admin';
+            loginAsDemoSuperAdmin(email, name);
             window.location.href = '/admin/dashboard';
             return;
           }
@@ -30,11 +32,11 @@ export default function AdminLogin() {
           console.warn('Firebase domain popup fallback:', popupErr);
         }
       }
-      // Grant Super Admin access for maithreyan2006@gmail.com
-      loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
+      // Grant Super Admin access for infoappziio@gmail.com / maithreyan2006@gmail.com
+      loginAsDemoSuperAdmin('infoappziio@gmail.com', 'Appziio Super Admin');
       window.location.href = '/admin/dashboard';
     } catch (err: any) {
-      loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
+      loginAsDemoSuperAdmin('infoappziio@gmail.com', 'Appziio Super Admin');
       window.location.href = '/admin/dashboard';
     } finally {
       setLoading(false);
