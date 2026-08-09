@@ -100,68 +100,72 @@ export default function ContactPage() {
                 </p>
               </div>
 
-              {/* Website Administrator & Developer Card */}
-              <div className={`p-6 rounded-3xl border shadow-xl relative overflow-hidden ${
+              {/* Symposium Organizers & Technical Administration Card */}
+              <div className={`p-6 rounded-3xl border shadow-xl ${
                 isDark ? 'bg-slate-900/90 border-purple-500/35 text-white' : 'bg-white border-slate-200 text-slate-950'
               }`}>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
-                      <Code className="w-5 h-5 text-amber-400" />
+                    <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0">
+                      <Users className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className={`font-black text-lg ${isDark ? 'text-white' : 'text-slate-950'}`}>Symposium Organizers &amp; Tech Team</h3>
+                      <p className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Contact our coordinators &amp; website administrator</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Featured Lead: Maithreyan D (Website Admin & Developer) */}
+                <div className={`p-4 rounded-2xl border mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                  isDark
+                    ? 'bg-gradient-to-r from-purple-950/60 via-slate-950 to-slate-900 border-purple-500/40'
+                    : 'bg-gradient-to-r from-purple-50 via-slate-50 to-indigo-50 border-purple-200'
+                }`}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
+                      <Code className="w-4.5 h-4.5 text-amber-400" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className={`font-black text-lg ${isDark ? 'text-white' : 'text-slate-950'}`}>Website Admin &amp; Developer</h3>
-                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-purple-500/20 text-amber-300 border border-purple-500/30">
-                          Dev Admin
+                        <span className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-950'}`}>Maithreyan D</span>
+                        <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-purple-500/25 text-amber-300 border border-purple-500/40">
+                          Website Admin &amp; Dev
                         </span>
                       </div>
-                      <p className={`text-xs font-bold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                        For website glitches, portal help, or tech issues
-                      </p>
+                      <span className={`text-xs font-bold ${isDark ? 'text-amber-300' : 'text-purple-700'}`}>
+                        Portfolio: <a href="https://maithreyan.in" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80 font-black">maithreyan.in</a>
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     <a
                       href="https://maithreyan.in"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider border transition-all ${
-                        isDark
-                          ? 'bg-purple-500/20 border-purple-500/40 text-amber-300 hover:bg-purple-500/30'
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider border transition-all ${
+                        isDark 
+                          ? 'bg-purple-500/20 border-purple-500/40 text-amber-300 hover:bg-purple-500/30' 
                           : 'bg-[#7c3aed]/10 border-[#7c3aed]/30 text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white'
                       }`}
                     >
                       <Globe className="w-3.5 h-3.5" />
-                      <span>Maithreyan.in</span>
+                      <span>Portfolio</span>
                       <ExternalLink className="w-3 h-3 opacity-70" />
                     </a>
                     <a
                       href="tel:+919342706675"
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all"
                     >
                       <Phone className="w-3.5 h-3.5" />
                       <span>9342706675</span>
                     </a>
                   </div>
                 </div>
-              </div>
 
-              {/* Student Coordinators Card */}
-              <div className={`p-6 rounded-3xl border shadow-xl ${
-                isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
-              }`}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-2xl bg-[#7c3aed]/10 border border-[#7c3aed]/20 flex items-center justify-center shrink-0">
-                    <Users className="w-5 h-5 text-[#7c3aed]" />
-                  </div>
-                  <div>
-                    <h3 className={`font-black text-lg ${isDark ? 'text-white' : 'text-slate-950'}`}>Student Coordinators</h3>
-                    <p className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Call us directly for event details &amp; help</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {/* Student Coordinators Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {studentCoordinators.map((c) => (
                     <a
                       key={c.name}
@@ -173,7 +177,10 @@ export default function ContactPage() {
                       }`}
                     >
                       <div>
-                        <div className="text-xs font-black">{c.name}</div>
+                        <div className="text-xs font-black flex items-center gap-1.5">
+                          <span>{c.name}</span>
+                          <span className={`text-[9px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>(Student Coordinator)</span>
+                        </div>
                         <div className={`text-xs font-bold ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>{c.phone}</div>
                       </div>
                       <Phone className="w-4 h-4 text-[#7c3aed] group-hover:scale-110 transition-transform" />

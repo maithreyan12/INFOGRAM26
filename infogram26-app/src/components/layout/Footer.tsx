@@ -221,37 +221,28 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom bar - PROMINENT DEVELOPER CREDIT FOR MAITHREYAN D */}
-        <div className={`pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-black ${
+        {/* Bottom bar - DEVELOPER CREDIT FOR APPZIIO */}
+        <div className={`pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-black ${
           isDark ? 'border-slate-800 text-slate-300' : 'border-slate-300 text-slate-800'
         }`}>
           <p>© {currentYear} INFOGRAM&apos;26 · Department of Information Technology, CAHCET. All rights reserved.</p>
           
-          <div className="flex flex-wrap items-center gap-2 text-xs font-black">
+          <p className="flex items-center gap-2 text-xs font-black">
             <span>Designed &amp; Developed by</span>
             <a
-              href="https://maithreyan.in"
+              href="https://appziio.com"
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-flex items-center gap-1.5 font-black text-xs uppercase tracking-wider transition-all px-3 py-1 rounded-full border ${
+              className={`font-black text-xs uppercase tracking-widest transition-all px-3 py-1 rounded-full border ${
                 isDark 
                   ? 'bg-purple-500/20 text-amber-300 border-purple-500/40 hover:bg-purple-500/30 shadow-[0_0_12px_rgba(252,211,77,0.4)]' 
                   : 'bg-[#7c3aed]/10 text-[#7c3aed] border-[#7c3aed]/30 hover:bg-[#7c3aed]/20 shadow-xs'
               }`}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <span>Maithreyan D</span>
-              <span className="opacity-70 font-mono text-[10px] lowercase">(maithreyan.in)</span>
+              Appziio
             </a>
-            <a
-              href="tel:+919342706675"
-              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full border transition-all text-[11px] font-bold ${
-                isDark ? 'bg-slate-900 border-slate-700 text-slate-300 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-950'
-              }`}
-            >
-              📞 9342706675
-            </a>
-          </div>
+          </p>
         </div>
       </div>
     </footer>
