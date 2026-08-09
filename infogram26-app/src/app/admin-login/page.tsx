@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 import { auth, isFirebaseConfigured } from '@/lib/firebase/config';
 import { LogOut, ShieldCheck, Phone, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
