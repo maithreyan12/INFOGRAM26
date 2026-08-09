@@ -186,11 +186,31 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className={`w-4 h-4 shrink-0 mt-0.5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
-                <span className={`text-sm font-black leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
-                  Hakeem Nagar, Melvisharam,<br />
-                  Ranipet District,<br />
-                  Tamil Nadu – 632 509
-                </span>
+                <div>
+                  <span className={`text-sm font-black leading-relaxed block ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
+                    C. Abdul Hakeem College<br />
+                    Hakeem Nagar, Melvisharam,<br />
+                    Ranipet District, TN – 632 509
+                  </span>
+                  <div className="flex items-center gap-2 mt-2">
+                    <a
+                      href="https://www.google.com/maps/place/C.+Abdul+Hakeem+College+of+Engineering+%26+Technology,+Melvisharam,+Ranipet,+Tamil+Nadu+632509/data=!4m2!3m1!1s0x3bad35d34059d16f:0xb443fab6e00b313f"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-red-600/90 text-white hover:bg-red-500 transition-colors"
+                    >
+                      🤖 Google Maps
+                    </a>
+                    <a
+                      href="https://maps.apple.com/p/~nwAp4fu74pyaQ"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-white hover:bg-slate-700 border border-slate-700 transition-colors"
+                    >
+                      🍎 Apple Maps
+                    </a>
+                  </div>
+                </div>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className={`w-4 h-4 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />

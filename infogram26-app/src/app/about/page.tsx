@@ -170,10 +170,16 @@ export default function AboutPage() {
                   <em className={isDark ? 'text-amber-300 font-black' : 'text-[#7c3aed] font-black'}>&quot;Enter to Learn, Leave to Serve.&quot;</em>
                 </p>
                 <div className="space-y-2.5 text-xs sm:text-sm">
-                  <div className={`flex items-start gap-2.5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                    <MapPin className="w-4 h-4 text-[#7c3aed] shrink-0 mt-0.5" />
-                    <span>Hakeem Nagar, Melvisharam, Ranipet District, Tamil Nadu – 632 509</span>
-                  </div>
+                  <a
+                    href="https://www.google.com/maps/place/C.+Abdul+Hakeem+College+of+Engineering+%26+Technology,+Melvisharam,+Ranipet,+Tamil+Nadu+632509/data=!4m2!3m1!1s0x3bad35d34059d16f:0xb443fab6e00b313f"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-start gap-2.5 font-bold transition-all hover:underline ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-800 hover:text-[#7c3aed]'}`}
+                    style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
+                  >
+                    <MapPin className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                    <span>Hakeem Nagar, Melvisharam, Ranipet District, Tamil Nadu – 632 509 <strong className="text-red-500 font-black text-xs uppercase tracking-wider ml-1">(Open Maps 📍)</strong></span>
+                  </a>
                   <div className={`flex items-center gap-2.5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                     <Phone className="w-4 h-4 text-[#7c3aed] shrink-0" />
                     <span>+91 4172 267387</span>

@@ -202,20 +202,48 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* College Address */}
-              <div className={`p-6 flex items-start gap-4 rounded-3xl border shadow-xl ${
+              {/* College Address — Dual Maps Navigation Card (Google Maps for Android + Apple Maps for iOS) */}
+              <div className={`p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 rounded-3xl border shadow-xl ${
                 isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
               }`}>
-                <div className="w-11 h-11 rounded-2xl bg-[#7c3aed]/10 border border-[#7c3aed]/20 flex items-center justify-center shrink-0">
-                  <Building className="w-5 h-5 text-[#7c3aed]" />
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center shrink-0">
+                    <Building className="w-5 h-5 text-red-500" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className={`font-black text-base ${isDark ? 'text-white' : 'text-slate-950'}`}>College Address</h3>
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        📍 Campus Navigation
+                      </span>
+                    </div>
+                    <p className={`font-bold text-xs sm:text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                      Department of Information Technology, Info Club<br />
+                      C. Abdul Hakeem College of Engineering &amp; Technology<br />
+                      Hakeem Nagar, Melvisharam – 632 509, Ranipet District, Tamil Nadu
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className={`font-black text-base mb-1 ${isDark ? 'text-white' : 'text-slate-950'}`}>College Address</h3>
-                  <p className={`font-bold text-xs sm:text-sm leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                    Department of Information Technology, Info Club<br />
-                    C. Abdul Hakeem College of Engineering &amp; Technology<br />
-                    Hakeem Nagar, Melvisharam – 632 509, Ranipet District, Tamil Nadu
-                  </p>
+
+                <div className="flex flex-wrap items-center gap-2.5 shrink-0 w-full sm:w-auto">
+                  <a
+                    href="https://www.google.com/maps/place/C.+Abdul+Hakeem+College+of+Engineering+%26+Technology,+Melvisharam,+Ranipet,+Tamil+Nadu+632509/data=!4m2!3m1!1s0x3bad35d34059d16f:0xb443fab6e00b313f"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-red-600 hover:bg-red-500 text-white shadow-md shadow-red-600/30 transition-all active:scale-95 whitespace-nowrap"
+                  >
+                    <span>🤖 Google Maps</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                  <a
+                    href="https://maps.apple.com/p/~nwAp4fu74pyaQ"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-slate-950 hover:bg-slate-800 text-white border border-slate-700 shadow-md transition-all active:scale-95 whitespace-nowrap"
+                  >
+                    <span>🍎 Apple Maps</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
                 </div>
               </div>
 
