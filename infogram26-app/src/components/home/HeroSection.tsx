@@ -251,20 +251,30 @@ export default function HeroSection() {
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: 'clamp(2.5rem, 12vw, 8rem)',
-              background: isDark
-                ? 'linear-gradient(180deg, #ffffff 0%, #c084fc 50%, #38bdf8 100%)'
-                : 'linear-gradient(180deg, #0f172a 0%, #6d28d9 55%, #059669 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              color: 'transparent',
-              display: 'inline-block',
-              filter: isDark 
-                ? 'drop-shadow(0 8px 30px rgba(192,132,252,0.35))'
-                : 'drop-shadow(0 4px 20px rgba(124,58,237,0.15))',
             }}
           >
-            INFOGRAM
+            <span
+              style={
+                isDark
+                  ? {
+                      background: 'linear-gradient(180deg, #ffffff 0%, #c084fc 50%, #38bdf8 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      color: 'transparent',
+                      display: 'inline-block',
+                      filter: 'drop-shadow(0 8px 30px rgba(192,132,252,0.35))',
+                    }
+                  : {
+                      color: '#0f172a',
+                      WebkitTextFillColor: '#0f172a',
+                      display: 'inline-block',
+                      filter: 'drop-shadow(0 2px 10px rgba(15,23,42,0.1))',
+                    }
+              }
+            >
+              INFOGRAM
+            </span>
           </motion.h1>
 
           {/* 4. '26 Identity Row */}
@@ -274,8 +284,8 @@ export default function HeroSection() {
             variants={getItemVariants(4)}
             className="flex items-center justify-center gap-3 w-full max-w-xs sm:max-w-md -mt-1 sm:-mt-3"
           >
-            <div className={`h-[2px] flex-1 rounded-full ${
-              isDark ? 'bg-gradient-to-r from-transparent via-amber-400 to-amber-300' : 'bg-gradient-to-r from-transparent to-[#7c3aed]'
+            <div className={`h-[2.5px] flex-1 rounded-full ${
+              isDark ? 'bg-gradient-to-r from-transparent via-amber-400 to-amber-300' : 'bg-gradient-to-r from-transparent via-amber-500 to-amber-600'
             }`} />
             
             <span
@@ -283,18 +293,19 @@ export default function HeroSection() {
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 'clamp(2.5rem, 12vw, 8rem)',
-                background: 'linear-gradient(180deg, #fef08a 0%, #f59e0b 50%, #b45309 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                filter: 'drop-shadow(0 0 16px rgba(245,158,11,0.55))',
+                color: isDark ? undefined : '#d97706',
+                WebkitTextFillColor: isDark ? 'transparent' : '#d97706',
+                background: isDark ? 'linear-gradient(180deg, #fef08a 0%, #f59e0b 50%, #b45309 100%)' : 'none',
+                WebkitBackgroundClip: isDark ? 'text' : undefined,
+                backgroundClip: isDark ? 'text' : undefined,
+                filter: isDark ? 'drop-shadow(0 0 16px rgba(245,158,11,0.55))' : 'drop-shadow(0 2px 8px rgba(217,119,6,0.25))',
               }}
             >
               &apos;26
             </span>
 
-            <div className={`h-[2px] flex-1 rounded-full ${
-              isDark ? 'bg-gradient-to-l from-transparent via-amber-400 to-amber-300' : 'bg-gradient-to-l from-transparent to-[#7c3aed]'
+            <div className={`h-[2.5px] flex-1 rounded-full ${
+              isDark ? 'bg-gradient-to-l from-transparent via-amber-400 to-amber-300' : 'bg-gradient-to-l from-transparent via-amber-500 to-amber-600'
             }`} />
           </motion.div>
         </div>
