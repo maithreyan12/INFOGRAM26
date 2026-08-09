@@ -352,32 +352,39 @@ export default function EventDetailPage() {
   return (
     <PublicLayout>
       <div className={`min-h-screen bg-transparent pb-24 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-        {/* Banner */}
-        <div 
-          className={`w-full h-64 md:h-80 relative ${
-            event.bannerUrl 
-              ? 'bg-cover bg-center' 
-              : isTechnical ? 'bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700' : 'bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-700'
-          }`}
-          style={event.bannerUrl ? { backgroundImage: `url('${event.bannerUrl}')` } : {}}
-        >
-          <div className={`absolute inset-0 ${event.bannerUrl ? 'bg-black/50' : 'bg-black/20'}`}></div>
-          <div className="container-xl h-full relative z-10 px-4 flex flex-col justify-end pb-8">
-            <Link href="/events" className="inline-flex items-center text-white/90 hover:text-white mb-6 transition-colors w-fit group font-bold">
-              <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+        {/* ── Clean compact event header (no coloured banner) ── */}
+        <div className={`w-full pt-24 pb-6 px-4 border-b ${
+          isDark ? 'border-slate-800' : 'border-slate-200'
+        }`}>
+          <div className="container-xl">
+            <Link
+              href="/events"
+              className={`inline-flex items-center gap-2 text-sm font-bold mb-4 group transition-colors ${
+                isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-150" />
               All Events
             </Link>
-            <div className="flex items-center gap-3 mb-3">
-              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md bg-white/20 text-white border border-white/30`}>
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${
+                isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-600'
+              }`}>
                 {event.status}
               </span>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md border ${
-                isTechnical ? 'bg-violet-500/30 text-white border-white/30' : 'bg-teal-500/30 text-white border-white/30'
+              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${
+                isTechnical
+                  ? (isDark ? 'bg-purple-500/15 border-purple-500/30 text-purple-300' : 'bg-purple-50 border-purple-200 text-purple-700')
+                  : (isDark ? 'bg-teal-500/15 border-teal-500/30 text-teal-300' : 'bg-teal-50 border-teal-200 text-teal-700')
               }`}>
                 {isTechnical ? 'Technical' : 'Non-Technical'}
               </span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-2 drop-shadow-md">{event.name}</h1>
+            <h1 className={`text-3xl sm:text-5xl font-black ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`} style={{ fontFamily: 'var(--font-display)' }}>
+              {event.name}
+            </h1>
           </div>
         </div>
 
@@ -385,13 +392,9 @@ export default function EventDetailPage() {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* LEFT COLUMN (7) */}
             <div className="w-full lg:w-7/12 space-y-8">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`glass-card p-6 md:p-8 rounded-3xl border transition-colors duration-300 ${
-                  isDark ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl' : 'bg-white/90 border-slate-200 text-slate-900 shadow-xl'
-                }`}
-              >
+              <div className={`p-6 md:p-8 rounded-3xl border ${
+                isDark ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl' : 'bg-white/90 border-slate-200 text-slate-900 shadow-xl'
+              }`}>
                 <h2 className={`text-2xl font-bold mb-4 flex items-center ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   <AlertCircle className={`w-6 h-6 mr-3 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                   About the Event
@@ -399,16 +402,11 @@ export default function EventDetailPage() {
                 <p className={`leading-relaxed text-lg font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                   {event.description}
                 </p>
-              </motion.div>
+              </div>
 
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className={`glass-card p-6 md:p-8 rounded-3xl border transition-colors duration-300 ${
-                  isDark ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl' : 'bg-white/90 border-slate-200 text-slate-900 shadow-xl'
-                }`}
-              >
+              <div className={`p-6 md:p-8 rounded-3xl border ${
+                isDark ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl' : 'bg-white/90 border-slate-200 text-slate-900 shadow-xl'
+              }`}>
                 <h2 className={`text-2xl font-bold mb-4 flex items-center ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   <Trophy className={`w-6 h-6 mr-3 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                   Rules &amp; Guidelines
@@ -425,14 +423,9 @@ export default function EventDetailPage() {
                     <li className={isDark ? 'text-slate-400' : 'text-slate-500'}>Standard symposium rules apply.</li>
                   )}
                 </ul>
-              </motion.div>
+              </div>
 
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-4"
-              >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className={`glass-card p-6 rounded-2xl border ${isDark ? 'bg-slate-900/90 border-purple-500/30' : 'bg-white/90 border-slate-200'}`}>
                   <div className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Student Coordinators</div>
                   {(() => {
@@ -483,16 +476,12 @@ export default function EventDetailPage() {
                   </div>
                   <div className={`text-xs font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>PERI Institute of Technology</div>
                 </div>
-              </motion.div>
+              </div>
             </div>
 
             {/* RIGHT COLUMN (5) */}
             <div className="w-full lg:w-5/12">
-              <motion.div 
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="sticky top-24 space-y-6"
-              >
+              <div className="sticky top-24 space-y-6">
                 {event.status === 'live' && (
                   <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-2xl flex items-center justify-center animate-pulse">
                     <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
@@ -628,7 +617,7 @@ export default function EventDetailPage() {
                     );
                   })()}
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
         </div>
