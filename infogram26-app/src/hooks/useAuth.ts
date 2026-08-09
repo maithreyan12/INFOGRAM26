@@ -179,9 +179,10 @@ export function useAuth() {
 
   const signIn = async () => {
     if (!auth) {
-      return null;
+      throw new Error("Firebase Auth is not initialized.");
     }
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
     return signInWithPopup(auth, provider);
   };
 

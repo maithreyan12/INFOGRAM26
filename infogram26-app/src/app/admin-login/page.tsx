@@ -18,26 +18,28 @@ export default function AdminLogin() {
     setLoading(true);
     setError(null);
     try {
-      // Set Super Admin session immediately in localStorage
-      loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
-      
-      if (isFirebaseConfigured && auth) {
-        try {
-          const result = await signIn();
-          if (result && result.user) {
-            const email = result.user.email || 'maithreyan2006@gmail.com';
-            const name = result.user.displayName || 'Maithreyan D';
-            loginAsDemoSuperAdmin(email, name);
-          }
-        } catch (popupErr) {
-          console.warn('Google Popup info:', popupErr);
-        }
+      // Launch REAL Google OAuth Account Picker Popup Window
+      const result = await signIn();
+      if (result && result.user) {
+        const user = result.user;
+        const demoUser = {
+          uid: user.uid,
+          email: user.email || 'maithreyan2006@gmail.com',
+          displayName: user.displayName || 'Maithreyan D',
+          role: 'super_admin' as const,
+        };
+        localStorage.setItem('infogram26_demo_user', JSON.stringify(demoUser));
+        window.location.href = '/admin/dashboard';
       }
-      
-      window.location.href = '/admin/dashboard';
     } catch (err: any) {
-      loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
-      window.location.href = '/admin/dashboard';
+      console.error('Google Sign-In Popup Error:', err);
+      if (err?.code === 'auth/popup-closed-by-user') {
+        setError('Google Sign-In window was closed. Please try again.');
+      } else if (err?.code === 'auth/unauthorized-domain') {
+        setError('Domain infogram26.vercel.app must be added to Firebase Authorized Domains.');
+      } else {
+        setError(err?.message || 'Google Sign-In failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
