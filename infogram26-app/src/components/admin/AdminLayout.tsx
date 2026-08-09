@@ -69,7 +69,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="p-6 border-b border-gray-800 flex flex-col items-center">
-          <img src="/logo.png" alt="INFOGRAM'26 Logo" className="h-12 w-auto object-contain mb-2 drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]" />
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-purple-500/50 bg-purple-950/40 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.4)] mb-2">
+            <img src="/logo-circle.png" alt="INFOGRAM'26 Logo" className="w-full h-full object-cover" />
+          </div>
           <h1 className="text-xl font-bold gradient-text tracking-wider text-center">INFOGRAM'26</h1>
           <div className="mt-2 text-center text-xs font-semibold text-purple-400 bg-purple-900/30 py-1 px-3 rounded-full border border-purple-500/30 flex items-center justify-center gap-1">
             <ShieldAlert className="w-3.5 h-3.5" /> SUPER ADMIN PORTAL

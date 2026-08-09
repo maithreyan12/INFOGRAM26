@@ -81,11 +81,13 @@ export default function Header() {
             className="flex items-center gap-2.5 group"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            <img 
-              src="/logo.png" 
-              alt="INFOGRAM'26 Logo" 
-              className="h-9 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_12px_rgba(0,212,255,0.4)]" 
-            />
+            <div className="w-10 h-10 rounded-full overflow-hidden border border-[#00d4ff]/40 bg-[#00d4ff]/10 flex items-center justify-center shadow-[0_0_12px_rgba(0,212,255,0.4)] group-hover:border-[#00d4ff] transition-all">
+              <img 
+                src="/logo-circle.png" 
+                alt="INFOGRAM'26 Logo" 
+                className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+              />
+            </div>
             <span className="text-base sm:text-lg font-bold tracking-wider hidden sm:inline-block" style={{ fontFamily: 'var(--font-display)' }}>
               <span className="text-white">INFOGRAM</span>
               <span className="text-[#00d4ff]">&apos;26</span>
