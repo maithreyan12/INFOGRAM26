@@ -257,6 +257,8 @@ export default function HeroSection() {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
+              color: 'transparent',
+              display: 'inline-block',
               filter: isDark 
                 ? 'drop-shadow(0 8px 30px rgba(192,132,252,0.35))'
                 : 'drop-shadow(0 4px 20px rgba(124,58,237,0.15))',

@@ -12,6 +12,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter } from 'next/navigation';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { CheckCircle, User, Upload, Calendar, ClipboardList, ChevronRight, ChevronLeft } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
 
 const personalInfoSchema = z.object({
   fullName: z.string().min(3, 'Full name must be at least 3 characters'),
@@ -63,6 +64,23 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const inputClass = `w-full rounded-xl px-4 py-3 text-sm transition-all duration-200 border ${
+    isDark
+      ? 'bg-slate-950/80 border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-amber-400'
+      : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#7c3aed]'
+  }`;
+  const labelClass = `block text-xs font-bold uppercase tracking-wider mb-2 ${
+    isDark ? 'text-slate-200' : 'text-slate-900'
+  }`;
+  const errorClass = 'text-red-500 text-xs mt-1.5 font-semibold';
+  const selectClass = `w-full rounded-xl px-4 py-3 text-sm transition-all duration-200 cursor-pointer border ${
+    isDark
+      ? 'bg-slate-950 border-slate-700 text-white focus:outline-none focus:border-amber-400'
+      : 'bg-white border-slate-300 text-slate-900 focus:outline-none focus:border-[#7c3aed]'
+  }`;
 
   const {
     register,
@@ -167,16 +185,28 @@ export default function RegisterPage() {
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 bg-[#00d4ff]/10 border border-[#00d4ff]/25 rounded-full px-4 py-1.5 text-xs font-semibold text-[#00d4ff] uppercase tracking-wider mb-4">
+            <div className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider mb-4 border ${
+              isDark ? 'bg-purple-500/10 border-purple-500/30 text-amber-300' : 'bg-[#7c3aed]/10 border-[#7c3aed]/20 text-[#7c3aed]'
+            }`}>
               ⚡ Registration Open
             </div>
             <h1
-              className="text-3xl sm:text-5xl font-black tracking-tight gradient-text-animated uppercase leading-none mb-3"
-              style={{ fontFamily: 'var(--font-display)' }}
+              className="text-3xl sm:text-5xl font-black tracking-tight uppercase leading-none mb-3"
+              style={{
+                fontFamily: 'var(--font-display)',
+                background: isDark
+                  ? 'linear-gradient(180deg, #ffffff 0%, #c084fc 50%, #38bdf8 100%)'
+                  : 'linear-gradient(180deg, #0f172a 0%, #6d28d9 55%, #059669 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                color: 'transparent',
+                display: 'inline-block',
+              }}
             >
               INFOGRAM&apos;26
             </h1>
-            <p className="text-white/50 text-sm" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.12em' }}>
+            <p className={`text-xs sm:text-sm font-extrabold uppercase tracking-[0.16em] ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               NATIONAL LEVEL TECHNICAL SYMPOSIUM
             </p>
           </div>
@@ -184,9 +214,9 @@ export default function RegisterPage() {
           {/* Step Indicators */}
           <div className="mb-10">
             <div className="flex items-center justify-between relative mb-3">
-              <div className="absolute left-0 right-0 top-5 h-px bg-white/8 mx-12 z-0">
+              <div className={`absolute left-0 right-0 top-5 h-px mx-12 z-0 ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
                 <motion.div
-                  className="h-full bg-gradient-to-r from-[#00d4ff] to-[#00b8d4] rounded-full"
+                  className={`h-full rounded-full ${isDark ? 'bg-gradient-to-r from-amber-300 to-purple-400' : 'bg-gradient-to-r from-[#7c3aed] to-[#059669]'}`}
                   initial={{ width: '0%' }}
                   animate={{ width: `${progressPct}%` }}
                   transition={{ duration: 0.4, ease: 'easeInOut' }}
@@ -200,16 +230,16 @@ export default function RegisterPage() {
                   <div key={s.number} className="flex flex-col items-center gap-2 z-10">
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                        done ? 'bg-[#00d4ff] border-[#00d4ff] text-black'
-                          : active ? 'bg-[#00d4ff]/15 border-[#00d4ff] text-[#00d4ff]'
-                          : 'bg-white/5 border-white/15 text-white/30'
+                        done ? (isDark ? 'bg-amber-300 border-amber-300 text-slate-950 font-bold' : 'bg-[#7c3aed] border-[#7c3aed] text-white')
+                          : active ? (isDark ? 'bg-purple-500/20 border-amber-300 text-amber-300 font-bold' : 'bg-[#7c3aed]/15 border-[#7c3aed] text-[#7c3aed] font-bold')
+                          : (isDark ? 'bg-slate-900 border-slate-700 text-slate-500' : 'bg-white border-slate-200 text-slate-400')
                       }`}
                     >
                       {done ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-4 h-4" />}
                     </div>
                     <span
-                      className={`text-[10px] font-semibold uppercase tracking-wider hidden sm:block transition-colors duration-300 ${
-                        active ? 'text-[#00d4ff]' : done ? 'text-white/70' : 'text-white/25'
+                      className={`text-[10px] font-bold uppercase tracking-wider hidden sm:block transition-colors duration-300 ${
+                        active ? (isDark ? 'text-amber-300' : 'text-[#7c3aed]') : done ? (isDark ? 'text-slate-200' : 'text-slate-700') : (isDark ? 'text-slate-500' : 'text-slate-400')
                       }`}
                     >
                       {s.label}
@@ -228,13 +258,17 @@ export default function RegisterPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="glass-card p-6 sm:p-8 rounded-2xl"
+              className={`glass-card p-6 sm:p-8 rounded-3xl border transition-colors duration-300 ${
+                isDark 
+                  ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl' 
+                  : 'bg-white/90 border-slate-200 text-slate-900 shadow-xl'
+              }`}
             >
               {/* STEP 1 */}
               {step === 1 && (
                 <div>
-                  <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <User className="text-[#00d4ff] w-5 h-5" /> Personal Information
+                  <h2 className={`text-xl font-bold mb-6 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <User className={`w-5 h-5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Personal Information
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
@@ -270,11 +304,11 @@ export default function RegisterPage() {
                     <div>
                       <label className={labelClass}>Year of Study *</label>
                       <select {...register('year')} className={selectClass}>
-                        <option value="" className="bg-[#071422]">Select Year</option>
-                        <option value="1st" className="bg-[#071422]">1st Year</option>
-                        <option value="2nd" className="bg-[#071422]">2nd Year</option>
-                        <option value="3rd" className="bg-[#071422]">3rd Year</option>
-                        <option value="4th" className="bg-[#071422]">4th Year</option>
+                        <option value="" className={isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}>Select Year</option>
+                        <option value="1st" className={isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}>1st Year</option>
+                        <option value="2nd" className={isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}>2nd Year</option>
+                        <option value="3rd" className={isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}>3rd Year</option>
+                        <option value="4th" className={isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}>4th Year</option>
                       </select>
                       {errors.year && <p className={errorClass}>{errors.year.message}</p>}
                     </div>
@@ -283,8 +317,8 @@ export default function RegisterPage() {
                       <div className="flex gap-5 mt-3">
                         {['Male', 'Female', 'Other'].map(g => (
                           <label key={g} className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" value={g} {...register('gender')} className="accent-[#00d4ff] w-4 h-4" />
-                            <span className="text-white/80 text-sm">{g}</span>
+                            <input type="radio" value={g} {...register('gender')} className="accent-[#7c3aed] w-4 h-4" />
+                            <span className={`text-sm font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>{g}</span>
                           </label>
                         ))}
                       </div>
@@ -297,14 +331,14 @@ export default function RegisterPage() {
               {/* STEP 2 */}
               {step === 2 && (
                 <div>
-                  <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Upload className="text-[#00d4ff] w-5 h-5" /> College ID Upload
+                  <h2 className={`text-xl font-bold mb-6 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <Upload className={`w-5 h-5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> College ID Upload
                   </h2>
                   <div
                     className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all duration-300 cursor-pointer ${
-                      dragOver ? 'border-[#00d4ff] bg-[#00d4ff]/10'
-                        : idFile ? 'border-green-400/50 bg-green-400/5'
-                        : 'border-white/15 hover:border-[#00d4ff]/40 hover:bg-[#00d4ff]/5'
+                      dragOver ? (isDark ? 'border-amber-300 bg-amber-300/10' : 'border-[#7c3aed] bg-[#7c3aed]/10')
+                        : idFile ? 'border-emerald-500/50 bg-emerald-500/5'
+                        : isDark ? 'border-slate-700 hover:border-amber-300/40 hover:bg-slate-800/50' : 'border-slate-300 hover:border-[#7c3aed]/40 hover:bg-slate-50'
                     }`}
                     onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                     onDragLeave={() => setDragOver(false)}
@@ -315,27 +349,27 @@ export default function RegisterPage() {
                       onChange={e => e.target.files?.[0] && handleFileSelection(e.target.files[0])} />
                     {idFile ? (
                       <div className="flex flex-col items-center gap-3">
-                        <div className="w-16 h-16 bg-green-400/15 rounded-full flex items-center justify-center">
-                          <CheckCircle className="w-8 h-8 text-green-400" />
+                        <div className="w-16 h-16 bg-emerald-500/15 rounded-full flex items-center justify-center">
+                          <CheckCircle className="w-8 h-8 text-emerald-500" />
                         </div>
-                        <p className="text-green-400 font-semibold">{idFile.name}</p>
-                        <p className="text-white/40 text-sm">Click to change file</p>
+                        <p className="text-emerald-600 font-bold">{idFile.name}</p>
+                        <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Click to change file</p>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-3">
-                        <div className="w-16 h-16 bg-[#00d4ff]/10 rounded-full flex items-center justify-center">
-                          <Upload className="w-8 h-8 text-[#00d4ff]" />
+                        <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isDark ? 'bg-purple-500/10' : 'bg-[#7c3aed]/10'}`}>
+                          <Upload className={`w-8 h-8 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                         </div>
-                        <p className="text-white font-semibold">Drag & drop your College ID</p>
-                        <p className="text-white/40 text-sm">or click to browse • JPG, PNG, PDF accepted</p>
-                        <div className="btn-primary px-5 py-2 rounded-full text-sm font-medium mt-2">Choose File</div>
+                        <p className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Drag & drop your College ID</p>
+                        <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>or click to browse • JPG, PNG, PDF accepted</p>
+                        <div className="btn-primary px-5 py-2 rounded-full text-sm font-bold mt-2">Choose File</div>
                       </div>
                     )}
                   </div>
                   {idPreview && (
                     <div className="mt-6">
-                      <p className="text-white/60 text-xs uppercase tracking-wider mb-3">Preview</p>
-                      <img src={idPreview} alt="ID Preview" className="max-h-56 mx-auto rounded-xl border border-white/10 shadow-lg" />
+                      <p className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Preview</p>
+                      <img src={idPreview} alt="ID Preview" className="max-h-56 mx-auto rounded-xl border border-slate-300 shadow-lg" />
                     </div>
                   )}
                 </div>
@@ -344,31 +378,37 @@ export default function RegisterPage() {
               {/* STEP 3 */}
               {step === 3 && (
                 <div>
-                  <h2 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                    <Calendar className="text-[#00d4ff] w-5 h-5" /> Select Events
+                  <h2 className={`text-xl font-bold mb-2 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <Calendar className={`w-5 h-5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Select Events
                   </h2>
-                  <p className="text-white/40 text-sm mb-6">Select one or more events to participate in</p>
+                  <p className={`text-sm mb-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Select one or more events to participate in</p>
 
                   {techEvents.length > 0 && (
                     <div className="mb-6">
-                      <p className="text-[#00d4ff] text-xs font-bold uppercase tracking-wider mb-3">🔧 Technical Events</p>
+                      <p className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>🔧 Technical Events</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {techEvents.map(event => {
                           const sel = selectedEvents.includes(event.id);
                           return (
                             <div key={event.id} onClick={() => toggleEvent(event.id)}
-                              className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
-                                sel ? 'border-[#00d4ff]/60 bg-[#00d4ff]/10' : 'border-white/10 bg-white/3 hover:border-[#00d4ff]/30'
+                              className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
+                                sel 
+                                  ? isDark ? 'border-amber-300 bg-amber-300/10' : 'border-[#7c3aed] bg-[#7c3aed]/10'
+                                  : isDark ? 'border-slate-800 bg-slate-950/40 hover:border-slate-700' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
                               }`}
                             >
                               <div className="flex justify-between items-start mb-1.5">
-                                <h3 className="font-bold text-white text-sm">{event.name}</h3>
-                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${sel ? 'border-[#00d4ff] bg-[#00d4ff]' : 'border-white/25'}`}>
-                                  {sel && <span className="text-black text-[10px] font-black">✓</span>}
+                                <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.name}</h3>
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                  sel 
+                                    ? isDark ? 'border-amber-300 bg-amber-300' : 'border-[#7c3aed] bg-[#7c3aed]'
+                                    : isDark ? 'border-slate-700' : 'border-slate-300'
+                                }`}>
+                                  {sel && <span className={`text-[10px] font-black ${isDark ? 'text-black' : 'text-white'}`}>✓</span>}
                                 </div>
                               </div>
-                              <p className="text-white/40 text-xs mb-1">{event.time}</p>
-                              <p className="text-[#ffd700] font-bold text-sm">₹{event.fee}</p>
+                              <p className={`text-xs mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{event.time}</p>
+                              <p className="text-amber-500 font-extrabold text-sm">₹{event.fee}</p>
                             </div>
                           );
                         })}
@@ -378,24 +418,28 @@ export default function RegisterPage() {
 
                   {nonTechEvents.length > 0 && (
                     <div className="mb-6">
-                      <p className="text-[#ffd700] text-xs font-bold uppercase tracking-wider mb-3">🎭 Non-Technical Events</p>
+                      <p className="text-teal-500 text-xs font-bold uppercase tracking-wider mb-3">🎭 Non-Technical Events</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {nonTechEvents.map(event => {
                           const sel = selectedEvents.includes(event.id);
                           return (
                             <div key={event.id} onClick={() => toggleEvent(event.id)}
-                              className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
-                                sel ? 'border-[#ffd700]/60 bg-[#ffd700]/8' : 'border-white/10 bg-white/3 hover:border-[#ffd700]/30'
+                              className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
+                                sel 
+                                  ? 'border-teal-500 bg-teal-500/10'
+                                  : isDark ? 'border-slate-800 bg-slate-950/40 hover:border-slate-700' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
                               }`}
                             >
                               <div className="flex justify-between items-start mb-1.5">
-                                <h3 className="font-bold text-white text-sm">{event.name}</h3>
-                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${sel ? 'border-[#ffd700] bg-[#ffd700]' : 'border-white/25'}`}>
-                                  {sel && <span className="text-black text-[10px] font-black">✓</span>}
+                                <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.name}</h3>
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                  sel ? 'border-teal-500 bg-teal-500' : isDark ? 'border-slate-700' : 'border-slate-300'
+                                }`}>
+                                  {sel && <span className="text-white text-[10px] font-black">✓</span>}
                                 </div>
                               </div>
-                              <p className="text-white/40 text-xs mb-1">{event.time}</p>
-                              <p className="text-[#ffd700] font-bold text-sm">₹{event.fee}</p>
+                              <p className={`text-xs mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{event.time}</p>
+                              <p className="text-amber-500 font-extrabold text-sm">₹{event.fee}</p>
                             </div>
                           );
                         })}
@@ -403,14 +447,16 @@ export default function RegisterPage() {
                     </div>
                   )}
 
-                  <div className="mt-4 p-4 rounded-xl bg-[#00d4ff]/8 border border-[#00d4ff]/20 flex justify-between items-center">
+                  <div className={`mt-4 p-4 rounded-2xl border flex justify-between items-center ${
+                    isDark ? 'bg-purple-500/10 border-purple-500/30' : 'bg-[#7c3aed]/5 border-[#7c3aed]/20'
+                  }`}>
                     <div>
-                      <p className="text-white/60 text-xs uppercase tracking-wider">Selected</p>
-                      <p className="text-white font-semibold">{selectedEvents.length} event{selectedEvents.length !== 1 ? 's' : ''}</p>
+                      <p className={`text-xs uppercase font-bold tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Selected</p>
+                      <p className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{selectedEvents.length} event{selectedEvents.length !== 1 ? 's' : ''}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-white/60 text-xs uppercase tracking-wider">Total Fee</p>
-                      <p className="text-[#ffd700] font-black text-2xl">₹{getTotalFee()}</p>
+                      <p className={`text-xs uppercase font-bold tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Total Fee</p>
+                      <p className="text-amber-500 font-black text-2xl">₹{getTotalFee()}</p>
                     </div>
                   </div>
                 </div>
@@ -419,12 +465,12 @@ export default function RegisterPage() {
               {/* STEP 4 */}
               {step === 4 && (
                 <div>
-                  <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <ClipboardList className="text-[#00d4ff] w-5 h-5" /> Review & Submit
+                  <h2 className={`text-xl font-bold mb-6 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <ClipboardList className={`w-5 h-5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Review & Submit
                   </h2>
                   <div className="space-y-5">
-                    <div className="bg-white/4 rounded-xl p-5 border border-white/8">
-                      <h3 className="text-[#00d4ff] text-xs font-bold uppercase tracking-wider mb-4">Personal Details</h3>
+                    <div className={`rounded-2xl p-5 border ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                      <h3 className={`text-xs font-bold uppercase tracking-wider mb-4 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Personal Details</h3>
                       <div className="grid grid-cols-2 gap-y-3 gap-x-6">
                         {[
                           ['Name', formData.fullName], ['Email', formData.email],
@@ -433,65 +479,81 @@ export default function RegisterPage() {
                           ['Year', formData.year], ['Gender', formData.gender],
                         ].map(([key, val]) => (
                           <div key={key}>
-                            <p className="text-white/40 text-xs">{key}</p>
-                            <p className="text-white text-sm font-medium truncate">{val}</p>
+                            <p className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{key}</p>
+                            <p className={`text-sm font-bold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{val}</p>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="bg-white/4 rounded-xl p-5 border border-white/8">
-                      <h3 className="text-[#00d4ff] text-xs font-bold uppercase tracking-wider mb-4">Selected Events</h3>
+                    <div className={`rounded-2xl p-5 border ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                      <h3 className={`text-xs font-bold uppercase tracking-wider mb-4 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Selected Events</h3>
                       <ul className="space-y-2">
                         {selectedEvents.map(id => {
                           const event = events.find(e => e.id === id);
                           return (
                             <li key={id} className="flex justify-between items-center text-sm">
-                              <span className="text-white flex items-center gap-2"><span className="text-[#00d4ff]">✓</span>{event?.name}</span>
-                              <span className="text-[#ffd700] font-semibold">₹{event?.fee}</span>
+                              <span className={`font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>{event?.name}</span>
+                              <span className="text-amber-500 font-extrabold">₹{event?.fee}</span>
                             </li>
                           );
                         })}
                       </ul>
-                      <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
-                        <span className="text-white/60 font-medium">Total Amount Due</span>
-                        <span className="text-[#ffd700] font-black text-xl">₹{getTotalFee()}</span>
+                      <div className={`mt-4 pt-3 border-t flex justify-between items-center ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+                        <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Total Amount</span>
+                        <span className="text-amber-500 font-black text-xl">₹{getTotalFee()}</span>
                       </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 bg-[#ffd700]/8 border border-[#ffd700]/20 rounded-xl p-4">
-                      <span className="text-[#ffd700] text-lg mt-0.5">⚠️</span>
-                      <p className="text-white/70 text-sm">
-                        After clicking <strong className="text-white">Proceed to Payment</strong>, scan the UPI QR code, pay, then enter your UTR number to confirm. Your QR ticket will be generated instantly.
-                      </p>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Navigation */}
-              <div className="flex justify-between mt-8 pt-6 border-t border-white/8">
+              {/* Navigation Buttons */}
+              <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-200/20">
                 {step > 1 ? (
-                  <button onClick={() => setStep(step - 1)} disabled={isSubmitting}
-                    className="btn-glass flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold">
-                    <ChevronLeft className="w-4 h-4" /> Previous
+                  <button
+                    type="button"
+                    onClick={() => setStep(step - 1)}
+                    className={`px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 border transition-all ${
+                      isDark 
+                        ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700' 
+                        : 'bg-slate-100 border-slate-300 text-slate-800 hover:bg-slate-200'
+                    }`}
+                  >
+                    <ChevronLeft className="w-4 h-4" /> Back
                   </button>
                 ) : <div />}
 
                 {step < 4 ? (
-                  <button onClick={handleNext}
-                    disabled={(step === 2 && !idFile) || (step === 3 && selectedEvents.length === 0)}
-                    className="btn-primary flex items-center gap-2 px-8 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed">
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    disabled={
+                      (step === 1 && (!formData.fullName || !formData.email || !formData.phone || !formData.college || !formData.department || !formData.registerNumber || !formData.year || !formData.gender)) ||
+                      (step === 2 && !idFile) ||
+                      (step === 3 && selectedEvents.length === 0)
+                    }
+                    className="btn-primary px-7 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
                     Next <ChevronRight className="w-4 h-4" />
                   </button>
                 ) : (
-                  <button onClick={onSubmit} disabled={isSubmitting}
-                    className="btn-primary flex items-center gap-2 px-8 py-3 rounded-xl font-bold disabled:opacity-60">
+                  <button
+                    type="button"
+                    onClick={onSubmit}
+                    disabled={isSubmitting}
+                    className="btn-primary px-8 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg"
+                  >
                     {isSubmitting ? (
-                      <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Processing... {uploadProgress > 0 && `${uploadProgress}%`}</>
+                      <>
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Processing ({uploadProgress}%)</span>
+                      </>
                     ) : (
-                      <>Proceed to Payment <ChevronRight className="w-4 h-4" /></>
+                      <>
+                        <span>Complete Registration</span>
+                        <CheckCircle className="w-4 h-4" />
+                      </>
                     )}
                   </button>
                 )}
