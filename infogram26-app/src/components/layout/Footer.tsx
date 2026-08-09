@@ -2,20 +2,7 @@
 
 import Link from 'next/link';
 import { Mail, Phone, MapPin } from 'lucide-react';
-
 import { useTheme } from '@/context/ThemeContext';
-
-const socialLinks = [
-  {
-    label: 'Instagram',
-    href: 'https://www.instagram.com/infogram_2k26?utm_source=qr&igsh=N2JqNW5zOWF0cHIw',
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-      </svg>
-    ),
-  },
-];
 
 const quickLinks = [
   { name: 'Home', path: '/' },
@@ -25,11 +12,6 @@ const quickLinks = [
   { name: 'Contact', path: '/contact' },
 ];
 
-const legalLinks = [
-  { name: 'Privacy Policy', path: '/privacy-policy' },
-  { name: 'Terms & Conditions', path: '/terms' },
-];
-
 const contactPersons = [
   { name: 'Naveeth Khan', phone: '9360257573' },
   { name: 'Farish Sharif', phone: '9487233290' },
@@ -37,30 +19,57 @@ const contactPersons = [
   { name: 'MD Thameem', phone: '9361900720' },
 ];
 
-const officials = [
-  { title: 'Chief Patron', names: ['Janab Dr. S. Ziauddeen Ahmed, Chairman', 'Janab V. Mohammed Rizwanullah, Correspondent'] },
-  { title: 'Patron', names: ['Dr. M. Sasikumar, Principal', 'Dr. A. Md Muzaffar Hussain, Vice-Principal'] },
-  { title: 'HOD', names: ['Dr. S. Umamaheswari, Prof & Head/IT'] },
-  { title: 'Convenors', names: ['Mr. M. Mohamed Rafee, AP/IT', 'Mr. I. Abdulla, AP/IT'] },
-  { title: 'Student Coordinators', names: ['Final Year IT Students'] },
+const legalLinks = [
+  { name: 'Privacy Policy', path: '/privacy-policy' },
+  { name: 'Terms & Conditions', path: '/terms' },
+];
+
+const socialLinks = [
+  {
+    label: 'Instagram',
+    href: 'https://instagram.com',
+    icon: (
+      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+      </svg>
+    ),
+  },
+  {
+    label: 'LinkedIn',
+    href: 'https://linkedin.com',
+    icon: (
+      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+      </svg>
+    ),
+  },
+  {
+    label: 'YouTube',
+    href: 'https://youtube.com',
+    icon: (
+      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+        <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+      </svg>
+    ),
+  },
 ];
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
+  const currentYear = 2026;
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
   return (
-    <footer className={`border-t transition-colors duration-500 mt-20 ${
-      isDark ? 'border-purple-500/20 bg-slate-950 text-slate-300' : 'border-slate-200/80 bg-gradient-to-b from-transparent to-slate-100/70 text-slate-600'
+    <footer className={`pt-16 pb-12 border-t transition-colors duration-300 relative z-10 ${
+      isDark ? 'bg-[#04060e] border-purple-500/20 text-white' : 'bg-white border-slate-200 text-slate-950'
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+      <div className="container-xl mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12">
 
-          {/* Brand */}
-          <div className="sm:col-span-2 lg:col-span-1 space-y-5">
-            <Link
-              href="/"
+          {/* Brand Info */}
+          <div className="lg:col-span-2 space-y-4">
+            <Link 
+              href="/" 
               className="flex items-center gap-2.5 group w-fit"
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
@@ -76,15 +85,16 @@ export default function Footer() {
                   className="w-full h-full object-cover rounded-full transform scale-105" 
                 />
               </div>
-              <span className={`text-xl font-black tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`} style={{ fontFamily: 'var(--font-display)' }}>
+              <span className={`text-xl font-black tracking-wider ${isDark ? 'text-white' : 'text-slate-950'}`} style={{ fontFamily: 'var(--font-display)' }}>
                 INFOGRAM<span className={isDark ? 'text-amber-300' : 'text-[#7c3aed]'}>&apos;26</span>
               </span>
             </Link>
-            <p className={`text-sm leading-relaxed font-medium max-w-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              The premier national-level technical symposium hosted by the Department of Information Technology, CAHCET.
+            
+            <p className={`text-sm leading-relaxed font-bold max-w-xs ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
+              National Level Technical Symposium organized by the Department of Information Technology at C. Abdul Hakeem College of Engineering &amp; Technology.
             </p>
-            {/* Social Icons */}
-            <div className="flex items-center gap-3 pt-1">
+
+            <div className="flex items-center gap-3 pt-2">
               {socialLinks.map((s) => (
                 <a
                   key={s.label}
@@ -95,7 +105,7 @@ export default function Footer() {
                   className={`w-[44px] h-[44px] flex items-center justify-center rounded-full border transition-all duration-200 ${
                     isDark 
                       ? 'bg-slate-900 border-slate-700 text-slate-200 hover:bg-purple-500/20 hover:text-amber-300 hover:border-amber-300/40' 
-                      : 'bg-white border-slate-200 text-slate-700 hover:bg-[#7c3aed]/10 hover:text-[#7c3aed] hover:border-[#7c3aed]/40'
+                      : 'bg-slate-100 border-slate-300 text-slate-900 hover:bg-[#7c3aed]/10 hover:text-[#7c3aed] hover:border-[#7c3aed]/40'
                   }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
@@ -107,14 +117,16 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className={`font-bold text-sm uppercase tracking-widest mb-5 ${isDark ? 'text-amber-300' : 'text-slate-900'}`} style={{ fontFamily: 'var(--font-heading)' }}>Quick Links</h3>
+            <h3 className={`font-black text-xs uppercase tracking-widest mb-5 ${isDark ? 'text-amber-300' : 'text-slate-950'}`} style={{ fontFamily: 'var(--font-heading)' }}>
+              Quick Links
+            </h3>
             <ul className="space-y-1">
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.path}
-                    className={`min-h-[40px] flex items-center text-sm font-medium transition-colors ${
-                      isDark ? 'text-slate-400 hover:text-amber-300' : 'text-slate-600 hover:text-[#7c3aed]'
+                    className={`min-h-[40px] flex items-center text-sm font-black transition-colors ${
+                      isDark ? 'text-slate-300 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
                     }`}
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
@@ -127,17 +139,21 @@ export default function Footer() {
 
           {/* Contact Persons */}
           <div>
-            <h3 className="text-slate-900 font-bold text-sm uppercase tracking-widest mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Contact</h3>
+            <h3 className={`font-black text-xs uppercase tracking-widest mb-5 ${isDark ? 'text-amber-300' : 'text-slate-950'}`} style={{ fontFamily: 'var(--font-heading)' }}>
+              Contact
+            </h3>
             <ul className="space-y-3">
               {contactPersons.map((person) => (
-                <li key={person.name} className="flex items-center gap-3">
-                  <Phone className="w-3.5 h-3.5 text-[#7c3aed] shrink-0" />
-                  <div>
-                    <span className="text-sm text-slate-900 font-bold">{person.name}</span>
-                    <span className="text-slate-400 mx-1.5">·</span>
+                <li key={person.name} className="flex items-center gap-2.5">
+                  <Phone className={`w-4 h-4 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>{person.name}</span>
+                    <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>·</span>
                     <a
                       href={`tel:+91${person.phone}`}
-                      className="text-sm text-slate-600 hover:text-[#7c3aed] font-semibold transition-colors"
+                      className={`text-sm font-black transition-colors ${
+                        isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
+                      }`}
                       style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                       {person.phone}
@@ -146,12 +162,14 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-            <div className="mt-4 space-y-2">
+            <div className="mt-5 space-y-2">
               {legalLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.path}
-                  className="block text-sm text-slate-500 hover:text-[#7c3aed] font-medium transition-colors"
+                  className={`block text-xs font-black uppercase tracking-wider transition-colors ${
+                    isDark ? 'text-slate-300 hover:text-amber-300' : 'text-slate-800 hover:text-[#7c3aed]'
+                  }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   {link.name}
@@ -162,31 +180,37 @@ export default function Footer() {
 
           {/* Location */}
           <div>
-            <h3 className="text-slate-900 font-bold text-sm uppercase tracking-widest mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Location</h3>
+            <h3 className={`font-black text-xs uppercase tracking-widest mb-5 ${isDark ? 'text-amber-300' : 'text-slate-950'}`} style={{ fontFamily: 'var(--font-heading)' }}>
+              Location
+            </h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-[#7c3aed] shrink-0 mt-0.5" />
-                <span className="text-sm text-slate-600 font-medium leading-relaxed">
+                <MapPin className={`w-4 h-4 shrink-0 mt-0.5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
+                <span className={`text-sm font-black leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
                   Hakeem Nagar, Melvisharam,<br />
                   Ranipet District,<br />
                   Tamil Nadu – 632 509
                 </span>
               </li>
               <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-[#7c3aed] shrink-0" />
+                <Phone className={`w-4 h-4 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                 <a
                   href="tel:+914172267387"
-                  className="text-sm text-slate-600 hover:text-[#7c3aed] font-semibold transition-colors"
+                  className={`text-sm font-black transition-colors ${
+                    isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
+                  }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   +91 4172 267387
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-[#7c3aed] shrink-0" />
+                <Mail className={`w-4 h-4 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                 <a
                   href="mailto:info@cahcet.edu.in"
-                  className="text-sm text-slate-600 hover:text-[#7c3aed] font-semibold transition-colors"
+                  className={`text-sm font-black transition-colors ${
+                    isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
+                  }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   info@cahcet.edu.in
@@ -197,16 +221,22 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-medium">
+        {/* Bottom bar - 100% PROMINENT DEVELOPER CREDIT FOR APPZIIO */}
+        <div className={`pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-black ${
+          isDark ? 'border-slate-800 text-slate-300' : 'border-slate-300 text-slate-800'
+        }`}>
           <p>© {currentYear} INFOGRAM&apos;26 · Department of Information Technology, CAHCET. All rights reserved.</p>
-          <p>
-            Designed &amp; Developed by{' '}
+          <p className="flex items-center gap-1.5 text-sm font-black">
+            <span>Designed &amp; Developed by</span>
             <a
               href="https://appziio.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#7c3aed] hover:text-[#6d28d9] font-bold transition-colors"
+              className={`font-black text-sm uppercase tracking-widest transition-all px-2.5 py-1 rounded-full border ${
+                isDark 
+                  ? 'bg-purple-500/20 text-amber-300 border-purple-500/40 hover:bg-purple-500/30 drop-shadow-[0_0_12px_rgba(252,211,77,0.6)]' 
+                  : 'bg-[#7c3aed]/10 text-[#7c3aed] border-[#7c3aed]/30 hover:bg-[#7c3aed]/20 shadow-xs'
+              }`}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               Appziio

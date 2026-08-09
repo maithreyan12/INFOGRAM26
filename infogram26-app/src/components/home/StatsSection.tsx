@@ -64,10 +64,10 @@ export default function StatsSection() {
                   damping: 24,
                 }}
                 style={{ willChange: 'transform, opacity', WebkitTapHighlightColor: 'transparent' }}
-                className={`glass-card p-4 sm:p-6 md:p-8 rounded-2xl flex flex-col items-center text-center cursor-default select-none border transition-all duration-300 ${
+                className={`p-4 sm:p-6 md:p-8 rounded-3xl flex flex-col items-center text-center cursor-default select-none border transition-all duration-300 ${
                   isDark 
-                    ? 'bg-slate-900/85 border-purple-500/30 text-white shadow-2xl hover:border-purple-400/50' 
-                    : 'bg-white/90 border-slate-200 text-slate-900 shadow-md hover:border-[#7c3aed]/30'
+                    ? 'bg-slate-900/95 border-purple-500/40 text-white shadow-2xl hover:border-purple-400/60' 
+                    : 'bg-white border-slate-200 text-slate-950 shadow-xl hover:border-[#7c3aed]/40'
                 }`}
               >
                 <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl ${stat.bg} border ${stat.border} flex items-center justify-center mb-3 sm:mb-4`}>
