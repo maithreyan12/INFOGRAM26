@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronDown, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@/context/ThemeContext';
@@ -12,7 +12,17 @@ export default function HeroSection() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [introFinished, setIntroFinished] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  // Mouse tracking for subtle 3D parallax physics
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePos({ x, y });
+  };
 
   // Countdown timer calculation
   useEffect(() => {
@@ -33,7 +43,7 @@ export default function HeroSection() {
     return () => clearInterval(id);
   }, []);
 
-  // ── CINEMATIC LIQUID GLASS INTRO ANIMATION & FLUID CANVAS ──
+  // ── CINEMATIC LIQUID PARTICLES & REFRACTION CANVAS ANIMATION ──
   useEffect(() => {
     if (!canvasRef.current || !mounted) return;
     const canvas = canvasRef.current;
@@ -47,11 +57,22 @@ export default function HeroSection() {
     resize();
     window.addEventListener('resize', resize);
 
+    // Generate 60 liquid glass particles
+    const particles = Array.from({ length: 60 }).map(() => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      radius: Math.random() * 3 + 1,
+      speedX: (Math.random() - 0.5) * 0.4,
+      speedY: (Math.random() - 0.5) * 0.4,
+      alpha: Math.random() * 0.5 + 0.2,
+      color: Math.random() > 0.5 ? '#c084fc' : '#38bdf8',
+    }));
+
     const startTime = performance.now();
     let frameId: number;
 
     const render = (now: number) => {
-      const elapsed = (now - startTime) / 1000; // seconds
+      const elapsed = (now - startTime) / 1000;
       const w = canvas.width;
       const h = canvas.height;
       const cx = w / 2;
@@ -59,76 +80,41 @@ export default function HeroSection() {
 
       ctx.clearRect(0, 0, w, h);
 
-      if (elapsed < 1.2) {
-        // Phase 1: Point of light expanding into liquid glass sphere
-        const progress = Math.min(elapsed / 1.2, 1);
-        const radius = 4 + progress * (Math.min(w, h) * 0.28);
-        const glowAlpha = Math.sin(progress * Math.PI) * 0.85;
+      // Intro Refraction Wave (First 1.5 seconds)
+      if (elapsed < 1.5) {
+        const progress = elapsed / 1.5;
+        const waveRadius = progress * (Math.min(w, h) * 0.45);
+        const alpha = (1 - progress) * 0.5;
 
-        // Inner liquid glass refraction gradient
-        const radGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-        radGrad.addColorStop(0, `rgba(255, 255, 255, ${0.9 * glowAlpha})`);
-        radGrad.addColorStop(0.3, `rgba(168, 85, 247, ${0.6 * glowAlpha})`);
-        radGrad.addColorStop(0.7, `rgba(56, 189, 248, ${0.4 * glowAlpha})`);
-        radGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-        ctx.fillStyle = radGrad;
+        ctx.save();
         ctx.beginPath();
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.arc(cx, cy, waveRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(192, 132, 252, ${alpha})`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Draw floating liquid glass particles
+      particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if (p.x < 0) p.x = w;
+        if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h;
+        if (p.y > h) p.y = 0;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha * (isDark ? 0.6 : 0.3);
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 10;
         ctx.fill();
-      } else if (elapsed < 2.5) {
-        // Phase 2: Fluid glass morphing into flowing ribbons
-        const ribbonProgress = (elapsed - 1.2) / 1.3;
-        const waveCount = 5;
-
-        for (let i = 0; i < waveCount; i++) {
-          ctx.save();
-          ctx.beginPath();
-          const offset = i * 0.4;
-          const yPos = cy + Math.sin(ribbonProgress * Math.PI * 2 + offset) * 40;
-
-          ctx.moveTo(0, yPos);
-          for (let x = 0; x <= w; x += 30) {
-            const waveY = yPos + Math.sin(x * 0.008 + ribbonProgress * 4 + offset) * 35;
-            ctx.lineTo(x, waveY);
-          }
-
-          const alpha = (1 - ribbonProgress) * 0.4;
-          const colors = [
-            `rgba(192, 132, 252, ${alpha})`,
-            `rgba(56, 189, 248, ${alpha})`,
-            `rgba(234, 179, 8, ${alpha * 0.7})`,
-            `rgba(124, 58, 237, ${alpha})`,
-            `rgba(52, 211, 153, ${alpha})`
-          ];
-
-          ctx.strokeStyle = colors[i % colors.length];
-          ctx.lineWidth = 3 + i * 2;
-          ctx.stroke();
-          ctx.restore();
-        }
-      } else if (!introFinished) {
-        setIntroFinished(true);
-      }
-
-      // Continuous ambient fluid glass particle aura
-      if (elapsed >= 2.0) {
-        const time = elapsed * 0.5;
-        const count = 30;
-        for (let i = 0; i < count; i++) {
-          const px = cx + Math.cos(time + i) * (120 + i * 8);
-          const py = cy + Math.sin(time * 1.2 + i * 1.5) * (60 + i * 4);
-          const size = 1.5 + (i % 3);
-          const pAlpha = 0.2 + Math.sin(time * 2 + i) * 0.15;
-
-          ctx.fillStyle = i % 4 === 0 
-            ? `rgba(234, 179, 8, ${pAlpha})` 
-            : `rgba(168, 85, 247, ${pAlpha})`;
-          ctx.beginPath();
-          ctx.arc(px, py, size, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
+        ctx.restore();
+      });
 
       frameId = requestAnimationFrame(render);
     };
@@ -139,15 +125,15 @@ export default function HeroSection() {
       cancelAnimationFrame(frameId);
       window.removeEventListener('resize', resize);
     };
-  }, [mounted, introFinished]);
+  }, [mounted, isDark]);
 
-  // Choreographed reveal timing for the 9 content items
+  // Fast, crisp choreographed reveal for all 9 content items
   const getItemVariants = (order: number) => ({
     hidden: { 
       opacity: 0, 
-      y: 35, 
-      scale: 0.94,
-      filter: 'blur(16px)',
+      y: 24, 
+      scale: 0.96,
+      filter: 'blur(10px)',
     },
     visible: { 
       opacity: 1, 
@@ -155,8 +141,8 @@ export default function HeroSection() {
       scale: 1,
       filter: 'blur(0px)',
       transition: { 
-        delay: 2.2 + order * 0.18, 
-        duration: 0.7, 
+        delay: 0.15 + order * 0.08, 
+        duration: 0.55, 
         ease: [0.22, 1, 0.36, 1] as const
       } 
     },
@@ -164,6 +150,8 @@ export default function HeroSection() {
 
   return (
     <section
+      ref={heroRef}
+      onMouseMove={handleMouseMove}
       className={`relative flex flex-col items-center justify-center overflow-hidden transition-colors duration-700 ${
         isDark ? 'bg-[#020617] text-white' : 'bg-[#f8fafc] text-slate-900'
       }`}
@@ -172,33 +160,45 @@ export default function HeroSection() {
         contain: 'layout style',
       }}
     >
-      {/* ── Fluid Intro & Ambient Glass Canvas ── */}
+      {/* ── Dynamic Particle Canvas ── */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 pointer-events-none"
-        style={{ zIndex: 1, opacity: mounted ? 1 : 0, transition: 'opacity 1s' }}
+        style={{ zIndex: 1, opacity: mounted ? 1 : 0, transition: 'opacity 0.8s' }}
       />
 
-      {/* ── Subtle Background Mesh Glow ── */}
+      {/* ── Background Ambient Light Mesh ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         <div 
-          className={`absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[800px] h-[500px] rounded-full blur-[140px] transition-opacity duration-1000 ${
-            isDark ? 'bg-purple-900/25 opacity-70' : 'bg-purple-300/30 opacity-60'
+          className={`absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] max-w-[750px] h-[450px] rounded-full blur-[140px] transition-all duration-1000 ${
+            isDark ? 'bg-purple-900/30 opacity-80' : 'bg-purple-300/35 opacity-70'
           }`}
+          style={{
+            transform: `translate(calc(-50% + ${mousePos.x * 30}px), calc(-50% + ${mousePos.y * 30}px))`,
+          }}
         />
         <div 
-          className={`absolute top-1/3 left-1/3 w-[60vw] max-w-[600px] h-[400px] rounded-full blur-[130px] transition-opacity duration-1000 ${
-            isDark ? 'bg-cyan-900/20 opacity-60' : 'bg-cyan-200/40 opacity-50'
+          className={`absolute top-1/3 left-1/3 w-[55vw] max-w-[550px] h-[350px] rounded-full blur-[130px] transition-all duration-1000 ${
+            isDark ? 'bg-cyan-900/20 opacity-70' : 'bg-cyan-200/45 opacity-60'
           }`}
+          style={{
+            transform: `translate(${mousePos.x * -20}px, ${mousePos.y * -20}px)`,
+          }}
         />
       </div>
 
       {/* ══════════════════════════════════
           MAIN CHOREOGRAPHED CONTENT
       ══════════════════════════════════ */}
-      <div
+      <motion.div
         className="relative flex flex-col items-center text-center w-full px-4 max-w-5xl mx-auto"
-        style={{ zIndex: 10, paddingTop: 'max(84px, calc(env(safe-area-inset-top,0px) + 84px))', paddingBottom: 60 }}
+        style={{ 
+          zIndex: 10, 
+          paddingTop: 'max(84px, calc(env(safe-area-inset-top,0px) + 84px))', 
+          paddingBottom: 60,
+          transform: `perspective(1000px) rotateX(${mousePos.y * -4}deg) rotateY(${mousePos.x * 4}deg)`,
+          transition: 'transform 0.2s ease-out',
+        }}
       >
         {/* 1. College Name & 2. Department Name Badge Container */}
         <motion.div
@@ -208,10 +208,10 @@ export default function HeroSection() {
           className="mb-4"
         >
           <div
-            className={`inline-flex flex-col items-center gap-0.5 px-5 py-2.5 rounded-full border transition-all duration-300 ${
+            className={`inline-flex flex-col items-center gap-0.5 px-6 py-2.5 rounded-full border transition-all duration-300 ${
               isDark
-                ? 'bg-slate-900/80 border-purple-500/30 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.15)]'
-                : 'bg-white/80 border-slate-200 shadow-[0_4px_20px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)]'
+                ? 'bg-slate-900/85 border-purple-500/30 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.15)] hover:border-purple-400/50'
+                : 'bg-white/90 border-slate-200 shadow-[0_4px_20px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] hover:border-[#7c3aed]/30'
             }`}
             style={{
               backdropFilter: 'blur(24px) saturate(190%)',
@@ -221,7 +221,7 @@ export default function HeroSection() {
             {/* ITEM 1: College Name */}
             <span 
               className={`text-[9px] sm:text-[11px] font-bold tracking-[0.18em] uppercase ${
-                isDark ? 'text-slate-300' : 'text-slate-600'
+                isDark ? 'text-slate-300' : 'text-slate-700'
               }`}
               style={{ fontFamily: 'var(--font-heading)' }}
             >
@@ -230,11 +230,12 @@ export default function HeroSection() {
 
             {/* ITEM 2: Department Name */}
             <span 
-              className={`text-[10px] sm:text-[12px] font-extrabold tracking-[0.18em] uppercase ${
+              className={`text-[10px] sm:text-[12px] font-black tracking-[0.18em] uppercase flex items-center gap-1.5 ${
                 isDark ? 'text-amber-300 drop-shadow-[0_0_8px_rgba(252,211,77,0.4)]' : 'text-[#7c3aed]'
               }`}
               style={{ fontFamily: 'var(--font-heading)' }}
             >
+              <Sparkles className="w-3 h-3 text-amber-400 animate-pulse" />
               Department of Information Technology
             </span>
           </div>
@@ -315,8 +316,8 @@ export default function HeroSection() {
           initial="hidden"
           animate="visible"
           variants={getItemVariants(5)}
-          className={`text-xs sm:text-base font-bold uppercase tracking-[0.22em] mt-3 mb-2 ${
-            isDark ? 'text-slate-300' : 'text-slate-600'
+          className={`text-xs sm:text-base font-black uppercase tracking-[0.22em] mt-3 mb-2 ${
+            isDark ? 'text-slate-300' : 'text-slate-700'
           }`}
           style={{ fontFamily: 'var(--font-heading)' }}
         >
@@ -350,8 +351,8 @@ export default function HeroSection() {
           <div
             className={`p-4 sm:p-5 rounded-3xl border transition-all duration-300 ${
               isDark
-                ? 'bg-slate-900/80 border-purple-500/30 shadow-[0_12px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.15)]'
-                : 'bg-white/80 border-slate-200 shadow-[0_8px_30px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)]'
+                ? 'bg-slate-900/85 border-purple-500/30 shadow-[0_12px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.15)]'
+                : 'bg-white/90 border-slate-200 shadow-[0_8px_30px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)]'
             }`}
             style={{
               backdropFilter: 'blur(28px) saturate(190%)',
@@ -382,8 +383,8 @@ export default function HeroSection() {
                     </motion.span>
                   </AnimatePresence>
                   <span
-                    className={`text-[9px] sm:text-xs font-bold uppercase tracking-widest mt-1.5 ${
-                      isDark ? 'text-slate-400' : 'text-slate-500'
+                    className={`text-[9px] sm:text-xs font-black uppercase tracking-widest mt-1.5 ${
+                      isDark ? 'text-slate-400' : 'text-slate-600'
                     }`}
                     style={{ fontFamily: 'var(--font-heading)' }}
                   >
@@ -403,12 +404,14 @@ export default function HeroSection() {
             animate="visible"
             variants={getItemVariants(8)}
             className="w-full sm:w-auto"
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.97 }}
           >
             <Link
               href="/register"
               className={`
                 group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 
-                rounded-full font-extrabold text-sm uppercase tracking-wider w-full sm:w-auto
+                rounded-full font-black text-sm uppercase tracking-wider w-full sm:w-auto
                 overflow-hidden transition-all duration-300 select-none cursor-pointer border
                 ${
                   isDark
@@ -436,17 +439,19 @@ export default function HeroSection() {
             animate="visible"
             variants={getItemVariants(9)}
             className="w-full sm:w-auto"
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.97 }}
           >
             <Link
               href="/events"
               className={`
                 inline-flex items-center justify-center gap-2 px-8 py-3.5 
-                rounded-full font-bold text-sm uppercase tracking-wider w-full sm:w-auto
+                rounded-full font-black text-sm uppercase tracking-wider w-full sm:w-auto
                 transition-all duration-300 select-none cursor-pointer border
                 ${
                   isDark
                     ? 'bg-slate-900/80 text-white border-slate-700/80 hover:bg-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
-                    : 'bg-white/80 text-slate-900 border-slate-200 hover:bg-white shadow-[0_4px_20px_rgba(15,23,42,0.05),inset_0_1px_0_rgba(255,255,255,0.9)]'
+                    : 'bg-white/90 text-slate-900 border-slate-300 hover:bg-white shadow-[0_4px_20px_rgba(15,23,42,0.08),inset_0_1px_0_rgba(255,255,255,0.9)]'
                 }
               `}
               style={{
@@ -459,7 +464,7 @@ export default function HeroSection() {
             </Link>
           </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {/* ── Scroll hint ── */}
       <motion.div
@@ -469,8 +474,8 @@ export default function HeroSection() {
         transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
       >
         <span 
-          className={`text-[8px] uppercase tracking-[0.3em] font-bold ${
-            isDark ? 'text-slate-400' : 'text-slate-500'
+          className={`text-[8px] uppercase tracking-[0.3em] font-black ${
+            isDark ? 'text-slate-400' : 'text-slate-600'
           }`}
           style={{ fontFamily: 'var(--font-heading)' }}
         >
