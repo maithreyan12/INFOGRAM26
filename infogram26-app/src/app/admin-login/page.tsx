@@ -133,7 +133,7 @@ export default function AdminLogin() {
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 font-semibold py-3 px-6 rounded-xl hover:bg-gray-100 transition-all duration-300 transform hover:scale-[1.01] shadow-lg disabled:opacity-70"
+          className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 font-bold py-3.5 px-6 rounded-xl hover:bg-gray-100 transition-all duration-300 transform hover:scale-[1.01] shadow-lg disabled:opacity-70 text-sm uppercase tracking-wider"
         >
           <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0">
             <path
@@ -153,66 +153,12 @@ export default function AdminLogin() {
               fill="#EA4335"
             />
           </svg>
-          {loading ? 'Authenticating...' : 'Sign in with Google'}
+          {loading ? 'Authenticating Super Admin...' : 'Sign in with Google'}
         </button>
 
-        <div className="relative flex py-2 items-center">
-          <div className="flex-grow border-t border-gray-700/60"></div>
-          <span className="flex-shrink mx-4 text-gray-500 text-xs font-semibold uppercase tracking-wider">
-            Or Demo Quick Switch
-          </span>
-          <div className="flex-grow border-t border-gray-700/60"></div>
-        </div>
-
-        {/* Demo Persona Switcher */}
-        <div className="space-y-3">
-          <button
-            onClick={handleDemoSuperAdmin}
-            className="w-full flex items-center justify-between px-4 py-3 bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/40 rounded-xl text-left transition-all text-purple-200 group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-600/30 rounded-lg text-purple-400 group-hover:text-purple-300">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="font-semibold text-sm text-white">Super Administrator</p>
-                <p className="text-xs text-purple-300/70">Full control over all events & organizers</p>
-              </div>
-            </div>
-            <Zap className="w-4 h-4 text-purple-400 opacity-70 group-hover:opacity-100" />
-          </button>
-
-          <div className="pt-2">
-            <p className="text-xs font-medium text-gray-400 mb-2">Event-Specific Organizers:</p>
-            <div className="grid grid-cols-1 gap-2">
-              {organizers.slice(0, 3).map((org) => {
-                const assignedEvt = events.find((e) => e.id === org.assignedEventId);
-                return (
-                  <button
-                    key={org.uid}
-                    onClick={() => handleDemoOrganizer(org.uid)}
-                    className="flex items-center justify-between px-4 py-2.5 bg-blue-950/30 hover:bg-blue-900/50 border border-blue-500/30 rounded-xl text-left transition-all text-blue-200 group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-1.5 bg-blue-600/30 rounded-lg text-blue-400 group-hover:text-blue-300">
-                        <UserCheck className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-xs text-white">{org.displayName}</p>
-                        <p className="text-[11px] text-blue-300/70">
-                          Assigned: <span className="font-semibold text-blue-300">{assignedEvt?.name || org.assignedEventName || 'Event Admin'}</span>
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                      Login &rarr;
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        <p className="text-[11px] text-gray-400 text-center font-bold">
+          Authorized Super Admin: <span className="text-amber-300 font-mono">maithreyan2006@gmail.com</span>
+        </p>
       </div>
 
       <div className="z-10 mt-6 flex flex-col sm:flex-row items-center gap-4 text-xs">

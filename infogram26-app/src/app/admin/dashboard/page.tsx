@@ -5,12 +5,9 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { Users, IndianRupee, Calendar as CalendarIcon, Clock, Plus, Bell, UserCheck, ShieldCheck, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEventStore } from '@/store/eventStore';
-import { useTheme } from '@/context/ThemeContext';
 
 export default function AdminDashboard() {
   const { events, organizers, registrations } = useEventStore();
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
 
   const totalRegistrations = registrations.length;
   const totalRevenue = registrations.reduce((sum, r) => sum + r.totalFee, 0);
@@ -23,17 +20,17 @@ export default function AdminDashboard() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/40 px-3 py-0.5 rounded-full font-black uppercase tracking-wider">
+            <span className="text-[10px] bg-[#00d4ff]/20 text-[#00d4ff] border border-[#00d4ff]/40 px-3 py-0.5 rounded-full font-black uppercase tracking-wider">
               Super Admin Mode
             </span>
-            <span className={`text-[11px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <span className="text-[11px] font-bold text-gray-400">
               maithreyan2006@gmail.com
             </span>
           </div>
-          <h1 className={`text-2xl sm:text-4xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`} style={{ fontFamily: 'var(--font-display)' }}>
+          <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
             Dashboard Overview
           </h1>
-          <p className={`mt-1 text-xs sm:text-sm font-bold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+          <p className="mt-1 text-xs sm:text-sm font-bold text-gray-400">
             System-wide analytics, symposium events metrics, and organizer management
           </p>
         </div>
@@ -41,96 +38,84 @@ export default function AdminDashboard() {
         <div className="flex flex-wrap gap-3">
           <Link
             href="/admin/events"
-            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 px-4 py-2.5 rounded-xl text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-purple-600/30 transition-all active:scale-95"
+            className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] px-4 py-2.5 rounded-xl text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 transition-all active:scale-95"
           >
             <Plus className="w-4 h-4" /> Create Event
           </Link>
           <Link
             href="/admin/organizers"
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider border transition-all active:scale-95 ${
-              isDark
-                ? 'bg-slate-900 border-purple-500/30 text-white hover:bg-slate-800'
-                : 'bg-white border-slate-300 text-slate-900 hover:bg-slate-50 shadow-sm'
-            }`}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider border border-gray-700 bg-[#08182b] text-white hover:bg-gray-800 transition-all active:scale-95"
           >
-            <UserCheck className="w-4 h-4 text-purple-500" /> Manage Event Admins
+            <UserCheck className="w-4 h-4 text-[#00d4ff]" /> Manage Event Admins
           </Link>
         </div>
       </div>
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-        <div className={`p-6 rounded-3xl border shadow-xl transition-all ${
-          isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
-        }`}>
+        <div className="p-6 rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl">
           <div className="flex justify-between items-start">
             <div>
-              <p className={`text-xs font-black uppercase tracking-wider mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">
                 Total Registrations
               </p>
-              <h3 className={`text-3xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>
+              <h3 className="text-3xl font-black text-white">
                 {totalRegistrations}
               </h3>
-              <p className="text-purple-400 text-xs mt-2 font-bold">Across all symposium events</p>
+              <p className="text-[#00d4ff] text-xs mt-2 font-bold">Across all symposium events</p>
             </div>
-            <div className="p-3 bg-purple-500/20 rounded-2xl text-purple-400 border border-purple-500/30">
+            <div className="p-3 bg-[#00d4ff]/10 rounded-2xl text-[#00d4ff] border border-[#00d4ff]/30">
               <Users className="w-6 h-6" />
             </div>
           </div>
         </div>
 
-        <div className={`p-6 rounded-3xl border shadow-xl transition-all ${
-          isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
-        }`}>
+        <div className="p-6 rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl">
           <div className="flex justify-between items-start">
             <div>
-              <p className={`text-xs font-black uppercase tracking-wider mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">
                 Total Revenue
               </p>
-              <h3 className={`text-3xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>
+              <h3 className="text-3xl font-black text-white">
                 ₹{totalRevenue.toLocaleString('en-IN')}
               </h3>
               <p className="text-emerald-400 text-xs mt-2 font-bold">Verified registration fees</p>
             </div>
-            <div className="p-3 bg-emerald-500/20 rounded-2xl text-emerald-400 border border-emerald-500/30">
+            <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400 border border-emerald-500/30">
               <IndianRupee className="w-6 h-6" />
             </div>
           </div>
         </div>
 
-        <div className={`p-6 rounded-3xl border shadow-xl transition-all ${
-          isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
-        }`}>
+        <div className="p-6 rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl">
           <div className="flex justify-between items-start">
             <div>
-              <p className={`text-xs font-black uppercase tracking-wider mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">
                 Active Events
               </p>
-              <h3 className={`text-3xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>
+              <h3 className="text-3xl font-black text-white">
                 {activeEventsCount}
               </h3>
-              <p className="text-blue-400 text-xs mt-2 font-bold">Technical &amp; Non-Technical</p>
+              <p className="text-purple-400 text-xs mt-2 font-bold">Technical &amp; Non-Technical</p>
             </div>
-            <div className="p-3 bg-blue-500/20 rounded-2xl text-blue-400 border border-blue-500/30">
+            <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-400 border border-purple-500/30">
               <CalendarIcon className="w-6 h-6" />
             </div>
           </div>
         </div>
 
-        <div className={`p-6 rounded-3xl border shadow-xl transition-all ${
-          isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
-        }`}>
+        <div className="p-6 rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl">
           <div className="flex justify-between items-start">
             <div>
-              <p className={`text-xs font-black uppercase tracking-wider mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">
                 Event Admins
               </p>
-              <h3 className={`text-3xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>
+              <h3 className="text-3xl font-black text-white">
                 {organizersCount}
               </h3>
               <p className="text-amber-400 text-xs mt-2 font-bold">Assigned student coordinators</p>
             </div>
-            <div className="p-3 bg-amber-500/20 rounded-2xl text-amber-400 border border-amber-500/30">
+            <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 border border-amber-500/30">
               <UserCheck className="w-6 h-6" />
             </div>
           </div>
@@ -140,23 +125,19 @@ export default function AdminDashboard() {
       {/* Main Tables Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Events Table */}
-        <div className={`p-6 rounded-3xl border shadow-xl ${
-          isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
-        }`}>
+        <div className="p-6 rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl">
           <div className="flex items-center justify-between mb-6">
-            <h2 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>
+            <h2 className="text-lg font-black text-white">
               Events &amp; Assigned Admins
             </h2>
-            <Link href="/admin/events" className="text-xs font-black uppercase text-purple-400 hover:underline flex items-center gap-1">
+            <Link href="/admin/events" className="text-xs font-black uppercase text-[#00d4ff] hover:underline flex items-center gap-1">
               View All &rarr;
             </Link>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-bold">
-              <thead className={`uppercase text-[10px] tracking-wider border-b ${
-                isDark ? 'bg-slate-950/80 text-slate-300 border-slate-800' : 'bg-slate-100 text-slate-700 border-slate-200'
-              }`}>
+              <thead className="text-[10px] uppercase tracking-wider border-b border-gray-800 bg-black/40 text-gray-300">
                 <tr>
                   <th className="px-4 py-3">Event Name</th>
                   <th className="px-4 py-3">Category</th>
@@ -164,22 +145,22 @@ export default function AdminDashboard() {
                   <th className="px-4 py-3 text-right">Registered</th>
                 </tr>
               </thead>
-              <tbody className={`divide-y ${isDark ? 'divide-slate-800/60' : 'divide-slate-200'}`}>
+              <tbody className="divide-y divide-gray-800/80">
                 {events.map((evt) => {
                   const org = organizers.find((o) => o.uid === evt.organizerUid || o.assignedEventId === evt.id);
                   return (
-                    <tr key={evt.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50'}`}>
-                      <td className={`px-4 py-3.5 font-black text-sm ${isDark ? 'text-white' : 'text-slate-950'}`}>{evt.name}</td>
+                    <tr key={evt.id} className="transition-colors hover:bg-gray-800/50">
+                      <td className="px-4 py-3.5 font-black text-sm text-white">{evt.name}</td>
                       <td className="px-4 py-3.5 capitalize">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase border ${
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${
                           evt.category === 'technical'
-                            ? (isDark ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : 'bg-purple-50 text-purple-700 border-purple-200')
-                            : (isDark ? 'bg-teal-500/20 text-teal-300 border-teal-500/30' : 'bg-teal-50 text-teal-700 border-teal-200')
+                            ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                            : 'bg-teal-500/20 text-teal-300 border-teal-500/30'
                         }`}>
                           {evt.category}
                         </span>
                       </td>
-                      <td className={`px-4 py-3.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                      <td className="px-4 py-3.5 text-gray-300">
                         {org ? org.displayName : 'IT Association'}
                       </td>
                       <td className="px-4 py-3.5 text-right font-black text-amber-400">
@@ -194,23 +175,19 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Registrations Table */}
-        <div className={`p-6 rounded-3xl border shadow-xl ${
-          isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
-        }`}>
+        <div className="p-6 rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl">
           <div className="flex items-center justify-between mb-6">
-            <h2 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>
+            <h2 className="text-lg font-black text-white">
               Recent Registrations
             </h2>
-            <Link href="/admin/registrations" className="text-xs font-black uppercase text-purple-400 hover:underline flex items-center gap-1">
+            <Link href="/admin/registrations" className="text-xs font-black uppercase text-[#00d4ff] hover:underline flex items-center gap-1">
               View All &rarr;
             </Link>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-bold">
-              <thead className={`uppercase text-[10px] tracking-wider border-b ${
-                isDark ? 'bg-slate-950/80 text-slate-300 border-slate-800' : 'bg-slate-100 text-slate-700 border-slate-200'
-              }`}>
+              <thead className="text-[10px] uppercase tracking-wider border-b border-gray-800 bg-black/40 text-gray-300">
                 <tr>
                   <th className="px-4 py-3">Applicant ID</th>
                   <th className="px-4 py-3">Participant</th>
@@ -218,12 +195,12 @@ export default function AdminDashboard() {
                   <th className="px-4 py-3 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className={`divide-y ${isDark ? 'divide-slate-800/60' : 'divide-slate-200'}`}>
+              <tbody className="divide-y divide-gray-800/80">
                 {registrations.map((reg) => (
-                  <tr key={reg.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50'}`}>
-                    <td className="px-4 py-3.5 font-mono text-purple-400 font-bold">{reg.applicantId}</td>
-                    <td className={`px-4 py-3.5 font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>{reg.fullName}</td>
-                    <td className={`px-4 py-3.5 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{reg.college}</td>
+                  <tr key={reg.id} className="transition-colors hover:bg-gray-800/50">
+                    <td className="px-4 py-3.5 font-mono text-[#00d4ff] font-bold">{reg.applicantId}</td>
+                    <td className="px-4 py-3.5 font-black text-white">{reg.fullName}</td>
+                    <td className="px-4 py-3.5 text-gray-300">{reg.college}</td>
                     <td className="px-4 py-3.5 text-right">
                       <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase">
                         {reg.status}
