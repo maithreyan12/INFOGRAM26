@@ -70,8 +70,10 @@ export default function Header() {
               : 'bg-white/90 border-slate-200/90 shadow-md'
         }`}
         style={{ 
-          backdropFilter: 'saturate(190%) blur(20px)',
-          WebkitBackdropFilter: 'saturate(190%) blur(20px)'
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          transform: 'translate3d(0,0,0)',
+          WebkitTransform: 'translate3d(0,0,0)',
         }}
       >
         <div className="px-4 sm:px-6 h-15 sm:h-16 flex items-center justify-between">
@@ -87,6 +89,9 @@ export default function Header() {
               <img 
                 src="/logo.png" 
                 alt="INFOGRAM'26 Logo" 
+                width={44}
+                height={44}
+                decoding="async"
                 className="w-full h-full object-cover rounded-full transform scale-105" 
               />
             </div>

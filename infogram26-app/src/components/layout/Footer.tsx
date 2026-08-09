@@ -70,6 +70,9 @@ export default function Footer() {
                 <img 
                   src="/logo.png" 
                   alt="INFOGRAM'26 Logo" 
+                  width={48}
+                  height={48}
+                  decoding="async"
                   className="w-full h-full object-cover rounded-full transform scale-105" 
                 />
               </div>
