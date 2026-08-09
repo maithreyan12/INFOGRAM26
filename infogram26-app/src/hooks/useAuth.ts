@@ -133,9 +133,12 @@ export function useAuth() {
             setRole('super_admin');
           }
         } else {
-          setUser(null);
-          setAdminUser(null);
-          setRole(null);
+          const savedDemo = typeof window !== 'undefined' ? localStorage.getItem(DEMO_USER_KEY) : null;
+          if (!savedDemo) {
+            setUser(null);
+            setAdminUser(null);
+            setRole(null);
+          }
         }
         setLoading(false);
       });

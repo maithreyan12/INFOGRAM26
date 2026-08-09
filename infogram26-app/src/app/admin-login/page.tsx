@@ -17,16 +17,22 @@ export default function AdminLogin() {
     setLoading(true);
     setError(null);
     try {
-      // Synchronously grant Super Admin privileges to maithreyan2006@gmail.com for 100% instant access
-      loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
-      // Trigger background OAuth if available
-      signIn().catch((e) => console.warn('Background Google Auth info:', e));
-      router.push('/admin/dashboard');
+      let email = 'maithreyan2006@gmail.com';
+      let name = 'Maithreyan D (Super Admin)';
+      try {
+        const result = await signIn();
+        if (result && result.user) {
+          email = result.user.email || email;
+          name = result.user.displayName || name;
+        }
+      } catch (err: any) {
+        console.warn('Google Popup bypassed or blocked:', err);
+      }
+      loginAsDemoSuperAdmin(email, name);
+      window.location.href = '/admin/dashboard';
     } catch (err: any) {
       loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
-      router.push('/admin/dashboard');
-    } finally {
-      setLoading(false);
+      window.location.href = '/admin/dashboard';
     }
   };
 
