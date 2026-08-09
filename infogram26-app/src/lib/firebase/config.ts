@@ -16,12 +16,26 @@ const defaultFirebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-1000000000",
 };
 
-export const isFirebaseConfigured = true;
+export const isFirebaseConfigured =
+  !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
+  !process.env.NEXT_PUBLIC_FIREBASE_API_KEY.includes('AIzaSyA0B0C0D0E0F0G0H0I0J0K0L0M0N0O0P0Q') &&
+  !process.env.NEXT_PUBLIC_FIREBASE_API_KEY.includes('Placeholder') &&
+  !process.env.NEXT_PUBLIC_FIREBASE_API_KEY.includes('placeholder');
 
 // Singleton pattern for Next.js app initialization
-const app = getApps().length > 0 ? getApp() : initializeApp(defaultFirebaseConfig);
+const app = isFirebaseConfigured
+  ? getApps().length > 0 ? getApp() : initializeApp({
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+      measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+    })
+  : null;
 
-export const auth = (typeof window !== 'undefined' ? getAuth(app) : null) as any;
-export const db = (typeof window !== 'undefined' ? getFirestore(app) : null) as any;
-export const storage = (typeof window !== 'undefined' ? getStorage(app) : null) as any;
+export const auth = (app && typeof window !== 'undefined' ? getAuth(app) : null) as any;
+export const db = (app && typeof window !== 'undefined' ? getFirestore(app) : null) as any;
+export const storage = (app && typeof window !== 'undefined' ? getStorage(app) : null) as any;
 export default app;

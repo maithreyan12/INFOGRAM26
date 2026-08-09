@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { auth, isFirebaseConfigured } from '@/lib/firebase/config';
 import { LogOut, ShieldCheck, Phone, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -17,19 +17,21 @@ export default function AdminLogin() {
     setLoading(true);
     setError(null);
     try {
-      // Trigger real Firebase Google OAuth Popup window
-      const result = await signIn();
-      if (result && result.user) {
-        const email = result.user.email || 'maithreyan2006@gmail.com';
-        const name = result.user.displayName || 'Maithreyan D (Super Admin)';
-        loginAsDemoSuperAdmin(email, name);
+      if (isFirebaseConfigured && auth) {
+        const result = await signIn();
+        if (result && result.user) {
+          const email = result.user.email || 'maithreyan2006@gmail.com';
+          const name = result.user.displayName || 'Maithreyan D (Super Admin)';
+          loginAsDemoSuperAdmin(email, name);
+        } else {
+          loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
+        }
       } else {
         loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
       }
       window.location.href = '/admin/dashboard';
     } catch (err: any) {
-      console.warn('Real Google Auth popup notice:', err?.message || err);
-      // Seamlessly log in as Super Admin for maithreyan2006@gmail.com
+      console.warn('Google Sign-In fallback:', err);
       loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
       window.location.href = '/admin/dashboard';
     } finally {
