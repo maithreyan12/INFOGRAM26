@@ -244,52 +244,7 @@
 
 /* Premium card — Apple Light Liquid Glass */
 .glass-card {
-  backdrop-filter: saturate(180%) blur(16px);
-  -webkit-backdrop-filter: saturate(180%) blur(16px);
   border-radius: 26px;
-  transition:
-    transform 0.35s var(--spring),
-    box-shadow 0.35s var(--ease-smooth),
-    background 0.35s var(--ease-smooth),
-    border-color 0.35s var(--ease-smooth);
-  transform: translate3d(0, 0, 0);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Specular highlight overlay */
-.glass-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.5) 0%,
-    rgba(255, 255, 255, 0.15) 35%,
-    transparent 60%
-  );
-  pointer-events: none;
-  border-radius: inherit;
-  z-index: 1;
-}
-
-/* Inner light refraction */
-.glass-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -60%;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
-  transform: skewX(-15deg);
-  transition: left 0.6s var(--ease-smooth);
-  pointer-events: none;
   z-index: 2;
 }
 
