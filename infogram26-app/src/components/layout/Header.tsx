@@ -79,15 +79,15 @@ export default function Header() {
           {/* Logo */}
           <Link 
             href="/" 
-            className="flex items-center gap-2"
+            className="flex items-center gap-2.5 group"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            <div className="bg-[#00d4ff]/10 p-1.5 rounded-full border border-[#00d4ff]/20">
-              <svg className="w-4 h-4 text-[#00d4ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
-              </svg>
-            </div>
-            <span className="text-base sm:text-lg font-bold tracking-wider" style={{ fontFamily: 'var(--font-display)' }}>
+            <img 
+              src="/logo.png" 
+              alt="INFOGRAM'26 Logo" 
+              className="h-9 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_12px_rgba(0,212,255,0.4)]" 
+            />
+            <span className="text-base sm:text-lg font-bold tracking-wider hidden sm:inline-block" style={{ fontFamily: 'var(--font-display)' }}>
               <span className="text-white">INFOGRAM</span>
               <span className="text-[#00d4ff]">&apos;26</span>
             </span>

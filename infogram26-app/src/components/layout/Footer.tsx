@@ -80,11 +80,11 @@ export default function Footer() {
               className="flex items-center gap-2.5 group w-fit"
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <div className="w-9 h-9 bg-[#00d4ff]/15 rounded-xl flex items-center justify-center group-hover:bg-[#00d4ff]/25 transition-colors border border-[#00d4ff]/20">
-                <svg className="w-5 h-5 text-[#00d4ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
-                </svg>
-              </div>
+              <img 
+                src="/logo.png" 
+                alt="INFOGRAM'26 Logo" 
+                className="h-10 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_12px_rgba(0,212,255,0.4)]" 
+              />
               <span className="text-xl font-black tracking-wider text-white" style={{ fontFamily: 'var(--font-display)' }}>
                 INFOGRAM<span className="text-[#00d4ff]">&apos;26</span>
               </span>

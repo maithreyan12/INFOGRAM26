@@ -59,8 +59,9 @@ export default function OrganizerLayout({ children }: { children: React.ReactNod
         fixed top-0 left-0 h-full w-64 bg-gray-950 border-r border-gray-800 z-40 flex flex-col transition-transform duration-300
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        <div className="p-6 border-b border-gray-800">
-          <h1 className="text-2xl font-bold gradient-text tracking-wider text-center">INFOGRAM'26</h1>
+        <div className="p-6 border-b border-gray-800 flex flex-col items-center">
+          <img src="/logo.png" alt="INFOGRAM'26 Logo" className="h-12 w-auto object-contain mb-2 drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]" />
+          <h1 className="text-xl font-bold gradient-text tracking-wider text-center">INFOGRAM'26</h1>
           <div className="mt-2 text-center text-xs font-semibold text-blue-400 bg-blue-900/30 py-1.5 px-3 rounded-full border border-blue-500/30 flex items-center justify-center gap-1.5">
             <Calendar className="w-3.5 h-3.5" /> EVENT ADMIN PORTAL
           </div>
