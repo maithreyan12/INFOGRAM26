@@ -114,16 +114,6 @@ export default function AdminLogin() {
           </svg>
           <span>{loading ? 'Opening Admin Dashboard...' : 'Sign in with Google'}</span>
         </button>
-
-        {/* High-Contrast Badge for Super Admin Email */}
-        <div className="p-3.5 rounded-2xl bg-black/60 border border-gray-800 text-center">
-          <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">
-            Authorized Super Admin
-          </p>
-          <p className="text-xs font-black text-[#00d4ff] font-mono mt-0.5">
-            maithreyan2006@gmail.com
-          </p>
-        </div>
       </div>
 
       {/* Footer Navigation */}
