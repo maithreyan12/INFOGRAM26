@@ -157,11 +157,13 @@ export function useAuth() {
     return signInWithPopup(auth, provider);
   };
 
-  const loginAsDemoSuperAdmin = () => {
+  const loginAsDemoSuperAdmin = (customEmail?: string, customName?: string) => {
+    const emailToUse = customEmail || 'maithreyan2006@gmail.com';
+    const nameToUse = customName || 'Maithreyan D (Super Admin)';
     const demoUser: DemoSession = {
       uid: 'super-admin-1',
-      email: 'admin@infogram26.com',
-      displayName: 'Super Administrator',
+      email: emailToUse,
+      displayName: nameToUse,
       role: 'super_admin',
     };
     localStorage.setItem(DEMO_USER_KEY, JSON.stringify(demoUser));
