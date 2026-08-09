@@ -384,7 +384,7 @@ export default function HeroSection() {
               <motion.span
                 key={index}
                 variants={letterVariants}
-                className="inline-block font-black"
+                className="inline-block font-black cursor-pointer"
                 style={{
                   color: isDark ? '#ffffff' : '#04060f',
                   textShadow: isDark
@@ -392,6 +392,23 @@ export default function HeroSection() {
                     : '0 0 20px rgba(124,58,237,0.22), 0 2px 14px rgba(124,58,237,0.15)',
                   willChange: 'transform, opacity',
                   display: 'inline-block',
+                  WebkitTapHighlightColor: 'transparent',
+                  touchAction: 'manipulation',
+                }}
+                whileHover={{
+                  scale: 1.18,
+                  y: -8,
+                  color: isDark ? '#c084fc' : '#7c3aed',
+                  textShadow: isDark
+                    ? '0 0 35px rgba(192,132,252,0.9), 0 0 70px rgba(56,189,248,0.6), 0 -4px 20px rgba(192,132,252,0.5)'
+                    : '0 0 30px rgba(124,58,237,0.55), 0 0 55px rgba(124,58,237,0.3)',
+                  transition: { type: 'spring', stiffness: 600, damping: 18 },
+                }}
+                whileTap={{
+                  scale: 0.88,
+                  y: 4,
+                  color: isDark ? '#e879f9' : '#6d28d9',
+                  transition: { type: 'spring', stiffness: 800, damping: 20 },
                 }}
               >
                 {char}
@@ -425,7 +442,7 @@ export default function HeroSection() {
                 <motion.span
                   key={index}
                   variants={yearLetterVariants}
-                  className="inline-block font-black"
+                  className="inline-block font-black cursor-pointer"
                   style={{
                     color: isDark ? '#fcd34d' : '#d97706',
                     textShadow: isDark
@@ -433,6 +450,23 @@ export default function HeroSection() {
                       : '0 2px 10px rgba(217,119,6,0.35)',
                     willChange: 'transform, opacity',
                     display: 'inline-block',
+                    WebkitTapHighlightColor: 'transparent',
+                    touchAction: 'manipulation',
+                  }}
+                  whileHover={{
+                    scale: 1.18,
+                    y: -8,
+                    color: isDark ? '#fde68a' : '#b45309',
+                    textShadow: isDark
+                      ? '0 0 40px rgba(252,211,77,1), 0 0 80px rgba(252,211,77,0.6), 0 -6px 24px rgba(252,211,77,0.5)'
+                      : '0 0 28px rgba(217,119,6,0.7), 0 0 50px rgba(217,119,6,0.4)',
+                    transition: { type: 'spring', stiffness: 600, damping: 18 },
+                  }}
+                  whileTap={{
+                    scale: 0.88,
+                    y: 5,
+                    color: isDark ? '#f59e0b' : '#92400e',
+                    transition: { type: 'spring', stiffness: 800, damping: 20 },
                   }}
                 >
                   {char}
