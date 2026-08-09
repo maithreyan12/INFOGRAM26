@@ -5,10 +5,10 @@ import { useRef, useEffect, useState } from 'react';
 import { Calendar, Users, Building, Trophy } from 'lucide-react';
 
 const stats = [
-  { id: 1, label: 'Events', value: 15, suffix: '+', icon: Calendar, color: 'text-[#00d4ff]', bg: 'bg-[#00d4ff]/10', border: 'border-[#00d4ff]/20' },
-  { id: 2, label: 'Participants', value: 500, suffix: '+', icon: Users, color: 'text-[#00d4ff]', bg: 'bg-[#00d4ff]/10', border: 'border-[#00d4ff]/20' },
-  { id: 3, label: 'Sponsors', value: 10, suffix: '+', icon: Building, color: 'text-[#ffd700]', bg: 'bg-[#ffd700]/10', border: 'border-[#ffd700]/20' },
-  { id: 4, label: 'Prize Pool', value: 50000, prefix: '₹', suffix: '+', icon: Trophy, color: 'text-[#ffd700]', bg: 'bg-[#ffd700]/10', border: 'border-[#ffd700]/20' },
+  { id: 1, label: 'Events', value: 15, suffix: '+', icon: Calendar, color: 'text-[#7c3aed]', bg: 'bg-[#7c3aed]/10', border: 'border-[#7c3aed]/20' },
+  { id: 2, label: 'Participants', value: 500, suffix: '+', icon: Users, color: 'text-[#059669]', bg: 'bg-[#059669]/10', border: 'border-[#059669]/20' },
+  { id: 3, label: 'Sponsors', value: 10, suffix: '+', icon: Building, color: 'text-[#d97706]', bg: 'bg-[#d97706]/10', border: 'border-[#d97706]/20' },
+  { id: 4, label: 'Prize Pool', value: 50000, prefix: '₹', suffix: '+', icon: Trophy, color: 'text-[#d97706]', bg: 'bg-[#d97706]/10', border: 'border-[#d97706]/20' },
 ];
 
 function AnimatedCounter({ value, prefix = '', suffix = '' }: { value: number; prefix?: string; suffix?: string }) {
@@ -68,7 +68,7 @@ export default function StatsSection() {
                 <div className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-1 ${stat.color}`} style={{ fontFamily: 'var(--font-display)' }}>
                   <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
                 </div>
-                <p className="text-[10px] sm:text-xs text-white/50 font-semibold uppercase tracking-widest" style={{ fontFamily: 'var(--font-heading)' }}>
+                <p className="text-[10px] sm:text-xs text-slate-600 font-bold uppercase tracking-widest" style={{ fontFamily: 'var(--font-heading)' }}>
                   {stat.label}
                 </p>
               </motion.div>

@@ -57,22 +57,22 @@ export default function VideoSection() {
         className="text-center mb-8 sm:mb-10 px-2"
       >
         <span
-          className="inline-block mb-3 px-5 py-1.5 rounded-full text-[#00d4ff] bg-[#00d4ff]/10 border border-[#00d4ff]/25 text-xs tracking-[0.15em] uppercase font-semibold"
+          className="inline-block mb-3 px-5 py-1.5 rounded-full text-[#7c3aed] bg-[#7c3aed]/10 border border-[#7c3aed]/25 text-xs tracking-[0.15em] uppercase font-semibold"
           style={{ fontFamily: 'var(--font-heading)' }}
         >
           🎬 Official Promo
         </span>
         <h2
-          className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-3"
+          className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-3"
           style={{ fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}
         >
           Feel the{' '}
           <span className="gradient-text">INFOGRAM</span>
-          <span className="text-[#00d4ff]">&apos;</span>
+          <span className="text-[#7c3aed]">&apos;</span>
           <span className="gradient-text">26</span>
           {' '}Energy
         </h2>
-        <p className="text-white/50 text-sm sm:text-base max-w-lg mx-auto" style={{ fontFamily: 'var(--font-heading)' }}>
+        <p className="text-slate-600 text-sm sm:text-base max-w-lg mx-auto font-medium" style={{ fontFamily: 'var(--font-heading)' }}>
           Experience the most electrifying symposium in Tamil Nadu
         </p>
       </motion.div>

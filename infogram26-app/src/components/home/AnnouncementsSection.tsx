@@ -77,10 +77,10 @@ export default function AnnouncementsSection() {
   return (
     <section className="section-padding container-xl mx-auto px-4 max-w-4xl">
       <div className="mb-10">
-        <span className="section-badge inline-block px-4 py-1 rounded-full bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-[#00d4ff] text-sm font-semibold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+        <span className="section-badge inline-block px-4 py-1 rounded-full bg-[#7c3aed]/10 border border-[#7c3aed]/20 text-[#7c3aed] text-sm font-semibold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
           Latest Announcements
         </span>
-        <h2 className="text-3xl md:text-4xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>Stay Updated</h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-display)' }}>Stay Updated</h2>
       </div>
 
       <motion.div 
@@ -96,17 +96,17 @@ export default function AnnouncementsSection() {
             <motion.div 
               key={announcement.id} 
               variants={itemVariants}
-              className={`glass-card p-6 rounded-xl border-l-4 ${styles.border} bg-white/5 backdrop-blur-sm border-y border-r border-white/10 flex gap-4`}
+              className={`glass-card p-6 rounded-xl border-l-4 ${styles.border} flex gap-4`}
             >
               <div className="shrink-0 mt-1">
                 {styles.icon}
               </div>
               <div>
                 <div className="flex flex-wrap items-baseline gap-3 mb-2">
-                  <h3 className="text-xl font-bold text-white">{announcement.title}</h3>
-                  <span className="text-xs text-white/50">{announcement.dateStr}</span>
+                  <h3 className="text-xl font-bold text-slate-900">{announcement.title}</h3>
+                  <span className="text-xs text-slate-500 font-medium">{announcement.dateStr}</span>
                 </div>
-                <p className="text-white/70">{announcement.content}</p>
+                <p className="text-slate-700 leading-relaxed font-medium">{announcement.content}</p>
               </div>
             </motion.div>
           );

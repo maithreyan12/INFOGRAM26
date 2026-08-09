@@ -76,35 +76,35 @@ export default function EventCard({ event }: EventCardProps) {
 
         {/* Body */}
         <div className="p-5 flex-grow flex flex-col gap-3">
-          <h3 className="font-bold text-[clamp(1rem,3.5vw,1.2rem)] text-white leading-snug">
+          <h3 className="font-bold text-[clamp(1rem,3.5vw,1.2rem)] text-slate-900 leading-snug">
             {event.name}
           </h3>
 
-          <p className="text-white/55 text-sm leading-relaxed line-clamp-2 flex-grow">
+          <p className="text-slate-600 text-sm leading-relaxed line-clamp-2 flex-grow font-medium">
             {event.description}
           </p>
 
           {/* Info pills */}
           <div className="flex flex-col gap-1.5 mt-1">
-            <div className="flex items-center gap-2 text-xs text-white/60">
-              <Calendar className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+            <div className="flex items-center gap-2 text-xs text-slate-700 font-semibold">
+              <Calendar className="w-3.5 h-3.5 text-[#7c3aed] shrink-0" />
               <span>{event.date}</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-white/60">
-              <MapPin className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+            <div className="flex items-center gap-2 text-xs text-slate-700 font-semibold">
+              <MapPin className="w-3.5 h-3.5 text-[#7c3aed] shrink-0" />
               <span className="truncate">{event.venue}</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-white/60">
-              <IndianRupee className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+            <div className="flex items-center gap-2 text-xs text-slate-700 font-semibold">
+              <IndianRupee className="w-3.5 h-3.5 text-[#7c3aed] shrink-0" />
               <span>₹{event.registrationFee} registration</span>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between gap-2">
+          <div className="mt-auto pt-4 border-t border-slate-200/80 flex items-center justify-between gap-2">
             <div className="text-xs">
               <span className={`font-bold text-sm ${seatColor}`}>{seatsLeft}</span>
-              <span className="text-white/40 ml-1">seats left</span>
+              <span className="text-slate-500 font-semibold ml-1">seats left</span>
             </div>
 
             <motion.div
@@ -114,10 +114,10 @@ export default function EventCard({ event }: EventCardProps) {
             >
               <Link
                 href={`/events/${event.slug}`}
-                className="btn-glass inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl text-white whitespace-nowrap"
+                className="btn-glass inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-full text-slate-900 whitespace-nowrap shadow-xs hover:border-[#7c3aed]/40"
                 style={{ WebkitTapHighlightColor: 'transparent' }}
               >
-                Details <ArrowRight className="w-3.5 h-3.5" />
+                Details <ArrowRight className="w-3.5 h-3.5 text-[#7c3aed]" />
               </Link>
             </motion.div>
           </div>

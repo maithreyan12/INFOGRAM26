@@ -313,10 +313,9 @@ export default function EventsPage() {
 
   return (
     <PublicLayout>
-      <div className="min-h-screen text-white pb-20">
+      <div className="min-h-screen text-slate-900 pb-20">
         {/* HERO SECTION */}
         <section className="relative pt-32 pb-12 flex flex-col items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-blue-900/10 z-0 blur-3xl"></div>
           <div className="container-xl relative z-10 text-center px-4">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -324,7 +323,7 @@ export default function EventsPage() {
               transition={{ duration: 0.6 }}
             >
               <h1 className="text-5xl md:text-7xl font-bold gradient-text mb-6" style={{ fontFamily: 'var(--font-display)' }}>Explore Events</h1>
-              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              <p className="text-xl text-slate-600 font-medium max-w-2xl mx-auto">
                 Discover the perfect challenge for your skills from our wide range of technical and non-technical events.
               </p>
             </motion.div>
@@ -335,15 +334,15 @@ export default function EventsPage() {
         <section className="container-xl px-4 mb-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 glass-card p-4 rounded-2xl">
             {/* TABS */}
-            <div className="flex space-x-2 bg-white/5 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
+            <div className="flex space-x-2 bg-slate-100/80 p-1.5 rounded-xl w-full md:w-auto overflow-x-auto border border-slate-200/60">
               {['All', 'Technical', 'Non-Technical'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  className={`px-6 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                  className={`px-6 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${
                     activeTab === tab 
-                      ? 'bg-[#00d4ff]/20 text-[#00d4ff] border border-[#00d4ff]/30' 
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-[#7c3aed] text-white shadow-md' 
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                   }`}
                   style={{ fontFamily: 'var(--font-heading)' }}
                 >
@@ -355,14 +354,14 @@ export default function EventsPage() {
             {/* SEARCH */}
             <div className="relative w-full md:w-auto md:min-w-[300px]">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-5 w-5 text-slate-400" />
               </div>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search events..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50 transition-all"
+                className="w-full bg-white/90 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#7c3aed] transition-all shadow-xs"
               />
             </div>
           </div>
@@ -370,13 +369,13 @@ export default function EventsPage() {
 
         {/* EVENTS GRID */}
         <section className="container-xl px-4">
-          <div className="mb-6 text-gray-400 font-medium">
+          <div className="mb-6 text-slate-600 font-bold">
             {filteredEvents.length} events found
           </div>
 
           {loading ? (
             <div className="flex justify-center items-center py-20">
-              <div className="w-10 h-10 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+              <div className="w-10 h-10 border-4 border-[#7c3aed]/20 border-t-[#7c3aed] rounded-full animate-spin"></div>
             </div>
           ) : filteredEvents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -393,8 +392,8 @@ export default function EventsPage() {
             </div>
           ) : (
             <div className="glass-card p-12 text-center rounded-3xl">
-              <h3 className="text-xl font-bold mb-2">No events found</h3>
-              <p className="text-gray-400">Try adjusting your search or filters.</p>
+              <h3 className="text-xl font-bold mb-2 text-slate-900">No events found</h3>
+              <p className="text-slate-600">Try adjusting your search or filters.</p>
             </div>
           )}
         </section>

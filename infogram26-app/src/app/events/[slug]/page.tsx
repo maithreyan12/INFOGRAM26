@@ -319,8 +319,8 @@ export default function EventDetailPage() {
   if (loading) {
     return (
       <PublicLayout>
-        <div className="min-h-screen bg-black flex justify-center items-center">
-          <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+        <div className="min-h-screen bg-transparent flex justify-center items-center">
+          <div className="w-12 h-12 border-4 border-[#7c3aed]/20 border-t-[#7c3aed] rounded-full animate-spin"></div>
         </div>
       </PublicLayout>
     );
@@ -329,9 +329,9 @@ export default function EventDetailPage() {
   if (!event) {
     return (
       <PublicLayout>
-        <div className="min-h-screen bg-black flex flex-col justify-center items-center text-white">
+        <div className="min-h-screen bg-transparent flex flex-col justify-center items-center text-slate-900">
           <h1 className="text-4xl font-bold mb-4">Event Not Found</h1>
-          <Link href="/events" className="text-blue-400 hover:underline">Return to Events</Link>
+          <Link href="/events" className="text-[#7c3aed] hover:underline font-bold">Return to Events</Link>
         </div>
       </PublicLayout>
     );
@@ -341,39 +341,39 @@ export default function EventDetailPage() {
   const seatsLeft = event.maxParticipants - (event.registeredCount || 0);
   const seatsPercentage = (seatsLeft / event.maxParticipants) * 100;
   
-  let progressColor = 'bg-green-500';
+  let progressColor = 'bg-emerald-500';
   if (seatsPercentage < 10) progressColor = 'bg-red-500';
-  else if (seatsPercentage < 50) progressColor = 'bg-yellow-500';
+  else if (seatsPercentage < 50) progressColor = 'bg-amber-500';
 
   return (
     <PublicLayout>
-      <div className="min-h-screen bg-black text-white pb-24">
+      <div className="min-h-screen bg-transparent text-slate-900 pb-24">
         {/* Banner */}
         <div 
           className={`w-full h-64 md:h-80 relative ${
             event.bannerUrl 
               ? 'bg-cover bg-center' 
-              : isTechnical ? 'bg-gradient-to-br from-blue-900 via-blue-800 to-sky-900' : 'bg-gradient-to-br from-purple-900 via-purple-800 to-fuchsia-900'
+              : isTechnical ? 'bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700' : 'bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-700'
           }`}
           style={event.bannerUrl ? { backgroundImage: `url('${event.bannerUrl}')` } : {}}
         >
-          <div className={`absolute inset-0 ${event.bannerUrl ? 'bg-black/60' : 'bg-black/40'}`}></div>
+          <div className={`absolute inset-0 ${event.bannerUrl ? 'bg-black/50' : 'bg-black/20'}`}></div>
           <div className="container-xl h-full relative z-10 px-4 flex flex-col justify-end pb-8">
-            <Link href="/events" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors w-fit group">
+            <Link href="/events" className="inline-flex items-center text-white/90 hover:text-white mb-6 transition-colors w-fit group font-bold">
               <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
               All Events
             </Link>
             <div className="flex items-center gap-3 mb-3">
-              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md bg-white/10 border border-white/20`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md bg-white/20 text-white border border-white/30`}>
                 {event.status}
               </span>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md border ${
-                isTechnical ? 'bg-blue-500/20 text-blue-100 border-blue-400/30' : 'bg-purple-500/20 text-purple-100 border-purple-400/30'
+              <span className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md border ${
+                isTechnical ? 'bg-violet-500/30 text-white border-white/30' : 'bg-teal-500/30 text-white border-white/30'
               }`}>
                 {isTechnical ? 'Technical' : 'Non-Technical'}
               </span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-2">{event.name}</h1>
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-2 drop-shadow-md">{event.name}</h1>
           </div>
         </div>
 
@@ -386,11 +386,11 @@ export default function EventDetailPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="glass-card p-6 md:p-8 rounded-3xl"
               >
-                <h2 className="text-2xl font-bold mb-4 flex items-center">
-                  <AlertCircle className="w-6 h-6 mr-3 text-blue-400" />
+                <h2 className="text-2xl font-bold mb-4 flex items-center text-slate-900">
+                  <AlertCircle className="w-6 h-6 mr-3 text-[#7c3aed]" />
                   About the Event
                 </h2>
-                <p className="text-gray-300 leading-relaxed text-lg">
+                <p className="text-slate-700 leading-relaxed text-lg font-medium">
                   {event.description}
                 </p>
               </motion.div>
@@ -401,20 +401,20 @@ export default function EventDetailPage() {
                 transition={{ delay: 0.1 }}
                 className="glass-card p-6 md:p-8 rounded-3xl"
               >
-                <h2 className="text-2xl font-bold mb-4 flex items-center">
-                  <Trophy className="w-6 h-6 mr-3 text-blue-400" />
+                <h2 className="text-2xl font-bold mb-4 flex items-center text-slate-900">
+                  <Trophy className="w-6 h-6 mr-3 text-[#7c3aed]" />
                   Rules &amp; Guidelines
                 </h2>
-                <ul className="space-y-3 text-gray-300">
+                <ul className="space-y-3 text-slate-700 font-medium">
                   {event.rules && event.rules.length > 0 ? (
                     event.rules.map((rule, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-base leading-relaxed">
-                        <span className="text-[#00d4ff] font-bold shrink-0">{idx + 1}.</span>
+                        <span className="text-[#7c3aed] font-bold shrink-0">{idx + 1}.</span>
                         <span>{rule}</span>
                       </li>
                     ))
                   ) : (
-                    <li className="text-gray-400">Standard symposium rules apply.</li>
+                    <li className="text-slate-500">Standard symposium rules apply.</li>
                   )}
                 </ul>
               </motion.div>
@@ -426,7 +426,7 @@ export default function EventDetailPage() {
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
                 <div className="glass-card p-6 rounded-2xl">
-                  <div className="text-xs font-bold uppercase tracking-wider text-[#00d4ff] mb-3">Student Coordinators</div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-[#7c3aed] mb-3">Student Coordinators</div>
                   {(() => {
                     const names = event.coordinatorName
                       ? event.coordinatorName.split(/&|,|\band\b/i).map((n) => n.trim()).filter(Boolean)
@@ -436,7 +436,7 @@ export default function EventDetailPage() {
                       : [];
 
                     if (names.length === 0) {
-                      return <div className="text-lg font-bold text-white mb-1">Student Coordinator</div>;
+                      return <div className="text-lg font-bold text-slate-900 mb-1">Student Coordinator</div>;
                     }
 
                     return (
@@ -444,12 +444,12 @@ export default function EventDetailPage() {
                         {names.map((name, i) => {
                           const phone = numbers[i] || numbers[0] || '';
                           return (
-                            <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10">
-                              <span className="text-sm font-semibold text-white">{name}</span>
+                            <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-100/70 border border-slate-200/80">
+                              <span className="text-sm font-bold text-slate-900">{name}</span>
                               {phone && (
                                 <a
                                   href={`tel:+91${phone}`}
-                                  className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-[#00d4ff]/15 border border-[#00d4ff]/30 text-[#00d4ff] hover:bg-[#00d4ff]/30 transition-all w-fit"
+                                  className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-[#7c3aed]/10 border border-[#7c3aed]/30 text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white transition-all w-fit"
                                 >
                                   <Phone className="w-3.5 h-3.5" />
                                   Call {phone}
@@ -463,11 +463,11 @@ export default function EventDetailPage() {
                   })()}
                 </div>
                 <div className="glass-card p-6 rounded-2xl">
-                  <div className="text-xs font-bold uppercase tracking-wider text-purple-400 mb-2">Organizing Department</div>
-                  <div className="text-base font-bold text-white mb-1">
+                  <div className="text-xs font-bold uppercase tracking-wider text-[#7c3aed] mb-2">Organizing Department</div>
+                  <div className="text-base font-bold text-slate-900 mb-1">
                     {event.organizerName || 'Department of IT & Info Club'}
                   </div>
-                  <div className="text-xs text-white/50">C. Abdul Hakeem College of Engg. &amp; Tech.</div>
+                  <div className="text-xs text-slate-600 font-medium">C. Abdul Hakeem College of Engg. &amp; Tech.</div>
                 </div>
               </motion.div>
             </div>
@@ -480,67 +480,67 @@ export default function EventDetailPage() {
                 className="sticky top-24 space-y-6"
               >
                 {event.status === 'live' && (
-                  <div className="bg-red-500/20 border border-red-500/50 p-4 rounded-2xl flex items-center justify-center animate-pulse">
+                  <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-2xl flex items-center justify-center animate-pulse">
                     <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-                    <span className="text-red-400 font-bold tracking-wider">LIVE NOW</span>
+                    <span className="text-red-600 font-bold tracking-wider">LIVE NOW</span>
                   </div>
                 )}
                 
                 {event.status === 'completed' && (
-                  <div className="glass-card bg-white/5 border-gray-500/30 p-4 rounded-2xl text-center">
-                    <span className="text-gray-300 font-bold">Event Completed</span>
+                  <div className="glass-card p-4 rounded-2xl text-center">
+                    <span className="text-slate-600 font-bold">Event Completed</span>
                   </div>
                 )}
 
                 <div className="glass-card p-6 md:p-8 rounded-3xl">
-                  <h3 className="text-xl font-bold mb-6 text-white border-b border-white/10 pb-4">Event Details</h3>
+                  <h3 className="text-xl font-bold mb-6 text-slate-900 border-b border-slate-200/80 pb-4">Event Details</h3>
                   
                   <div className="space-y-6">
                     <div className="flex items-start">
-                      <Calendar className="w-5 h-5 mr-4 text-blue-400 mt-0.5" />
+                      <Calendar className="w-5 h-5 mr-4 text-[#7c3aed] mt-0.5" />
                       <div>
-                        <div className="text-sm text-gray-400">Date</div>
-                        <div className="font-medium text-white">{event.date}</div>
+                        <div className="text-sm text-slate-500 font-medium">Date</div>
+                        <div className="font-bold text-slate-900">{event.date}</div>
                       </div>
                     </div>
                     
                     <div className="flex items-start">
-                      <Clock className="w-5 h-5 mr-4 text-blue-400 mt-0.5" />
+                      <Clock className="w-5 h-5 mr-4 text-[#7c3aed] mt-0.5" />
                       <div>
-                        <div className="text-sm text-gray-400">Time</div>
-                        <div className="font-medium text-white">{event.startTime} - {event.endTime}</div>
+                        <div className="text-sm text-slate-500 font-medium">Time</div>
+                        <div className="font-bold text-slate-900">{event.startTime} - {event.endTime}</div>
                       </div>
                     </div>
                     
                     <div className="flex items-start">
-                      <MapPin className="w-5 h-5 mr-4 text-blue-400 mt-0.5" />
+                      <MapPin className="w-5 h-5 mr-4 text-[#7c3aed] mt-0.5" />
                       <div>
-                        <div className="text-sm text-gray-400">Venue</div>
-                        <div className="font-medium text-white">{event.venue}</div>
+                        <div className="text-sm text-slate-500 font-medium">Venue</div>
+                        <div className="font-bold text-slate-900">{event.venue}</div>
                       </div>
                     </div>
                     
                     <div className="flex items-start">
-                      <IndianRupee className="w-5 h-5 mr-4 text-blue-400 mt-0.5" />
+                      <IndianRupee className="w-5 h-5 mr-4 text-[#7c3aed] mt-0.5" />
                       <div>
-                        <div className="text-sm text-gray-400">Registration Fee</div>
-                        <div className="font-medium text-white text-xl">₹{event.registrationFee}</div>
+                        <div className="text-sm text-slate-500 font-medium">Registration Fee</div>
+                        <div className="font-bold text-slate-900 text-xl">₹{event.registrationFee}</div>
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-white/10">
+                    <div className="pt-4 border-t border-slate-200/80">
                       <div className="flex justify-between text-sm mb-2">
-                        <span className="text-gray-400">Seats Available</span>
-                        <span className="font-bold text-white">{seatsLeft} / {event.maxParticipants}</span>
+                        <span className="text-slate-600 font-medium">Seats Available</span>
+                        <span className="font-bold text-slate-900">{seatsLeft} / {event.maxParticipants}</span>
                       </div>
-                      <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
                         <div 
                           className={`h-full rounded-full ${progressColor}`}
                           style={{ width: `${100 - seatsPercentage}%` }}
                         ></div>
                       </div>
                       {seatsPercentage < 20 && seatsLeft > 0 && (
-                        <p className="text-xs text-red-400 mt-2">Hurry! Almost full.</p>
+                        <p className="text-xs text-red-600 font-bold mt-2">Hurry! Almost full.</p>
                       )}
                     </div>
                   </div>
@@ -548,11 +548,11 @@ export default function EventDetailPage() {
                   <div className="mt-8">
                     {event.status === 'upcoming' ? (
                       seatsLeft > 0 ? (
-                        <Link href={`/register?event=${event.slug}`} className="btn-primary w-full block text-center py-4 rounded-xl text-lg font-bold shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                        <Link href={`/register?event=${event.slug}`} className="btn-primary w-full block text-center py-4 rounded-full text-lg font-bold shadow-md">
                           Register for this Event
                         </Link>
                       ) : (
-                        <button disabled className="w-full bg-gray-800 text-gray-500 py-4 rounded-xl text-lg font-bold cursor-not-allowed">
+                        <button disabled className="w-full bg-slate-200 text-slate-400 py-4 rounded-full text-lg font-bold cursor-not-allowed">
                           Registration Full
                         </button>
                       )
@@ -561,7 +561,7 @@ export default function EventDetailPage() {
                 </div>
 
                 <div className="glass-card p-6 rounded-2xl space-y-3">
-                  <div className="text-xs font-bold uppercase tracking-wider text-gray-400">Need help? Contact Event Organizers</div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-600">Need help? Contact Event Organizers</div>
                   {(() => {
                     const names = event.coordinatorName
                       ? event.coordinatorName.split(/&|,|\band\b/i).map((n) => n.trim()).filter(Boolean)
@@ -572,9 +572,9 @@ export default function EventDetailPage() {
 
                     if (names.length === 0 && numbers.length === 0) {
                       return (
-                        <a href="tel:+919360257573" className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                          <span className="text-sm font-semibold text-white">Main Help Desk</span>
-                          <span className="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-500/20 text-blue-400">Call 9360257573</span>
+                        <a href="tel:+919360257573" className="flex items-center justify-between p-2.5 rounded-xl bg-slate-100/70 border border-slate-200 hover:bg-slate-200/80 transition-colors">
+                          <span className="text-sm font-bold text-slate-900">Main Help Desk</span>
+                          <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#7c3aed]/10 text-[#7c3aed]">Call 9360257573</span>
                         </a>
                       );
                     }
@@ -585,14 +585,14 @@ export default function EventDetailPage() {
                           const name = names[i] || `Coordinator ${i + 1}`;
                           const phone = numbers[i] || numbers[0] || '9360257573';
                           return (
-                            <div key={i} className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10">
+                            <div key={i} className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-100/70 border border-slate-200/80">
                               <div>
-                                <div className="text-sm font-semibold text-white">{name}</div>
-                                <div className="text-[11px] text-gray-400">Coordinator · {phone}</div>
+                                <div className="text-sm font-bold text-slate-900">{name}</div>
+                                <div className="text-[11px] text-slate-500 font-semibold">Coordinator · {phone}</div>
                               </div>
                               <a
                                 href={`tel:+91${phone}`}
-                                className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 hover:bg-blue-500 hover:text-white transition-colors shrink-0"
+                                className="w-10 h-10 rounded-full bg-[#7c3aed]/10 flex items-center justify-center text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white transition-colors shrink-0"
                                 title={`Call ${name} (${phone})`}
                               >
                                 <Phone className="w-4 h-4" />

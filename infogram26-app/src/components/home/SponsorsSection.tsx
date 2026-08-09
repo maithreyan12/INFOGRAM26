@@ -58,12 +58,12 @@ export default function SponsorsSection() {
   };
 
   return (
-    <section className="section-padding overflow-hidden py-20 bg-black/40">
+    <section className="section-padding overflow-hidden py-20 bg-transparent">
       <div className="container-xl mx-auto px-4 text-center mb-12">
-        <span className="section-badge inline-block px-4 py-1 rounded-full bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-[#00d4ff] text-sm font-semibold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+        <span className="section-badge inline-block px-4 py-1 rounded-full bg-[#7c3aed]/10 border border-[#7c3aed]/20 text-[#7c3aed] text-sm font-semibold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
           Our Sponsors
         </span>
-        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'var(--font-display)' }}>Trusted by Leading Organizations</h2>
+        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4" style={{ fontFamily: 'var(--font-display)' }}>Trusted by Leading Organizations</h2>
       </div>
 
       <div className="relative flex overflow-x-hidden w-full group py-8">
@@ -71,16 +71,16 @@ export default function SponsorsSection() {
           {[...sponsors, ...sponsors, ...sponsors].map((sponsor, index) => (
             <div 
               key={`${sponsor.id}-${index}`}
-              className={`glass-card flex items-center gap-3 px-6 py-3 rounded-full border ${getBorderColor(sponsor.tier)} bg-white/5 backdrop-blur-md hover:scale-105 transition-transform shrink-0`}
+              className={`glass-card flex items-center gap-3 px-6 py-3 rounded-full border ${getBorderColor(sponsor.tier)} hover:scale-105 transition-transform shrink-0`}
             >
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-white/80 overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-800 overflow-hidden">
                 {sponsor.logoUrl ? (
                   <img src={sponsor.logoUrl} alt={sponsor.name} className="w-full h-full object-cover" />
                 ) : (
                   getInitials(sponsor.name)
                 )}
               </div>
-              <span className="text-white font-medium">{sponsor.name}</span>
+              <span className="text-slate-900 font-bold">{sponsor.name}</span>
             </div>
           ))}
         </div>
