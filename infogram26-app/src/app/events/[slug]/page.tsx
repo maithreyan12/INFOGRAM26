@@ -560,14 +560,49 @@ export default function EventDetailPage() {
                   </div>
                 </div>
 
-                <div className="glass-card p-6 rounded-2xl flex items-center justify-between">
-                  <div>
-                    <div className="text-sm text-gray-400 mb-1">Need help?</div>
-                    <div className="font-medium text-white">Contact Organizer</div>
-                  </div>
-                  <a href={`tel:${event.contactNumber}`} className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 hover:bg-blue-500 hover:text-white transition-colors">
-                    <Phone className="w-5 h-5" />
-                  </a>
+                <div className="glass-card p-6 rounded-2xl space-y-3">
+                  <div className="text-xs font-bold uppercase tracking-wider text-gray-400">Need help? Contact Event Organizers</div>
+                  {(() => {
+                    const names = event.coordinatorName
+                      ? event.coordinatorName.split(/&|,|\band\b/i).map((n) => n.trim()).filter(Boolean)
+                      : [];
+                    const numbers = event.contactNumber
+                      ? event.contactNumber.split(/,|\//).map((n) => n.trim()).filter(Boolean)
+                      : [];
+
+                    if (names.length === 0 && numbers.length === 0) {
+                      return (
+                        <a href="tel:+919360257573" className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                          <span className="text-sm font-semibold text-white">Main Help Desk</span>
+                          <span className="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-500/20 text-blue-400">Call 9360257573</span>
+                        </a>
+                      );
+                    }
+
+                    return (
+                      <div className="space-y-2">
+                        {(names.length > 0 ? names : numbers).map((nameOrNum, i) => {
+                          const name = names[i] || `Coordinator ${i + 1}`;
+                          const phone = numbers[i] || numbers[0] || '9360257573';
+                          return (
+                            <div key={i} className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10">
+                              <div>
+                                <div className="text-sm font-semibold text-white">{name}</div>
+                                <div className="text-[11px] text-gray-400">Coordinator · {phone}</div>
+                              </div>
+                              <a
+                                href={`tel:+91${phone}`}
+                                className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 hover:bg-blue-500 hover:text-white transition-colors shrink-0"
+                                title={`Call ${name} (${phone})`}
+                              >
+                                <Phone className="w-4 h-4" />
+                              </a>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                 </div>
               </motion.div>
             </div>
