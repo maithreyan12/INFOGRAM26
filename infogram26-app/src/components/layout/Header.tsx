@@ -95,7 +95,7 @@ export default function Header() {
                 className="w-full h-full object-cover rounded-full transform scale-105" 
               />
             </div>
-            <span className="text-base sm:text-lg font-black tracking-wider hidden sm:inline-block" style={{ fontFamily: 'var(--font-display)' }}>
+            <span className="text-xs xs:text-sm sm:text-base font-black tracking-wider inline-flex items-center gap-0.5 select-none" style={{ fontFamily: 'var(--font-display)' }}>
               <span className={isDark ? 'text-white' : 'text-slate-950'}>INFOGRAM</span>
               <span className={isDark ? 'text-amber-300' : 'text-[#7c3aed]'}>&apos;26</span>
             </span>
