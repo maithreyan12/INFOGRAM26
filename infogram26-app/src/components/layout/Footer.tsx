@@ -47,7 +47,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-[#a855f7]/[0.15] bg-gradient-to-b from-transparent to-[#07080e] text-white/50 mt-20">
+    <footer className="border-t border-slate-200/80 bg-gradient-to-b from-transparent to-slate-100/70 text-slate-600 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
 
@@ -58,16 +58,18 @@ export default function Footer() {
               className="flex items-center gap-2.5 group w-fit"
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <img 
-                src="/logo.png" 
-                alt="INFOGRAM'26 Logo" 
-                className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_12px_rgba(168,85,247,0.5)]" 
-              />
-              <span className="text-xl font-black tracking-wider text-white" style={{ fontFamily: 'var(--font-display)' }}>
-                INFOGRAM<span className="text-[#c084fc]">&apos;26</span>
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden p-1 shrink-0 group-hover:scale-105 transition-transform">
+                <img 
+                  src="/logo.png" 
+                  alt="INFOGRAM'26 Logo" 
+                  className="w-full h-full object-contain" 
+                />
+              </div>
+              <span className="text-xl font-black tracking-wider text-slate-900" style={{ fontFamily: 'var(--font-display)' }}>
+                INFOGRAM<span className="text-[#7c3aed]">&apos;26</span>
               </span>
             </Link>
-            <p className="text-sm leading-relaxed text-white/50 max-w-xs">
+            <p className="text-sm leading-relaxed text-slate-600 font-medium max-w-xs">
               The premier national-level technical symposium hosted by the Department of Information Technology, CAHCET.
             </p>
             {/* Social Icons */}
@@ -79,7 +81,7 @@ export default function Footer() {
                   target={s.href.startsWith('http') ? '_blank' : undefined}
                   rel={s.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   aria-label={s.label}
-                  className="w-[44px] h-[44px] flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/60 hover:bg-[#a855f7]/15 hover:text-[#c084fc] hover:border-[#a855f7]/40 transition-all duration-200"
+                  className="w-[44px] h-[44px] flex items-center justify-center rounded-full bg-white border border-slate-200 shadow-xs text-slate-700 hover:bg-[#7c3aed]/10 hover:text-[#7c3aed] hover:border-[#7c3aed]/40 transition-all duration-200"
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   {s.icon}
@@ -90,13 +92,13 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-widest mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Quick Links</h3>
+            <h3 className="text-slate-900 font-bold text-sm uppercase tracking-widest mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Quick Links</h3>
             <ul className="space-y-1">
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.path}
-                    className="min-h-[40px] flex items-center text-sm text-white/50 hover:text-[#00d4ff] transition-colors"
+                    className="min-h-[40px] flex items-center text-sm text-slate-600 hover:text-[#7c3aed] font-medium transition-colors"
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
                     {link.name}
@@ -108,17 +110,17 @@ export default function Footer() {
 
           {/* Contact Persons */}
           <div>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-widest mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Contact</h3>
+            <h3 className="text-slate-900 font-bold text-sm uppercase tracking-widest mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Contact</h3>
             <ul className="space-y-3">
               {contactPersons.map((person) => (
                 <li key={person.name} className="flex items-center gap-3">
-                  <Phone className="w-3.5 h-3.5 text-[#00d4ff] shrink-0" />
+                  <Phone className="w-3.5 h-3.5 text-[#7c3aed] shrink-0" />
                   <div>
-                    <span className="text-sm text-white/70 font-medium">{person.name}</span>
-                    <span className="text-white/40 mx-1.5">·</span>
+                    <span className="text-sm text-slate-900 font-bold">{person.name}</span>
+                    <span className="text-slate-400 mx-1.5">·</span>
                     <a
                       href={`tel:+91${person.phone}`}
-                      className="text-sm text-white/50 hover:text-[#00d4ff] transition-colors"
+                      className="text-sm text-slate-600 hover:text-[#7c3aed] font-semibold transition-colors"
                       style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                       {person.phone}
@@ -132,7 +134,7 @@ export default function Footer() {
                 <Link
                   key={link.name}
                   href={link.path}
-                  className="block text-sm text-white/30 hover:text-[#00d4ff] transition-colors"
+                  className="block text-sm text-slate-500 hover:text-[#7c3aed] font-medium transition-colors"
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   {link.name}
@@ -143,31 +145,31 @@ export default function Footer() {
 
           {/* Location */}
           <div>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-widest mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Location</h3>
+            <h3 className="text-slate-900 font-bold text-sm uppercase tracking-widest mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Location</h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-[#00d4ff] shrink-0 mt-0.5" />
-                <span className="text-sm text-white/50 leading-relaxed">
+                <MapPin className="w-4 h-4 text-[#7c3aed] shrink-0 mt-0.5" />
+                <span className="text-sm text-slate-600 font-medium leading-relaxed">
                   Hakeem Nagar, Melvisharam,<br />
                   Ranipet District,<br />
                   Tamil Nadu – 632 509
                 </span>
               </li>
               <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-[#00d4ff] shrink-0" />
+                <Phone className="w-4 h-4 text-[#7c3aed] shrink-0" />
                 <a
                   href="tel:+914172267387"
-                  className="text-sm text-white/50 hover:text-[#00d4ff] transition-colors"
+                  className="text-sm text-slate-600 hover:text-[#7c3aed] font-semibold transition-colors"
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   +91 4172 267387
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-[#00d4ff] shrink-0" />
+                <Mail className="w-4 h-4 text-[#7c3aed] shrink-0" />
                 <a
                   href="mailto:info@cahcet.edu.in"
-                  className="text-sm text-white/50 hover:text-[#00d4ff] transition-colors"
+                  className="text-sm text-slate-600 hover:text-[#7c3aed] font-semibold transition-colors"
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   info@cahcet.edu.in
@@ -179,7 +181,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-[#00d4ff]/[0.06] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/30">
+        <div className="pt-8 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-medium">
           <p>© {currentYear} INFOGRAM&apos;26 · Department of Information Technology, CAHCET. All rights reserved.</p>
           <p>
             Designed &amp; Developed by{' '}
@@ -187,7 +189,7 @@ export default function Footer() {
               href="https://appziio.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#00d4ff] hover:text-[#00e5ff] font-semibold transition-colors"
+              className="text-[#7c3aed] hover:text-[#6d28d9] font-bold transition-colors"
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               Appziio
