@@ -1,0 +1,10 @@
+{
+  "name": "infogram26-root",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "cd infogram26-app && npm install && npm run build",
+    "dev": "cd infogram26-app && npm run dev",
+    "start": "cd infogram26-app && npm start"
+  }
+}
