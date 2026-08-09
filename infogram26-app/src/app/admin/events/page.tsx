@@ -7,8 +7,12 @@ import { Plus, Edit2, Trash2, X, UserCheck, Calendar, MapPin, Clock, Tag } from 
 import { useEventStore } from '@/store/eventStore';
 import type { Event, EventCategory } from '@/types';
 
+import { useTheme } from '@/context/ThemeContext';
+
 export default function EventsPage() {
   const { events, organizers, addEvent, updateEvent, deleteEvent } = useEventStore();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
 
@@ -114,22 +118,26 @@ export default function EventsPage() {
     <AdminLayout>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Events Management</h1>
-          <p className="text-gray-400 mt-1">Create events and assign dedicated Event Admins (Organizers)</p>
+          <h1 className={`text-2xl sm:text-3xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Events Management</h1>
+          <p className={`mt-1 text-xs sm:text-sm font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Create events and assign dedicated Event Admins (Organizers)</p>
         </div>
         <button 
           onClick={openCreateModal}
-          className="btn-primary flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-5 py-2.5 rounded-xl text-white font-medium shadow-lg shadow-purple-600/30 transition-all transform hover:scale-105"
+          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 px-5 py-2.5 rounded-xl text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-purple-600/30 transition-all active:scale-95"
         >
-          <Plus className="w-5 h-5" /> Create New Event
+          <Plus className="w-4 h-4" /> Create New Event
         </button>
       </div>
 
       {/* Events Table */}
-      <div className="glass-card bg-white/5 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+      <div className={`rounded-3xl border shadow-xl overflow-hidden ${
+        isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
+      }`}>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-300">
-            <thead className="text-xs uppercase bg-white/5 border-b border-white/10 text-gray-400 font-semibold tracking-wider">
+          <table className="w-full text-left text-xs font-bold">
+            <thead className={`text-[10px] uppercase tracking-wider border-b ${
+              isDark ? 'bg-slate-950/80 text-slate-300 border-slate-800' : 'bg-slate-100 text-slate-700 border-slate-200'
+            }`}>
               <tr>
                 <th className="px-6 py-4">Event Name</th>
                 <th className="px-6 py-4">Category</th>
