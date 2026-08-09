@@ -147,7 +147,7 @@ const demoEvents: Event[] = [
     ],
     venue: 'Main Campus Grounds', date: '2026-08-22', startTime: '13:30', endTime: '15:30',
     registrationDeadline: '2026-08-20', registrationFee: 50, maxParticipants: 200, registeredCount: 0,
-    coordinatorName: 'Shyam Sundar & Maithreyan', organizerName: 'IT Association', contactNumber: '9345837870, 9342706675',
+    coordinatorName: 'Shyam Sundar & Maithreyan & Afnaan Saaqib', organizerName: 'IT Association', contactNumber: '9345837870, 9342706675, 9150032643',
     status: 'upcoming', isFeatured: true, organizerUid: '', createdAt: new Date(), updatedAt: new Date(),
   },
   {
