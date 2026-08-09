@@ -64,13 +64,13 @@ export default function Footer() {
               className="flex items-center gap-2.5 group w-fit"
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full border shadow-sm flex items-center justify-center overflow-hidden p-1 shrink-0 group-hover:scale-105 transition-transform ${
-                isDark ? 'bg-slate-950 border-purple-500/40' : 'bg-white border-slate-200'
+              <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full border shadow-sm flex items-center justify-center overflow-hidden shrink-0 bg-black transition-all duration-200 ${
+                isDark ? 'border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.3)]' : 'border-[#7c3aed]/40'
               }`}>
                 <img 
                   src="/logo.png" 
                   alt="INFOGRAM'26 Logo" 
-                  className="w-full h-full object-contain" 
+                  className="w-full h-full object-cover rounded-full transform scale-105" 
                 />
               </div>
               <span className={`text-xl font-black tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`} style={{ fontFamily: 'var(--font-display)' }}>

@@ -81,13 +81,13 @@ export default function Header() {
             className="flex items-center gap-2.5 group active:scale-95 transition-transform duration-150"
             style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
           >
-            <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center overflow-hidden p-1 shrink-0 ${
-              isDark ? 'bg-slate-950 border border-purple-500/40 shadow-sm' : 'bg-white border border-slate-200 shadow-sm'
+            <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center overflow-hidden shrink-0 bg-black border transition-all duration-200 ${
+              isDark ? 'border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.3)]' : 'border-[#7c3aed]/40 shadow-sm'
             }`}>
               <img 
                 src="/logo.png" 
                 alt="INFOGRAM'26 Logo" 
-                className="w-full h-full object-contain" 
+                className="w-full h-full object-cover rounded-full transform scale-105" 
               />
             </div>
             <span className="text-base sm:text-lg font-black tracking-wider hidden sm:inline-block" style={{ fontFamily: 'var(--font-display)' }}>
