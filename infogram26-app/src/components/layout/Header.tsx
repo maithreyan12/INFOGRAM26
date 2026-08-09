@@ -57,7 +57,7 @@ export default function Header() {
   const navItemClass = (path: string) => {
     const isActive = pathname === path;
     return `relative px-4 py-2 text-sm font-semibold transition-colors ${
-      isActive ? 'text-[#c084fc]' : 'text-gray-300 hover:text-white'
+      isActive ? 'text-[#7c3aed]' : 'text-slate-700 hover:text-slate-900'
     }`;
   };
 
@@ -66,8 +66,8 @@ export default function Header() {
       <div 
         className={`w-full max-w-5xl rounded-full border transition-all duration-300 ${
           scrolled 
-            ? 'bg-[rgba(13,15,25,0.85)] border-[#a855f7]/30 shadow-[0_4px_30px_rgba(0,0,0,0.6)]'
-            : 'bg-[rgba(13,15,25,0.5)] border-white/10 shadow-[0_2px_15px_rgba(0,0,0,0.3)]'
+            ? 'bg-[rgba(255,255,255,0.85)] border-white/90 shadow-[0_8px_30px_rgba(15,23,42,0.08)]'
+            : 'bg-[rgba(255,255,255,0.65)] border-white/70 shadow-[0_4px_20px_rgba(15,23,42,0.04)]'
         }`}
         style={{ 
           backdropFilter: 'saturate(180%) blur(24px)',
@@ -84,11 +84,11 @@ export default function Header() {
             <img 
               src="/logo.png" 
               alt="INFOGRAM'26 Logo" 
-              className="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_12px_rgba(168,85,247,0.5)]" 
+              className="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_4px_12px_rgba(124,58,237,0.25)]" 
             />
             <span className="text-base sm:text-lg font-bold tracking-wider hidden sm:inline-block" style={{ fontFamily: 'var(--font-display)' }}>
-              <span className="text-white">INFOGRAM</span>
-              <span className="text-[#c084fc]">&apos;26</span>
+              <span className="text-slate-900">INFOGRAM</span>
+              <span className="text-[#7c3aed]">&apos;26</span>
             </span>
           </Link>
 

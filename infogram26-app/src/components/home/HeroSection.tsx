@@ -81,7 +81,7 @@ export default function HeroSection() {
           ? p.life / 20
           : 1 - (p.life - 20) / (p.maxLife - 20);
         ctx.globalAlpha = alpha * 0.9;
-        ctx.fillStyle = p.gold ? '#fbbf24' : '#a855f7';
+        ctx.fillStyle = p.gold ? '#d97706' : '#7c3aed';
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
@@ -108,7 +108,7 @@ export default function HeroSection() {
       className="relative flex flex-col items-center justify-center overflow-hidden"
       style={{
         minHeight: '100svh',
-        background: 'radial-gradient(ellipse 120% 80% at 50% 0%, rgba(168,85,247,0.22) 0%, rgba(16,185,129,0.06) 50%, #07080e 90%)',
+        background: 'radial-gradient(ellipse 120% 80% at 50% 0%, rgba(192,132,252,0.28) 0%, rgba(52,211,153,0.18) 50%, #f6f8fc 90%)',
         contain: 'layout style',
       }}
     >
@@ -124,7 +124,7 @@ export default function HeroSection() {
         className="absolute left-0 right-0 pointer-events-none"
         style={{
           height: 1,
-          background: 'linear-gradient(90deg,transparent,rgba(168,85,247,0.55),transparent)',
+          background: 'linear-gradient(90deg,transparent,rgba(124,58,237,0.35),transparent)',
           zIndex: 2,
         }}
         animate={{ top: ['5%', '95%'] }}
@@ -135,9 +135,9 @@ export default function HeroSection() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: 'linear-gradient(rgba(168,85,247,0.8) 1px,transparent 1px),linear-gradient(90deg,rgba(168,85,247,0.8) 1px,transparent 1px)',
+          backgroundImage: 'linear-gradient(rgba(124,58,237,0.4) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.4) 1px,transparent 1px)',
           backgroundSize: '64px 64px',
-          opacity: 0.025,
+          opacity: 0.04,
           zIndex: 0,
         }}
       />
@@ -154,17 +154,18 @@ export default function HeroSection() {
           <div
             style={{
               display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-              padding: '5px 14px', borderRadius: 100,
-              background: 'rgba(13,15,25,0.75)',
-              border: '1px solid rgba(168,85,247,0.3)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
+              padding: '6px 16px', borderRadius: 100,
+              background: 'rgba(255,255,255,0.75)',
+              border: '1px solid rgba(255,255,255,0.9)',
+              boxShadow: '0 4px 20px rgba(15,23,42,0.05)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
             }}
           >
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 8, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 8.5, color: '#475569', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600 }}>
               C. Abdul Hakeem College of Engineering &amp; Technology
             </span>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 9.5, color: '#c084fc', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700 }}>
+            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 10, color: '#7c3aed', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 800 }}>
               Department of Information Technology
             </span>
           </div>
@@ -181,8 +182,8 @@ export default function HeroSection() {
             className="absolute pointer-events-none"
             style={{
               inset: 0,
-              background: 'radial-gradient(ellipse 90% 100% at 50% 50%, rgba(168,85,247,0.25) 0%, transparent 65%)',
-              filter: 'blur(18px)',
+              background: 'radial-gradient(ellipse 90% 100% at 50% 50%, rgba(124,58,237,0.18) 0%, transparent 65%)',
+              filter: 'blur(20px)',
             }}
           />
 
@@ -196,11 +197,11 @@ export default function HeroSection() {
               letterSpacing: '-0.01em',
               lineHeight: 1,
               whiteSpace: 'nowrap',           /* ← forces single line */
-              background: 'linear-gradient(180deg,#fff 0%,#c084fc 55%,#10b981 100%)',
+              background: 'linear-gradient(180deg,#0f172a 0%,#6d28d9 55%,#059669 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              textShadow: '0 0 30px rgba(168,85,247,0.4)',
+              textShadow: '0 4px 25px rgba(124,58,237,0.2)',
               transform: 'translateZ(0)',      /* GPU layer */
             }}
           >
