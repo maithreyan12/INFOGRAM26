@@ -48,25 +48,25 @@ export default function TermsPage() {
 
       <div className="section-padding container-xl mx-auto px-4 max-w-4xl">
         <div className="space-y-6">
-          <div className="glass-card p-8 rounded-3xl border border-white/10 mb-10">
-            <p className="text-slate-300 leading-relaxed text-lg">
-              Welcome to INFOGRAM'26. These Terms and Conditions govern your use of our website and your registration and participation in the national level technical symposium organized by the Department of Information Technology.
+          <div className="glass-card p-8 rounded-3xl border border-slate-200 mb-10">
+            <p className="text-slate-700 font-medium leading-relaxed text-lg">
+              Welcome to INFOGRAM&apos;26. These Terms and Conditions govern your use of our website and your registration and participation in the national level technical symposium organized by the Department of Information Technology.
             </p>
           </div>
 
           {sections.map((section, idx) => (
-            <div key={idx} className="glass-card p-8 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
-              <h2 className="text-xl font-semibold text-white mb-4">{section.title}</h2>
-              <p className="text-slate-400 leading-relaxed">{section.content}</p>
+            <div key={idx} className="glass-card p-8 rounded-2xl border border-slate-200 hover:border-[#7c3aed]/30 transition-colors">
+              <h2 className="text-xl font-bold text-slate-900 mb-4">{section.title}</h2>
+              <p className="text-slate-600 font-medium leading-relaxed">{section.content}</p>
             </div>
           ))}
 
-          <div className="mt-12 glass-card p-8 rounded-2xl bg-primary/10 border border-primary/20 text-center">
-            <h2 className="text-xl font-semibold text-white mb-3">Questions?</h2>
-            <p className="text-slate-300 mb-4">
+          <div className="mt-12 glass-card p-8 rounded-2xl bg-[#7c3aed]/5 border border-[#7c3aed]/20 text-center">
+            <h2 className="text-xl font-bold text-slate-900 mb-3">Questions?</h2>
+            <p className="text-slate-600 font-medium mb-4">
               If you have any queries regarding these terms, please reach out to the organizing committee.
             </p>
-            <a href="/contact" className="btn-primary px-6 py-2 rounded-full inline-block">
+            <a href="/contact" className="btn-primary px-6 py-2.5 rounded-full inline-block font-bold">
               Contact Us
             </a>
           </div>

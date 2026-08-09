@@ -116,9 +116,9 @@ export default function TicketPage() {
   if (!ticket) return (
     <PublicLayout>
       <div className="flex flex-col justify-center items-center min-h-screen text-center px-4">
-        <h1 className="text-4xl font-bold mb-4 text-white">Ticket Not Found</h1>
-        <p className="text-white/50 mb-8">This ticket does not exist or has been removed.</p>
-        <button onClick={() => router.push('/')} className="btn-primary px-8 py-3 rounded-xl font-medium">
+        <h1 className="text-4xl font-bold mb-4 text-slate-900">Ticket Not Found</h1>
+        <p className="text-slate-600 mb-8 font-medium">This ticket does not exist or has been removed.</p>
+        <button onClick={() => router.push('/')} className="btn-primary px-8 py-3 rounded-full font-bold">
           Return to Home
         </button>
       </div>
@@ -135,11 +135,11 @@ export default function TicketPage() {
         <div className="max-w-4xl mx-auto">
           {/* Success Header */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 bg-green-400/10 border border-green-400/25 rounded-full px-5 py-2 text-sm font-semibold text-green-400 mb-4">
+            <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 rounded-full px-5 py-2 text-sm font-semibold text-emerald-600 mb-4">
               <CheckCircle className="w-4 h-4" /> Registration Successful
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white mb-2">Your Entry Pass is Ready!</h1>
-            <p className="text-white/50 text-sm">Download and present this ticket at the registration desk on event day.</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Your Entry Pass is Ready!</h1>
+            <p className="text-slate-600 text-sm font-medium">Download and present this ticket at the registration desk on event day.</p>
           </div>
 
           {/* ══════════ PREMIUM TICKET ══════════ */}

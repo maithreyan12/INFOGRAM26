@@ -23,7 +23,6 @@ export default function PageHero({ title, subtitle, breadcrumbs }: PageHeroProps
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[120px]" />
         <div className="absolute top-[20%] -right-[10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0B0F19]/80 to-[#0B0F19]" />
       </div>
 
       <div className="container-xl mx-auto px-4 relative z-10">
@@ -34,24 +33,24 @@ export default function PageHero({ title, subtitle, breadcrumbs }: PageHeroProps
           className="flex flex-col items-center text-center"
         >
           {breadcrumbs && breadcrumbs.length > 0 && (
-            <nav className="flex items-center gap-2 text-sm text-slate-400 mb-6 bg-white/5 px-4 py-2 rounded-full border border-white/10 backdrop-blur-sm">
+            <nav className="flex items-center gap-2 text-sm text-slate-600 font-semibold mb-6 bg-white/80 px-4 py-2 rounded-full border border-slate-200/80 shadow-xs backdrop-blur-sm">
               {breadcrumbs.map((crumb, idx) => (
                 <React.Fragment key={crumb.href}>
-                  <Link href={crumb.href} className="hover:text-primary-400 transition-colors">
+                  <Link href={crumb.href} className="hover:text-[#7c3aed] transition-colors">
                     {crumb.label}
                   </Link>
-                  {idx < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-slate-600" />}
+                  {idx < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-slate-400" />}
                 </React.Fragment>
               ))}
             </nav>
           )}
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 gradient-text pb-2">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 gradient-text pb-2" style={{ fontFamily: 'var(--font-display)' }}>
             {title}
           </h1>
           
           {subtitle && (
-            <p className="text-lg md:text-xl text-slate-300 max-w-2xl">
+            <p className="text-lg md:text-xl text-slate-600 font-medium max-w-2xl">
               {subtitle}
             </p>
           )}

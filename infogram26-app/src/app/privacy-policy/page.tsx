@@ -44,25 +44,25 @@ export default function PrivacyPolicyPage() {
 
       <div className="section-padding container-xl mx-auto px-4 max-w-4xl">
         <div className="space-y-6">
-          <div className="glass-card p-8 rounded-3xl border border-white/10 mb-10">
-            <p className="text-slate-300 leading-relaxed text-lg">
-              Welcome to the official website of INFOGRAM'26. We value your privacy and are committed to protecting your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data when you interact with our platform.
+          <div className="glass-card p-8 rounded-3xl border border-slate-200 mb-10">
+            <p className="text-slate-700 font-medium leading-relaxed text-lg">
+              Welcome to the official website of INFOGRAM&apos;26. We value your privacy and are committed to protecting your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data when you interact with our platform.
             </p>
           </div>
 
           {sections.map((section, idx) => (
-            <div key={idx} className="glass-card p-8 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
-              <h2 className="text-xl font-semibold text-white mb-4">{section.title}</h2>
-              <p className="text-slate-400 leading-relaxed">{section.content}</p>
+            <div key={idx} className="glass-card p-8 rounded-2xl border border-slate-200 hover:border-[#7c3aed]/30 transition-colors">
+              <h2 className="text-xl font-bold text-slate-900 mb-4">{section.title}</h2>
+              <p className="text-slate-600 font-medium leading-relaxed">{section.content}</p>
             </div>
           ))}
 
-          <div className="mt-12 glass-card p-8 rounded-2xl bg-primary/10 border border-primary/20 text-center">
-            <h2 className="text-xl font-semibold text-white mb-3">Contact Us</h2>
-            <p className="text-slate-300 mb-4">
+          <div className="mt-12 glass-card p-8 rounded-2xl bg-[#7c3aed]/5 border border-[#7c3aed]/20 text-center">
+            <h2 className="text-xl font-bold text-slate-900 mb-3">Contact Us</h2>
+            <p className="text-slate-600 font-medium mb-4">
               If you have any questions about this Privacy Policy, please contact us.
             </p>
-            <a href="mailto:info@cahcet.edu.in" className="text-primary-400 hover:text-primary-300 font-medium">
+            <a href="mailto:info@cahcet.edu.in" className="text-[#7c3aed] hover:underline font-bold">
               info@cahcet.edu.in
             </a>
           </div>

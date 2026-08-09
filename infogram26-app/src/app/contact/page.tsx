@@ -76,19 +76,19 @@ export default function ContactPage() {
           >
             <div>
               <h2 className="text-3xl font-bold mb-4 gradient-text">Get In Touch</h2>
-              <p className="text-slate-300 text-lg">
-                Have questions about INFOGRAM'26? Reach out to our organizing team.
+              <p className="text-slate-600 font-medium text-lg">
+                Have questions about INFOGRAM&apos;26? Reach out to our organizing team.
               </p>
             </div>
 
             <div className="space-y-6">
-              <div className="glass-card p-6 flex items-start gap-4 rounded-2xl border border-white/10 hover:border-primary/30 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                  <Building className="w-6 h-6 text-primary-400" />
+              <div className="glass-card p-6 flex items-start gap-4 rounded-2xl border border-slate-200 hover:border-[#7c3aed]/30 transition-colors">
+                <div className="w-12 h-12 rounded-full bg-[#7c3aed]/10 flex items-center justify-center shrink-0">
+                  <Building className="w-6 h-6 text-[#7c3aed]" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white mb-2">College Address</h3>
-                  <p className="text-slate-300 leading-relaxed">
+                  <h3 className="font-bold text-slate-900 mb-2">College Address</h3>
+                  <p className="text-slate-700 font-medium leading-relaxed">
                     Department of Information Technology, Info Club<br />
                     C. Abdul Hakeem College of Engineering & Technology<br />
                     Hakeem Nagar, Melvisharam - 632 509<br />
@@ -97,39 +97,39 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="glass-card p-6 flex items-center gap-4 rounded-2xl border border-white/10 hover:border-primary/30 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                  <Mail className="w-6 h-6 text-primary-400" />
+              <div className="glass-card p-6 flex items-center gap-4 rounded-2xl border border-slate-200 hover:border-[#7c3aed]/30 transition-colors">
+                <div className="w-12 h-12 rounded-full bg-[#7c3aed]/10 flex items-center justify-center shrink-0">
+                  <Mail className="w-6 h-6 text-[#7c3aed]" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white mb-1">Email Us</h3>
-                  <a href="mailto:info@cahcet.edu.in" className="text-slate-300 hover:text-primary-400 transition-colors">info@cahcet.edu.in</a>
+                  <h3 className="font-bold text-slate-900 mb-1">Email Us</h3>
+                  <a href="mailto:info@cahcet.edu.in" className="text-slate-700 font-semibold hover:text-[#7c3aed] transition-colors">info@cahcet.edu.in</a>
                 </div>
               </div>
 
-              <div className="glass-card p-6 flex items-center gap-4 rounded-2xl border border-white/10 hover:border-primary/30 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                  <Phone className="w-6 h-6 text-primary-400" />
+              <div className="glass-card p-6 flex items-center gap-4 rounded-2xl border border-slate-200 hover:border-[#7c3aed]/30 transition-colors">
+                <div className="w-12 h-12 rounded-full bg-[#7c3aed]/10 flex items-center justify-center shrink-0">
+                  <Phone className="w-6 h-6 text-[#7c3aed]" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white mb-1">Call Us</h3>
-                  <a href="tel:+914172267387" className="text-slate-300 hover:text-primary-400 transition-colors">+91 4172 267387</a>
+                  <h3 className="font-bold text-slate-900 mb-1">Call Us</h3>
+                  <a href="tel:+914172267387" className="text-slate-700 font-semibold hover:text-[#7c3aed] transition-colors">+91 4172 267387</a>
                 </div>
               </div>
 
               <div className="glass-card p-6 flex items-center gap-4 rounded-2xl border border-pink-500/20 hover:border-pink-500/40 bg-pink-500/5 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-pink-500/20 flex items-center justify-center shrink-0">
-                  <svg className="w-6 h-6 text-pink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="w-12 h-12 rounded-full bg-pink-500/10 flex items-center justify-center shrink-0">
+                  <svg className="w-6 h-6 text-pink-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white mb-1">Follow Us on Instagram</h3>
+                  <h3 className="font-bold text-slate-900 mb-1">Follow Us on Instagram</h3>
                   <a 
                     href="https://www.instagram.com/infogram_2k26?utm_source=qr&igsh=N2JqNW5zOWF0cHIw" 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="text-pink-400 hover:text-pink-300 font-semibold transition-colors text-sm"
+                    className="text-pink-600 hover:text-pink-700 font-bold transition-colors text-sm"
                   >
                     @infogram_2k26 &rarr;
                   </a>
@@ -144,10 +144,8 @@ export default function ContactPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <div className="glass-card p-8 rounded-3xl border border-white/10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-              
-              <h3 className="text-2xl font-semibold text-white mb-6">Send a Message</h3>
+            <div className="glass-card p-8 rounded-3xl border border-slate-200 relative overflow-hidden">
+              <h3 className="text-2xl font-bold text-slate-900 mb-6">Send a Message</h3>
               
               {isSuccess ? (
                 <motion.div 
@@ -155,14 +153,14 @@ export default function ContactPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex flex-col items-center justify-center text-center py-12"
                 >
-                  <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
-                    <CheckCircle className="w-8 h-8 text-green-500" />
+                  <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mb-4">
+                    <CheckCircle className="w-8 h-8 text-emerald-600" />
                   </div>
-                  <h4 className="text-xl font-semibold text-white mb-2">Message Sent!</h4>
-                  <p className="text-slate-300">We'll get back to you as soon as possible.</p>
+                  <h4 className="text-xl font-bold text-slate-900 mb-2">Message Sent!</h4>
+                  <p className="text-slate-600 font-medium">We&apos;ll get back to you as soon as possible.</p>
                   <button 
                     onClick={() => setIsSuccess(false)}
-                    className="mt-6 btn-glass px-6 py-2 rounded-full text-sm"
+                    className="mt-6 btn-glass px-6 py-2 rounded-full text-sm font-bold"
                   >
                     Send Another
                   </button>
@@ -170,10 +168,10 @@ export default function ContactPage() {
               ) : (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                   <div>
-                    <label className="form-label">Full Name</label>
+                    <label className="form-label font-bold text-slate-900">Full Name</label>
                     <input 
                       type="text" 
-                      className="form-input" 
+                      className="form-input bg-white/90 border-slate-200 text-slate-900 placeholder-slate-400" 
                       placeholder="John Doe"
                       {...register("name")}
                     />
@@ -182,20 +180,20 @@ export default function ContactPage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <label className="form-label">Email</label>
+                      <label className="form-label font-bold text-slate-900">Email</label>
                       <input 
                         type="email" 
-                        className="form-input" 
+                        className="form-input bg-white/90 border-slate-200 text-slate-900 placeholder-slate-400" 
                         placeholder="john@example.com"
                         {...register("email")}
                       />
                       {errors.email && <p className="form-error">{errors.email.message}</p>}
                     </div>
                     <div>
-                      <label className="form-label">Phone (Optional)</label>
+                      <label className="form-label font-bold text-slate-900">Phone (Optional)</label>
                       <input 
                         type="tel" 
-                        className="form-input" 
+                        className="form-input bg-white/90 border-slate-200 text-slate-900 placeholder-slate-400" 
                         placeholder="+91..."
                         {...register("phone")}
                       />
@@ -203,8 +201,8 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <label className="form-label">Subject</label>
-                    <select className="form-input bg-[#0B0F19]" {...register("subject")}>
+                    <label className="form-label font-bold text-slate-900">Subject</label>
+                    <select className="form-input bg-white border-slate-200 text-slate-900" {...register("subject")}>
                       <option value="">Select a subject...</option>
                       <option value="General Inquiry">General Inquiry</option>
                       <option value="Event Query">Event Query</option>
@@ -216,9 +214,9 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <label className="form-label">Message</label>
+                    <label className="form-label font-bold text-slate-900">Message</label>
                     <textarea 
-                      className="form-input min-h-[120px] resize-y" 
+                      className="form-input bg-white/90 border-slate-200 text-slate-900 placeholder-slate-400 min-h-[120px] resize-y" 
                       placeholder="How can we help you?"
                       {...register("message")}
                     />
@@ -228,7 +226,7 @@ export default function ContactPage() {
                   <button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="btn-primary w-full py-3 flex items-center justify-center gap-2 group"
+                    className="btn-primary w-full py-3 flex items-center justify-center gap-2 group font-bold shadow-md"
                   >
                     {isSubmitting ? (
                       <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -250,20 +248,20 @@ export default function ContactPage() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="glass-card p-2 rounded-3xl overflow-hidden border border-white/10"
+          className="glass-card p-2 rounded-3xl overflow-hidden border border-slate-200"
         >
-          <div className="w-full h-[400px] bg-slate-900 rounded-2xl overflow-hidden relative">
+          <div className="w-full h-[400px] bg-slate-100 rounded-2xl overflow-hidden relative">
             <iframe
               title="College Location Map"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000!2d79.6!3d12.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTLCsDU0JzAwLjAiTiA3OcKwMzYnMDAuMCJF!5e0!3m2!1sen!2sin!4v1234567890"
               width="100%"
               height="100%"
-              style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) opacity(0.8)' }}
+              style={{ border: 0 }}
               allowFullScreen={false}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             ></iframe>
-            <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-md px-4 py-2 rounded-lg border border-white/10 text-xs text-white/70">
+            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg border border-slate-200 text-xs text-slate-600 font-medium shadow-sm">
               Note: Map embed URL can be configured by admin.
             </div>
           </div>
