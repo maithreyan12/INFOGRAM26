@@ -5,6 +5,9 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Event, AdminUser, Registration } from '@/types';
 
+import { db, isFirebaseConfigured } from '@/lib/firebase/config';
+import { doc, setDoc, deleteDoc } from 'firebase/firestore';
+
 export interface OrganizerData extends AdminUser {
   assignedEventName?: string;
 }
@@ -272,6 +275,19 @@ export const useEventStore = create<EventState>()(
         if (eventData.organizerUid) {
           get().assignOrganizerToEvent(eventData.organizerUid, newId);
         }
+
+        if (db && isFirebaseConfigured) {
+          try {
+            setDoc(doc(db, 'events', newId), {
+              ...newEvent,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            }).catch((err) => console.error("Firestore sync add error:", err));
+          } catch (e) {
+            console.error("Firestore add error:", e);
+          }
+        }
+
         return newEvent;
       },
 
@@ -292,6 +308,17 @@ export const useEventStore = create<EventState>()(
           }
           return { events: updatedEvents, organizers: updatedOrganizers };
         });
+
+        if (db && isFirebaseConfigured) {
+          try {
+            setDoc(doc(db, 'events', id), {
+              ...updates,
+              updatedAt: new Date().toISOString(),
+            }, { merge: true }).catch((err) => console.error("Firestore sync update error:", err));
+          } catch (e) {
+            console.error("Firestore update error:", e);
+          }
+        }
       },
 
       deleteEvent: (id) => {
@@ -301,6 +328,14 @@ export const useEventStore = create<EventState>()(
             org.assignedEventId === id ? { ...org, assignedEventId: undefined, assignedEventName: undefined } : org
           ),
         }));
+
+        if (db && isFirebaseConfigured) {
+          try {
+            deleteDoc(doc(db, 'events', id)).catch((err) => console.error("Firestore sync delete error:", err));
+          } catch (e) {
+            console.error("Firestore delete error:", e);
+          }
+        }
       },
 
       addOrganizer: (organizerData) => {
@@ -318,6 +353,18 @@ export const useEventStore = create<EventState>()(
         if (organizerData.assignedEventId) {
           get().assignOrganizerToEvent(newUid, organizerData.assignedEventId);
         }
+
+        if (db && isFirebaseConfigured) {
+          try {
+            setDoc(doc(db, 'users', newUid), {
+              ...newOrganizer,
+              createdAt: new Date().toISOString(),
+            }).catch((err) => console.error("Firestore organizer sync error:", err));
+          } catch (e) {
+            console.error("Firestore organizer sync error:", e);
+          }
+        }
+
         return newOrganizer;
       },
 
