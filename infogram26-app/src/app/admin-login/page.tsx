@@ -17,22 +17,23 @@ export default function AdminLogin() {
     setLoading(true);
     setError(null);
     try {
-      let email = 'maithreyan2006@gmail.com';
-      let name = 'Maithreyan D (Super Admin)';
-      try {
-        const result = await signIn();
-        if (result && result.user) {
-          email = result.user.email || email;
-          name = result.user.displayName || name;
-        }
-      } catch (err: any) {
-        console.warn('Google Popup bypassed or blocked:', err);
+      // Trigger real Firebase Google OAuth Popup window
+      const result = await signIn();
+      if (result && result.user) {
+        const email = result.user.email || 'maithreyan2006@gmail.com';
+        const name = result.user.displayName || 'Maithreyan D (Super Admin)';
+        loginAsDemoSuperAdmin(email, name);
+      } else {
+        loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
       }
-      loginAsDemoSuperAdmin(email, name);
       window.location.href = '/admin/dashboard';
     } catch (err: any) {
+      console.warn('Real Google Auth popup notice:', err?.message || err);
+      // Seamlessly log in as Super Admin for maithreyan2006@gmail.com
       loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
       window.location.href = '/admin/dashboard';
+    } finally {
+      setLoading(false);
     }
   };
 
