@@ -97,11 +97,13 @@ export const metadata: Metadata = {
   },
 };
 
+import { ThemeProvider } from '@/context/ThemeContext';
+
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en" className={`${plusJakartaSans.variable} ${outfit.variable} ${orbitron.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
       <head>
@@ -111,55 +113,57 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="shortcut icon" href="/favicon.ico" />
       </head>
-      <body className="antialiased bg-[#f8fafc] text-slate-900">
-        {/* Aurora Background — global, behind everything */}
-        <div className="aurora-bg" aria-hidden="true">
-          <div
-            className="absolute rounded-full aurora-blob-1"
-            style={{
-              width: '75vw',
-              height: '75vw',
-              background: 'radial-gradient(circle, rgba(244,114,182,0.22) 0%, rgba(192,132,252,0.18) 50%, transparent 70%)',
-              top: '-15%',
-              left: '-15%',
-              filter: 'blur(90px)',
-              opacity: 0.85,
-              willChange: 'transform',
-              transform: 'translateZ(0)',
+      <body className="antialiased font-sans transition-colors duration-500">
+        <ThemeProvider>
+          {/* Aurora Background — global, behind everything */}
+          <div className="aurora-bg" aria-hidden="true">
+            <div
+              className="absolute rounded-full aurora-blob-1"
+              style={{
+                width: '75vw',
+                height: '75vw',
+                background: 'radial-gradient(circle, rgba(124,58,237,0.25) 0%, rgba(56,189,248,0.18) 50%, transparent 70%)',
+                top: '-15%',
+                left: '-15%',
+                filter: 'blur(90px)',
+                opacity: 0.85,
+                willChange: 'transform',
+                transform: 'translateZ(0)',
+              }}
+            />
+            <div
+              className="absolute rounded-full aurora-blob-2"
+              style={{
+                width: '70vw',
+                height: '70vw',
+                background: 'radial-gradient(circle, rgba(56,189,248,0.25) 0%, rgba(52,211,153,0.20) 50%, transparent 70%)',
+                bottom: '-15%',
+                right: '-15%',
+                filter: 'blur(90px)',
+                opacity: 0.8,
+                willChange: 'transform',
+                transform: 'translateZ(0)',
+              }}
+            />
+          </div>
+
+          <div className="relative z-10 min-h-screen">
+            {children}
+          </div>
+
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: 'rgba(15, 23, 42, 0.92)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: 'white',
+                borderRadius: '16px',
+              },
             }}
           />
-          <div
-            className="absolute rounded-full aurora-blob-2"
-            style={{
-              width: '70vw',
-              height: '70vw',
-              background: 'radial-gradient(circle, rgba(56,189,248,0.25) 0%, rgba(52,211,153,0.20) 50%, transparent 70%)',
-              bottom: '-15%',
-              right: '-15%',
-              filter: 'blur(90px)',
-              opacity: 0.8,
-              willChange: 'transform',
-              transform: 'translateZ(0)',
-            }}
-          />
-        </div>
-
-        <div className="relative z-10">
-          {children}
-        </div>
-
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: 'rgba(10, 15, 30, 0.95)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'white',
-              borderRadius: '12px',
-            },
-          }}
-        />
+        </ThemeProvider>
       </body>
     </html>
   );

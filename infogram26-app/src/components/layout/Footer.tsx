@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { Mail, Phone, MapPin } from 'lucide-react';
 
+import { useTheme } from '@/context/ThemeContext';
+
 const socialLinks = [
   {
     label: 'Instagram',
@@ -45,9 +47,13 @@ const officials = [
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   return (
-    <footer className="border-t border-slate-200/80 bg-gradient-to-b from-transparent to-slate-100/70 text-slate-600 mt-20">
+    <footer className={`border-t transition-colors duration-500 mt-20 ${
+      isDark ? 'border-purple-500/20 bg-slate-950 text-slate-300' : 'border-slate-200/80 bg-gradient-to-b from-transparent to-slate-100/70 text-slate-600'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
 
@@ -58,18 +64,20 @@ export default function Footer() {
               className="flex items-center gap-2.5 group w-fit"
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden p-1 shrink-0 group-hover:scale-105 transition-transform">
+              <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full border shadow-sm flex items-center justify-center overflow-hidden p-1 shrink-0 group-hover:scale-105 transition-transform ${
+                isDark ? 'bg-slate-950 border-purple-500/40' : 'bg-white border-slate-200'
+              }`}>
                 <img 
                   src="/logo.png" 
                   alt="INFOGRAM'26 Logo" 
                   className="w-full h-full object-contain" 
                 />
               </div>
-              <span className="text-xl font-black tracking-wider text-slate-900" style={{ fontFamily: 'var(--font-display)' }}>
-                INFOGRAM<span className="text-[#7c3aed]">&apos;26</span>
+              <span className={`text-xl font-black tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`} style={{ fontFamily: 'var(--font-display)' }}>
+                INFOGRAM<span className={isDark ? 'text-amber-300' : 'text-[#7c3aed]'}>&apos;26</span>
               </span>
             </Link>
-            <p className="text-sm leading-relaxed text-slate-600 font-medium max-w-xs">
+            <p className={`text-sm leading-relaxed font-medium max-w-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
               The premier national-level technical symposium hosted by the Department of Information Technology, CAHCET.
             </p>
             {/* Social Icons */}
@@ -81,7 +89,11 @@ export default function Footer() {
                   target={s.href.startsWith('http') ? '_blank' : undefined}
                   rel={s.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   aria-label={s.label}
-                  className="w-[44px] h-[44px] flex items-center justify-center rounded-full bg-white border border-slate-200 shadow-xs text-slate-700 hover:bg-[#7c3aed]/10 hover:text-[#7c3aed] hover:border-[#7c3aed]/40 transition-all duration-200"
+                  className={`w-[44px] h-[44px] flex items-center justify-center rounded-full border transition-all duration-200 ${
+                    isDark 
+                      ? 'bg-slate-900 border-slate-700 text-slate-200 hover:bg-purple-500/20 hover:text-amber-300 hover:border-amber-300/40' 
+                      : 'bg-white border-slate-200 text-slate-700 hover:bg-[#7c3aed]/10 hover:text-[#7c3aed] hover:border-[#7c3aed]/40'
+                  }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   {s.icon}
@@ -92,13 +104,15 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-slate-900 font-bold text-sm uppercase tracking-widest mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Quick Links</h3>
+            <h3 className={`font-bold text-sm uppercase tracking-widest mb-5 ${isDark ? 'text-amber-300' : 'text-slate-900'}`} style={{ fontFamily: 'var(--font-heading)' }}>Quick Links</h3>
             <ul className="space-y-1">
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.path}
-                    className="min-h-[40px] flex items-center text-sm text-slate-600 hover:text-[#7c3aed] font-medium transition-colors"
+                    className={`min-h-[40px] flex items-center text-sm font-medium transition-colors ${
+                      isDark ? 'text-slate-400 hover:text-amber-300' : 'text-slate-600 hover:text-[#7c3aed]'
+                    }`}
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
                     {link.name}
