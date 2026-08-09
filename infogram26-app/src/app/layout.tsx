@@ -111,7 +111,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="shortcut icon" href="/favicon.ico" />
       </head>
-      <body className="antialiased bg-[#040d1a] text-white">
+      <body className="antialiased bg-[#07080e] text-white">
         {/* Aurora Background — global, behind everything */}
         <div className="aurora-bg" aria-hidden="true">
           <div
@@ -119,11 +119,11 @@ export default function RootLayout({
             style={{
               width: '70vw',
               height: '70vw',
-              background: 'radial-gradient(circle, #00d4ff 0%, transparent 70%)',
+              background: 'radial-gradient(circle, #a855f7 0%, transparent 70%)',
               top: '-20%',
               right: '-20%',
-              filter: 'blur(80px)',
-              opacity: 0.1,
+              filter: 'blur(90px)',
+              opacity: 0.14,
               willChange: 'transform',
               transform: 'translateZ(0)',
             }}
@@ -133,11 +133,11 @@ export default function RootLayout({
             style={{
               width: '60vw',
               height: '60vw',
-              background: 'radial-gradient(circle, #0a3d6b 0%, transparent 70%)',
+              background: 'radial-gradient(circle, #10b981 0%, transparent 70%)',
               bottom: '-20%',
               left: '-15%',
-              filter: 'blur(80px)',
-              opacity: 0.08,
+              filter: 'blur(90px)',
+              opacity: 0.12,
               willChange: 'transform',
               transform: 'translateZ(0)',
             }}

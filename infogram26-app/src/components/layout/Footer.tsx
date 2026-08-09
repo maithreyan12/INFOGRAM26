@@ -47,28 +47,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-[#00d4ff]/[0.08] bg-gradient-to-b from-transparent to-[#020a14] text-white/50 mt-20">
-      {/* Officials Section 
-      <div className="border-b border-[#00d4ff]/[0.06]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <h3 className="text-center text-[#00d4ff] font-bold text-sm uppercase tracking-[0.2em] mb-8" style={{ fontFamily: 'var(--font-heading)' }}>
-            Organizing Committee
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 text-center">
-            {officials.map((official) => (
-              <div key={official.title}>
-                <h4 className="text-[#00d4ff] font-semibold text-xs uppercase tracking-[0.15em] mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
-                  {official.title}
-                </h4>
-                {official.names.map((name, i) => (
-                  <p key={i} className="text-white/40 text-xs leading-relaxed">{name}</p>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>*/}
-
+    <footer className="border-t border-[#a855f7]/[0.15] bg-gradient-to-b from-transparent to-[#07080e] text-white/50 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
 
@@ -82,10 +61,10 @@ export default function Footer() {
               <img 
                 src="/logo.png" 
                 alt="INFOGRAM'26 Logo" 
-                className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_12px_rgba(0,212,255,0.4)]" 
+                className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_12px_rgba(168,85,247,0.5)]" 
               />
               <span className="text-xl font-black tracking-wider text-white" style={{ fontFamily: 'var(--font-display)' }}>
-                INFOGRAM<span className="text-[#00d4ff]">&apos;26</span>
+                INFOGRAM<span className="text-[#c084fc]">&apos;26</span>
               </span>
             </Link>
             <p className="text-sm leading-relaxed text-white/50 max-w-xs">
@@ -100,7 +79,7 @@ export default function Footer() {
                   target={s.href.startsWith('http') ? '_blank' : undefined}
                   rel={s.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   aria-label={s.label}
-                  className="w-[44px] h-[44px] flex items-center justify-center rounded-full bg-white/5 border border-[#00d4ff]/10 text-white/50 hover:bg-[#00d4ff]/10 hover:text-[#00d4ff] hover:border-[#00d4ff]/30 transition-all duration-200"
+                  className="w-[44px] h-[44px] flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/60 hover:bg-[#a855f7]/15 hover:text-[#c084fc] hover:border-[#a855f7]/40 transition-all duration-200"
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   {s.icon}

@@ -7,60 +7,62 @@
 
 @layer base {
   :root {
-    /* ─── Color Palette ─────────────────── */
-    --color-bg: #020810;
-    --color-bg-secondary: #050f1e;
-    --color-surface: rgba(0, 212, 255, 0.04);
-    --color-surface-hover: rgba(0, 212, 255, 0.09);
-    --color-border: rgba(0, 212, 255, 0.13);
-    --color-border-hover: rgba(0, 212, 255, 0.28);
+    /* ─── Color Palette: iPhone 17 Pro Max Liquid Glass ─── */
+    --color-bg: #07080e;
+    --color-bg-secondary: #0d0f19;
+    --color-surface: rgba(168, 85, 247, 0.05);
+    --color-surface-hover: rgba(168, 85, 247, 0.12);
+    --color-border: rgba(255, 255, 255, 0.12);
+    --color-border-hover: rgba(168, 85, 247, 0.45);
 
-    /* Cyan Accent */
-    --color-cyan-300: #00e5ff;
-    --color-cyan-400: #00d4ff;
-    --color-cyan-500: #00b8d4;
-    --color-cyan-600: #0097a7;
+    /* Electric Violet & Cyber Emerald Accents */
+    --color-violet-400: #c084fc;
+    --color-violet-500: #a855f7;
+    --color-violet-600: #9333ea;
 
-    /* Gold */
-    --color-gold: #ffd700;
-    --color-gold-dim: rgba(255, 215, 0, 0.6);
+    --color-emerald-400: #34d399;
+    --color-emerald-500: #10b981;
+
+    --color-amber-400: #fbbf24;
+    --color-amber-500: #f59e0b;
 
     /* Text */
-    --color-text-primary: rgba(255, 255, 255, 0.96);
-    --color-text-secondary: rgba(255, 255, 255, 0.62);
-    --color-text-muted: rgba(255, 255, 255, 0.36);
+    --color-text-primary: rgba(255, 255, 255, 0.98);
+    --color-text-secondary: rgba(255, 255, 255, 0.68);
+    --color-text-muted: rgba(255, 255, 255, 0.42);
 
     /* Glows */
-    --glow-cyan: 0 0 40px rgba(0, 212, 255, 0.4);
-    --glow-cyan-sm: 0 0 20px rgba(0, 212, 255, 0.25);
-    --glow-cyan-lg: 0 0 60px rgba(0, 212, 255, 0.3), 0 0 120px rgba(0, 212, 255, 0.1);
+    --glow-primary: 0 0 45px rgba(168, 85, 247, 0.45);
+    --glow-secondary: 0 0 45px rgba(16, 185, 129, 0.35);
+    --glow-sm: 0 0 20px rgba(168, 85, 247, 0.3);
+    --glow-lg: 0 0 70px rgba(168, 85, 247, 0.4), 0 0 120px rgba(16, 185, 129, 0.2);
 
-    /* Apple Liquid Glass tokens */
-    --glass-tint: rgba(255, 255, 255, 0.055);
-    --glass-tint-hover: rgba(255, 255, 255, 0.09);
+    /* Apple Liquid Glass tokens — iOS 18 / iPhone 17 Pro Max */
+    --glass-tint: rgba(255, 255, 255, 0.06);
+    --glass-tint-hover: rgba(255, 255, 255, 0.10);
     --glass-border: rgba(255, 255, 255, 0.14);
-    --glass-border-top: rgba(255, 255, 255, 0.28);
-    --glass-blur: blur(28px);
-    --glass-blur-heavy: blur(48px);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
-    --glass-shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 212, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.2);
+    --glass-border-top: rgba(255, 255, 255, 0.32);
+    --glass-blur: blur(32px);
+    --glass-blur-heavy: blur(60px);
+    --glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    --glass-shadow-hover: 0 24px 70px rgba(0, 0, 0, 0.7), 0 0 45px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255,255,255,0.3);
 
-    /* Premium Futuristic Typography */
+    /* Premium Typography */
     --font-display: var(--font-orbitron), 'Orbitron', system-ui, sans-serif;
     --font-heading: var(--font-space-grotesk), var(--font-outfit), 'Space Grotesk', sans-serif;
     --font-body: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
 
     /* Radii */
-    --radius-sm: 10px;
-    --radius-md: 18px;
-    --radius-lg: 24px;
-    --radius-xl: 32px;
-    --radius-2xl: 48px;
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --radius-xl: 36px;
+    --radius-2xl: 52px;
 
-    /* Apple spring curves */
-    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    --spring-soft: cubic-bezier(0.25, 1.0, 0.5, 1);
-    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    /* iPhone 17 Pro Max Liquid Spring Physics */
+    --spring: cubic-bezier(0.32, 1.35, 0.32, 1);
+    --spring-soft: cubic-bezier(0.2, 1.0, 0.3, 1);
+    --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-out: cubic-bezier(0, 0, 0.2, 1);
     --ease-ios: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
@@ -105,25 +107,25 @@
   }
 
   /* Liquid glass scrollbar */
-  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, rgba(0, 212, 255, 0.5), rgba(0, 212, 255, 0.2));
+    background: linear-gradient(180deg, rgba(168, 85, 247, 0.6), rgba(16, 185, 129, 0.4));
     border-radius: 100px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, rgba(0, 212, 255, 0.8), rgba(0, 212, 255, 0.4));
+    background: linear-gradient(180deg, rgba(168, 85, 247, 0.9), rgba(16, 185, 129, 0.7));
   }
 
   /* iOS-style text selection */
   ::selection {
-    background: rgba(0, 212, 255, 0.3);
+    background: rgba(168, 85, 247, 0.4);
     color: white;
   }
 
   /* Focus rings */
   :focus-visible {
-    outline: 2px solid var(--color-cyan-400);
+    outline: 2px solid #a855f7;
     outline-offset: 3px;
     border-radius: 8px;
   }
@@ -161,8 +163,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
-  50% { box-shadow: 0 0 50px rgba(0, 212, 255, 0.6), 0 0 80px rgba(0, 212, 255, 0.2); }
+  0%, 100% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.35); }
+  50% { box-shadow: 0 0 55px rgba(168, 85, 247, 0.65), 0 0 90px rgba(16, 185, 129, 0.3); }
 }
 
 @keyframes shimmer {
@@ -207,7 +209,7 @@
 }
 
 /* ============================================================
-   APPLE LIQUID GLASS COMPONENTS — iOS 26
+   APPLE LIQUID GLASS COMPONENTS — iOS 18 / iPhone 17 Pro Max
    ============================================================ */
 
 /* Base liquid glass — ultra realistic */
@@ -229,13 +231,13 @@
 .glass-heavy {
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.10) 0%,
     rgba(255, 255, 255, 0.04) 100%
   );
   backdrop-filter: var(--glass-blur-heavy) saturate(180%);
   -webkit-backdrop-filter: var(--glass-blur-heavy) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-top-color: rgba(255, 255, 255, 0.3);
+  border-top-color: rgba(255, 255, 255, 0.32);
   border-radius: var(--radius-lg);
   box-shadow: var(--glass-shadow);
 }
@@ -246,23 +248,23 @@
     145deg,
     rgba(255, 255, 255, 0.09) 0%,
     rgba(255, 255, 255, 0.04) 40%,
-    rgba(0, 212, 255, 0.03) 100%
+    rgba(168, 85, 247, 0.03) 100%
   );
-  backdrop-filter: saturate(150%) blur(14px);
-  -webkit-backdrop-filter: saturate(150%) blur(14px);
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.13);
-  border-top: 1px solid rgba(255, 255, 255, 0.26);
-  border-left: 1px solid rgba(255, 255, 255, 0.16);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.4),
-    0 2px 6px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  border-radius: 22px;
+    0 10px 32px rgba(0, 0, 0, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
   transition:
-    transform 0.3s var(--ease-smooth),
-    box-shadow 0.3s var(--ease-smooth),
-    background 0.3s var(--ease-smooth),
-    border-color 0.3s var(--ease-smooth);
+    transform 0.35s var(--spring),
+    box-shadow 0.35s var(--ease-smooth),
+    background 0.35s var(--ease-smooth),
+    border-color 0.35s var(--ease-smooth);
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   position: relative;
@@ -276,7 +278,7 @@
   inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.10) 0%,
+    rgba(255, 255, 255, 0.12) 0%,
     rgba(255, 255, 255, 0.04) 35%,
     transparent 60%
   );
@@ -296,7 +298,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.08),
     transparent
   );
   transform: skewX(-15deg);
@@ -312,18 +314,18 @@
 .glass-card:hover {
   transform: translateY(-8px) scale(1.008);
   box-shadow:
-    0 28px 70px rgba(0, 0, 0, 0.55),
-    0 0 50px rgba(0, 212, 255, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 28px 70px rgba(0, 0, 0, 0.6),
+    0 0 55px rgba(168, 85, 247, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   background: linear-gradient(
     145deg,
-    rgba(0, 212, 255, 0.10) 0%,
-    rgba(255, 255, 255, 0.06) 40%,
-    rgba(0, 212, 255, 0.04) 100%
+    rgba(168, 85, 247, 0.12) 0%,
+    rgba(255, 255, 255, 0.07) 40%,
+    rgba(16, 185, 129, 0.05) 100%
   );
-  border-color: rgba(0, 212, 255, 0.4);
-  border-top-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(168, 85, 247, 0.45);
+  border-top-color: rgba(255, 255, 255, 0.35);
 }
 
 .glass-card:active {
@@ -335,30 +337,20 @@
 }
 
 @media (max-width: 768px) {
-  /* ── Mobile glass blur: 32px → 6px (massive GPU savings) ── */
   .glass-card {
-    backdrop-filter: saturate(130%) blur(6px) !important;
-    -webkit-backdrop-filter: saturate(130%) blur(6px) !important;
+    backdrop-filter: saturate(130%) blur(8px) !important;
+    -webkit-backdrop-filter: saturate(130%) blur(8px) !important;
   }
-  /* Disable expensive shimmer paint on mobile */
   .glass-card::after { display: none !important; }
-
-  /* Disable aurora animations on mobile — they repaint every frame during scroll */
   .aurora-blob-1 { animation: none !important; }
   .aurora-blob-2 { animation: none !important; }
   .aurora-bg::before { animation: none !important; }
   .aurora-bg::after  { animation: none !important; }
-
-  /* content-visibility: auto skips rendering off-screen sections entirely */
   section {
     content-visibility: auto;
     contain-intrinsic-size: 0 420px;
   }
-
-  /* Disable float animations on mobile */
   .float-animation { animation: none !important; }
-
-  /* Faster glass transitions on mobile */
   .glass-card {
     transition: transform 0.2s ease, box-shadow 0.2s ease !important;
   }
@@ -366,9 +358,9 @@
 
 @media (max-width: 640px) {
   .glass-card {
-    border-radius: 18px;
-    backdrop-filter: saturate(120%) blur(4px) !important;
-    -webkit-backdrop-filter: saturate(120%) blur(4px) !important;
+    border-radius: 20px;
+    backdrop-filter: saturate(120%) blur(6px) !important;
+    -webkit-backdrop-filter: saturate(120%) blur(6px) !important;
   }
   .glass-card:hover { transform: none; }
   .glass-card:active {
@@ -377,12 +369,10 @@
   }
 }
 
-/* Desktop aurora animations via CSS (blobs have no animation attr now) */
 @media (min-width: 769px) {
   .aurora-blob-1 { animation: aurora-1 22s ease-in-out infinite; }
   .aurora-blob-2 { animation: aurora-2 28s ease-in-out infinite; }
 }
-
 
 /* Apple Liquid Glass Button */
 .btn-glass {
@@ -394,7 +384,7 @@
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-top-color: rgba(255, 255, 255, 0.32);
+  border-top-color: rgba(255, 255, 255, 0.35);
   border-radius: 100px;
   color: white;
   cursor: pointer;
@@ -425,7 +415,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.12),
+    rgba(255, 255, 255, 0.15),
     transparent
   );
   transition: left 0.55s var(--ease-ios);
@@ -436,12 +426,12 @@
 .btn-glass:hover {
   background: linear-gradient(
     135deg,
-    rgba(0, 212, 255, 0.15) 0%,
-    rgba(0, 212, 255, 0.06) 100%
+    rgba(168, 85, 247, 0.2) 0%,
+    rgba(16, 185, 129, 0.1) 100%
   );
-  border-color: rgba(0, 212, 255, 0.55);
-  border-top-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 24px rgba(0, 212, 255, 0.2), inset 0 1px 0 rgba(255,255,255,0.25);
+  border-color: rgba(168, 85, 247, 0.55);
+  border-top-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 6px 28px rgba(168, 85, 247, 0.3), inset 0 1px 0 rgba(255,255,255,0.3);
   transform: translateY(-2px);
 }
 
@@ -451,11 +441,11 @@
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
 }
 
-/* Primary Button — Apple-style */
+/* Primary Button — Apple iPhone 17 Pro Max Liquid Style */
 .btn-primary {
-  background: linear-gradient(135deg, #00d4ff 0%, #0097c7 50%, #006ea3 100%);
-  border: 1px solid rgba(0, 212, 255, 0.5);
-  border-top-color: rgba(100, 240, 255, 0.6);
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 45%, #10b981 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-top-color: rgba(255, 255, 255, 0.45);
   border-radius: 100px;
   color: white;
   cursor: pointer;
@@ -469,9 +459,9 @@
   position: relative;
   overflow: hidden;
   box-shadow:
-    0 4px 20px rgba(0, 212, 255, 0.35),
-    0 1px 3px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    0 6px 25px rgba(168, 85, 247, 0.4),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   will-change: transform;
@@ -485,49 +475,48 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.22) 0%,
     transparent 60%
   );
   pointer-events: none;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #18e5ff 0%, #00c4ef 50%, #0088cc 100%);
+  background: linear-gradient(135deg, #c084fc 0%, #9333ea 45%, #34d399 100%);
   box-shadow:
-    0 8px 40px rgba(0, 212, 255, 0.5),
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    0 10px 45px rgba(168, 85, 247, 0.55),
+    0 2px 10px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
   transform: translateY(-3px) scale(1.02);
 }
 
 .btn-primary:active {
   transform: scale(0.95);
   transition: transform 0.1s var(--ease-smooth);
-  box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
 @media (max-width: 640px) {
   .btn-primary, .btn-glass { padding: 13px 24px; font-size: 15px; }
 }
 
-
 /* ============================================================
    GRADIENT TEXT
    ============================================================ */
 .gradient-text {
-  background: linear-gradient(135deg, #ffffff 0%, #7dfffa 50%, #00d4ff 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #c084fc 45%, #34d399 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-animated {
-  background: linear-gradient(270deg, #ffffff, #7dfffa, #00d4ff, #00b8d4, #7dfffa, #ffffff);
+  background: linear-gradient(270deg, #ffffff, #c084fc, #a855f7, #10b981, #34d399, #ffffff);
   background-size: 400% 400%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-x 6s ease infinite;
+  animation: gradient-x 8s ease infinite;
 }
 
 /* ============================================================

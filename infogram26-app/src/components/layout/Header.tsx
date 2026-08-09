@@ -57,7 +57,7 @@ export default function Header() {
   const navItemClass = (path: string) => {
     const isActive = pathname === path;
     return `relative px-4 py-2 text-sm font-semibold transition-colors ${
-      isActive ? 'text-[#00d4ff]' : 'text-gray-300 hover:text-white'
+      isActive ? 'text-[#c084fc]' : 'text-gray-300 hover:text-white'
     }`;
   };
 
@@ -66,12 +66,12 @@ export default function Header() {
       <div 
         className={`w-full max-w-5xl rounded-full border transition-all duration-300 ${
           scrolled 
-            ? 'bg-[rgba(4,13,26,0.85)] border-[#00d4ff]/20 shadow-[0_4px_30px_rgba(0,0,0,0.5)]'
-            : 'bg-[rgba(4,13,26,0.4)] border-white/5 shadow-[0_2px_15px_rgba(0,0,0,0.2)]'
+            ? 'bg-[rgba(13,15,25,0.85)] border-[#a855f7]/30 shadow-[0_4px_30px_rgba(0,0,0,0.6)]'
+            : 'bg-[rgba(13,15,25,0.5)] border-white/10 shadow-[0_2px_15px_rgba(0,0,0,0.3)]'
         }`}
         style={{ 
-          backdropFilter: 'saturate(150%) blur(20px)',
-          WebkitBackdropFilter: 'saturate(150%) blur(20px)'
+          backdropFilter: 'saturate(180%) blur(24px)',
+          WebkitBackdropFilter: 'saturate(180%) blur(24px)'
         }}
       >
         <div className="px-6 h-16 flex items-center justify-between">
@@ -84,11 +84,11 @@ export default function Header() {
             <img 
               src="/logo.png" 
               alt="INFOGRAM'26 Logo" 
-              className="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_12px_rgba(0,212,255,0.4)]" 
+              className="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_12px_rgba(168,85,247,0.5)]" 
             />
             <span className="text-base sm:text-lg font-bold tracking-wider hidden sm:inline-block" style={{ fontFamily: 'var(--font-display)' }}>
               <span className="text-white">INFOGRAM</span>
-              <span className="text-[#00d4ff]">&apos;26</span>
+              <span className="text-[#c084fc]">&apos;26</span>
             </span>
           </Link>
 
@@ -106,7 +106,7 @@ export default function Header() {
                   {isActive && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute left-2 right-2 bottom-1 h-[2px] bg-[#00d4ff]"
+                      className="absolute left-2 right-2 bottom-1 h-[2px] bg-gradient-to-r from-[#a855f7] to-[#10b981]"
                       initial={false}
                       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     />
