@@ -215,9 +215,26 @@ export default function AdminLogin() {
         </div>
       </div>
 
-      <Link href="/" className="z-10 mt-6 text-white/50 hover:text-[#00d4ff] transition-colors text-sm">
-        &larr; Back to Home
-      </Link>
+      <div className="z-10 mt-6 flex flex-col sm:flex-row items-center gap-4 text-xs">
+        <Link href="/" className="text-white/60 hover:text-amber-300 transition-colors font-bold uppercase tracking-wider">
+          &larr; Back to Public Website
+        </Link>
+        <span className="text-white/30 hidden sm:inline">•</span>
+        <div className="flex items-center gap-2 text-white/70 font-bold">
+          <span>Website Admin:</span>
+          <a
+            href="https://maithreyan.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-amber-300 hover:underline font-black"
+          >
+            Maithreyan D (maithreyan.in)
+          </a>
+          <a href="tel:+919342706675" className="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full hover:bg-purple-500/30">
+            📞 9342706675
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
