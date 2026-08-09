@@ -426,25 +426,41 @@ export default function EventDetailPage() {
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
                 <div className="glass-card p-6 rounded-2xl">
-                  <div className="text-xs font-bold uppercase tracking-wider text-[#00d4ff] mb-2">Student Coordinators</div>
-                  <div className="text-lg font-bold text-white mb-1">{event.coordinatorName}</div>
-                  {event.contactNumber && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {event.contactNumber.split(',').map((num, i) => {
-                        const cleanNum = num.trim();
-                        return (
-                          <a
-                            key={i}
-                            href={`tel:+91${cleanNum}`}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-[#00d4ff] hover:bg-[#00d4ff]/20 transition-colors"
-                          >
-                            <Phone className="w-3 h-3" />
-                            {cleanNum}
-                          </a>
-                        );
-                      })}
-                    </div>
-                  )}
+                  <div className="text-xs font-bold uppercase tracking-wider text-[#00d4ff] mb-3">Student Coordinators</div>
+                  {(() => {
+                    const names = event.coordinatorName
+                      ? event.coordinatorName.split(/&|,|\band\b/i).map((n) => n.trim()).filter(Boolean)
+                      : [];
+                    const numbers = event.contactNumber
+                      ? event.contactNumber.split(/,|\//).map((n) => n.trim()).filter(Boolean)
+                      : [];
+
+                    if (names.length === 0) {
+                      return <div className="text-lg font-bold text-white mb-1">Student Coordinator</div>;
+                    }
+
+                    return (
+                      <div className="space-y-2.5">
+                        {names.map((name, i) => {
+                          const phone = numbers[i] || numbers[0] || '';
+                          return (
+                            <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10">
+                              <span className="text-sm font-semibold text-white">{name}</span>
+                              {phone && (
+                                <a
+                                  href={`tel:+91${phone}`}
+                                  className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-[#00d4ff]/15 border border-[#00d4ff]/30 text-[#00d4ff] hover:bg-[#00d4ff]/30 transition-all w-fit"
+                                >
+                                  <Phone className="w-3.5 h-3.5" />
+                                  Call {phone}
+                                </a>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div className="glass-card p-6 rounded-2xl">
                   <div className="text-xs font-bold uppercase tracking-wider text-purple-400 mb-2">Organizing Department</div>
