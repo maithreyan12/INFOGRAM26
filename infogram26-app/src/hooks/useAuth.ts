@@ -82,26 +82,35 @@ export function useAuth() {
         setLoading(true);
         if (firebaseUser) {
           setUser(firebaseUser);
+          const emailLower = firebaseUser.email?.toLowerCase() || '';
+          const isSuperAdminEmail = emailLower === 'maithreyan2006@gmail.com' || emailLower.includes('admin');
+
           try {
             if (db) {
               const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
               if (userDoc.exists()) {
                 const data = userDoc.data() as AdminUser;
-                setAdminUser(data);
-                setRole(data.role as 'super_admin' | 'organizer');
+                // If it's maithreyan2006@gmail.com, ensure role is super_admin
+                if (isSuperAdminEmail) {
+                  setAdminUser({ ...data, role: 'super_admin' });
+                  setRole('super_admin');
+                } else {
+                  setAdminUser(data);
+                  setRole(data.role as 'super_admin' | 'organizer');
+                }
               } else {
                 // Check if email matches any pre-configured organizer in store
-                const matchedOrg = organizers.find((o) => o.email.toLowerCase() === firebaseUser.email?.toLowerCase());
-                if (matchedOrg) {
+                const matchedOrg = organizers.find((o) => o.email.toLowerCase() === emailLower);
+                if (matchedOrg && !isSuperAdminEmail) {
                   setAdminUser(matchedOrg);
                   setRole('organizer');
                 } else {
-                  // Fallback: Default to super_admin for admin portal test
+                  // Default to super_admin for admin/maithreyan2006@gmail.com
                   setRole('super_admin');
                   setAdminUser({
                     uid: firebaseUser.uid,
-                    email: firebaseUser.email || 'admin@infogram26.com',
-                    displayName: firebaseUser.displayName || 'Admin User',
+                    email: firebaseUser.email || 'maithreyan2006@gmail.com',
+                    displayName: firebaseUser.displayName || 'Maithreyan (Admin)',
                     role: 'super_admin',
                     createdAt: new Date(),
                     isActive: true,
@@ -112,8 +121,8 @@ export function useAuth() {
               setRole('super_admin');
               setAdminUser({
                 uid: firebaseUser.uid,
-                email: firebaseUser.email || 'admin@infogram26.com',
-                displayName: firebaseUser.displayName || 'Admin User',
+                email: firebaseUser.email || 'maithreyan2006@gmail.com',
+                displayName: firebaseUser.displayName || 'Maithreyan (Admin)',
                 role: 'super_admin',
                 createdAt: new Date(),
                 isActive: true,

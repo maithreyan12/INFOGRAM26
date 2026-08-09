@@ -344,94 +344,12 @@ export default function HeroSection() {
       <div
         className="relative flex flex-col items-center text-center w-full px-4 max-w-5xl mx-auto z-10"
         style={{
-          paddingTop: 'max(96px, calc(env(safe-area-inset-top,0px) + 90px))',
-          paddingBottom: 64,
+          paddingTop: 'max(72px, calc(env(safe-area-inset-top, 0px) + 68px))',
+          paddingBottom: 56,
         }}
       >
-        {/* ── MASSIVE "INFORMATION TECHNOLOGY" Heading ── */}
-        <motion.div
-          variants={fadeUp(0.1)}
-          initial="hidden"
-          animate="visible"
-          className="mb-2 w-full text-center"
-        >
-          {/* College label — small pill above */}
-          <div className="flex items-center justify-center mb-3">
-            <div
-              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[10px] sm:text-xs font-black tracking-[0.15em] uppercase ${
-                isDark
-                  ? 'bg-slate-900/80 border-purple-500/30 text-slate-300'
-                  : 'bg-white/80 border-slate-200 text-slate-600'
-              }`}
-            >
-              <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
-              C. Abdul Hakeem College of Engineering &amp; Technology
-            </div>
-          </div>
-
-          {/* INFORMATION — massive line 1 */}
-          <motion.div
-            variants={fadeUp(0.2)}
-            initial="hidden"
-            animate="visible"
-            className="leading-none font-black uppercase tracking-tight w-full"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(1.6rem, 6.5vw, 5.2rem)',
-              letterSpacing: '-0.01em',
-              color: isDark ? 'transparent' : 'transparent',
-              backgroundImage: isDark
-                ? 'linear-gradient(135deg, #a78bfa 0%, #60a5fa 40%, #34d399 80%, #a78bfa 100%)'
-                : 'linear-gradient(135deg, #7c3aed 0%, #6366f1 40%, #0891b2 80%, #7c3aed 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundSize: '200% 200%',
-              filter: isDark
-                ? 'drop-shadow(0 0 20px rgba(167,139,250,0.4))'
-                : 'drop-shadow(0 0 14px rgba(124,58,237,0.25))',
-              willChange: 'opacity, transform',
-            }}
-          >
-            INFORMATION
-          </motion.div>
-
-          {/* TECHNOLOGY — massive line 2 */}
-          <motion.div
-            variants={fadeUp(0.32)}
-            initial="hidden"
-            animate="visible"
-            className="leading-none font-black uppercase w-full"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(1.6rem, 6.5vw, 5.2rem)',
-              letterSpacing: '-0.01em',
-              color: isDark ? '#ffffff' : '#04060f',
-              textShadow: isDark
-                ? '0 0 30px rgba(192,132,252,0.35)'
-                : '0 0 20px rgba(124,58,237,0.15)',
-              willChange: 'opacity, transform',
-            }}
-          >
-            TECHNOLOGY
-          </motion.div>
-
-          {/* Dept separator line */}
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.9, delay: 0.55, ease: 'easeOut' }}
-            className="mx-auto mt-3 mb-1 h-[2px] max-w-xs sm:max-w-sm rounded-full origin-center"
-            style={{
-              background: isDark
-                ? 'linear-gradient(90deg, transparent, rgba(167,139,250,0.7), rgba(52,211,153,0.5), transparent)'
-                : 'linear-gradient(90deg, transparent, rgba(124,58,237,0.5), rgba(8,145,178,0.4), transparent)',
-            }}
-          />
-        </motion.div>
-
-        {/* ── INFOGRAM Letter Animation ── */}
-        <div className="relative w-full flex flex-col items-center">
+        {/* ── INFOGRAM Letter Animation — TOP ── */}
+        <div className="relative w-full flex flex-col items-center mb-1">
           <motion.h1
             initial="hidden"
             animate="visible"
@@ -439,7 +357,7 @@ export default function HeroSection() {
             className="relative font-black uppercase leading-none text-center select-none flex items-center justify-center"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(3rem, 13vw, 9rem)',
+              fontSize: 'clamp(2.8rem, 13vw, 9rem)',
               willChange: 'opacity',
             }}
           >
@@ -480,17 +398,14 @@ export default function HeroSection() {
             ))}
           </motion.h1>
 
-          {/* '26 Row — animated letter-by-letter like INFOGRAM */}
-          <div className="flex items-center justify-center gap-3 w-full max-w-xs sm:max-w-md -mt-3 sm:-mt-5">
-            {/* Left line — expands after '26 finishes */}
+          {/* '26 Row — animated letter-by-letter */}
+          <div className="flex items-center justify-center gap-3 w-full max-w-xs sm:max-w-md -mt-2 sm:-mt-4">
             <motion.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 0.85, delay: 1.35, ease: 'easeOut' }}
               className={`h-[3px] flex-1 rounded-full origin-right ${isDark ? 'bg-gradient-to-l from-amber-400 to-transparent' : 'bg-gradient-to-l from-amber-600 to-transparent'}`}
             />
-
-            {/* '26 — cinematic letter-by-letter spring entrance */}
             <motion.div
               initial="hidden"
               animate="visible"
@@ -498,7 +413,7 @@ export default function HeroSection() {
               className="flex items-baseline justify-center leading-none select-none"
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(3rem, 13vw, 9rem)',
+                fontSize: 'clamp(2.8rem, 13vw, 9rem)',
                 willChange: 'opacity',
               }}
             >
@@ -538,8 +453,6 @@ export default function HeroSection() {
                 </motion.span>
               ))}
             </motion.div>
-
-            {/* Right line */}
             <motion.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
@@ -548,6 +461,35 @@ export default function HeroSection() {
             />
           </div>
         </div>
+
+        {/* ── INFORMATION TECHNOLOGY — subtitle below INFOGRAM '26 ── */}
+        <motion.div
+          variants={fadeUp(0.95)}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col items-center gap-0.5 mb-3"
+        >
+          <div
+            className="font-black uppercase tracking-[0.18em] leading-tight"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(0.75rem, 3.2vw, 1.35rem)',
+              color: isDark ? '#a78bfa' : '#7c3aed',
+            }}
+          >
+            INFORMATION TECHNOLOGY
+          </div>
+          <div
+            className="font-black uppercase tracking-[0.12em]"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'clamp(0.6rem, 2.2vw, 0.9rem)',
+              color: isDark ? '#94a3b8' : '#64748b',
+            }}
+          >
+            C. Abdul Hakeem College of Engineering &amp; Technology
+          </div>
+        </motion.div>
 
         {/* ── Tagline ── */}
         <motion.p
