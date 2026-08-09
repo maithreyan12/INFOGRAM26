@@ -348,23 +348,86 @@ export default function HeroSection() {
           paddingBottom: 64,
         }}
       >
-        {/* ── College + Department Badge ── */}
-        <motion.div variants={fadeUp(0.1)} initial="hidden" animate="visible" className="mb-5">
-          <div
-            className={`inline-flex flex-col items-center gap-0.5 px-5 py-2.5 rounded-full border ${
-              isDark
-                ? 'bg-slate-900/90 border-purple-500/35 shadow-lg'
-                : 'bg-white/90 border-slate-200 shadow-md'
-            }`}
-          >
-            <span className={`text-[10px] sm:text-xs font-black tracking-[0.14em] uppercase ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
-              C. Abdul Hakeem College of Engineering &amp; Technology
-            </span>
-            <span className={`text-[11px] sm:text-[13px] font-black tracking-[0.14em] uppercase flex items-center gap-1.5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>
+        {/* ── MASSIVE "INFORMATION TECHNOLOGY" Heading ── */}
+        <motion.div
+          variants={fadeUp(0.1)}
+          initial="hidden"
+          animate="visible"
+          className="mb-2 w-full text-center"
+        >
+          {/* College label — small pill above */}
+          <div className="flex items-center justify-center mb-3">
+            <div
+              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[10px] sm:text-xs font-black tracking-[0.15em] uppercase ${
+                isDark
+                  ? 'bg-slate-900/80 border-purple-500/30 text-slate-300'
+                  : 'bg-white/80 border-slate-200 text-slate-600'
+              }`}
+            >
               <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
-              Department of Information Technology
-            </span>
+              C. Abdul Hakeem College of Engineering &amp; Technology
+            </div>
           </div>
+
+          {/* INFORMATION — massive line 1 */}
+          <motion.div
+            variants={fadeUp(0.2)}
+            initial="hidden"
+            animate="visible"
+            className="leading-none font-black uppercase tracking-tight w-full"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(1.6rem, 6.5vw, 5.2rem)',
+              letterSpacing: '-0.01em',
+              color: isDark ? 'transparent' : 'transparent',
+              backgroundImage: isDark
+                ? 'linear-gradient(135deg, #a78bfa 0%, #60a5fa 40%, #34d399 80%, #a78bfa 100%)'
+                : 'linear-gradient(135deg, #7c3aed 0%, #6366f1 40%, #0891b2 80%, #7c3aed 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundSize: '200% 200%',
+              filter: isDark
+                ? 'drop-shadow(0 0 20px rgba(167,139,250,0.4))'
+                : 'drop-shadow(0 0 14px rgba(124,58,237,0.25))',
+              willChange: 'opacity, transform',
+            }}
+          >
+            INFORMATION
+          </motion.div>
+
+          {/* TECHNOLOGY — massive line 2 */}
+          <motion.div
+            variants={fadeUp(0.32)}
+            initial="hidden"
+            animate="visible"
+            className="leading-none font-black uppercase w-full"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(1.6rem, 6.5vw, 5.2rem)',
+              letterSpacing: '-0.01em',
+              color: isDark ? '#ffffff' : '#04060f',
+              textShadow: isDark
+                ? '0 0 30px rgba(192,132,252,0.35)'
+                : '0 0 20px rgba(124,58,237,0.15)',
+              willChange: 'opacity, transform',
+            }}
+          >
+            TECHNOLOGY
+          </motion.div>
+
+          {/* Dept separator line */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.9, delay: 0.55, ease: 'easeOut' }}
+            className="mx-auto mt-3 mb-1 h-[2px] max-w-xs sm:max-w-sm rounded-full origin-center"
+            style={{
+              background: isDark
+                ? 'linear-gradient(90deg, transparent, rgba(167,139,250,0.7), rgba(52,211,153,0.5), transparent)'
+                : 'linear-gradient(90deg, transparent, rgba(124,58,237,0.5), rgba(8,145,178,0.4), transparent)',
+            }}
+          />
         </motion.div>
 
         {/* ── INFOGRAM Letter Animation ── */}
