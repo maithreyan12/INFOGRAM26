@@ -77,50 +77,26 @@ export default function VideoSection() {
         </p>
       </motion.div>
 
-      {/* Mac Window Container */}
+      {/* Video Container */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 30 }}
         animate={isInView ? { opacity: 1, scale: 1, y: 0 } : {}}
         transition={{ duration: 0.75, ease: [0.25, 1, 0.5, 1], delay: 0.2 }}
-        className="relative mx-auto max-w-5xl w-full"
+        className="relative mx-auto max-w-5xl w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-black group"
         onMouseEnter={() => setShowControls(true)}
         onMouseLeave={() => setShowControls(false)}
         onTouchStart={() => setShowControls(true)}
         onTouchEnd={() => setTimeout(() => setShowControls(false), 2500)}
       >
-        {/* Glow aura behind card */}
-        <div
-          className="absolute -inset-2 rounded-2xl sm:rounded-3xl opacity-40 blur-2xl pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(0,212,255,0.35), transparent 70%)' }}
+        <video
+          ref={videoRef}
+          src="/infogram-promo.mp4"
+          className="w-full aspect-video object-cover block"
+          muted={muted}
+          loop
+          playsInline
+          preload="auto"
         />
-
-        {/* Mac Window Shell */}
-        <div
-          className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-[#00d4ff]/30 bg-[#071422]"
-          style={{
-            boxShadow: '0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(0,212,255,0.18)',
-            transform: 'translate3d(0,0,0)',
-          }}
-        >
-
-
-          {/* Video Container — Edge-to-Edge inside Mac Shell, zero black gaps */}
-          <div className="relative w-full aspect-video bg-black overflow-hidden group">
-            <video
-              ref={videoRef}
-              src="/infogram-promo.mp4"
-              className="w-full h-full object-cover block"
-              muted={muted}
-              loop
-              playsInline
-              preload="auto"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                display: 'block',
-              }}
-            />
 
             {/* Play/Pause Center Button Overlay */}
             <motion.button
@@ -185,8 +161,6 @@ export default function VideoSection() {
                 <Maximize className="w-4 h-4 text-white/80" />
               </button>
             </motion.div>
-          </div>
-        </div>
       </motion.div>
 
       {/* Hashtag tags below video */}
