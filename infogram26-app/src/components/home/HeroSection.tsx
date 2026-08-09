@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 
 const titleLetters = ['I', 'N', 'F', 'O', 'G', 'R', 'A', 'M'];
+const yearLetters = ["'", '2', '6'];
 
 const letterContainerVariants = {
   hidden: { opacity: 0 },
@@ -16,11 +17,29 @@ const letterContainerVariants = {
   },
 };
 
+// '26 letters animate after INFOGRAM completes (8 letters × 0.065s stagger + 0.28 delay ≈ 0.8s)
+const yearContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.95 },
+  },
+};
+
 const letterVariants = {
   hidden: { opacity: 0, y: 50, scale: 0.7, filter: 'blur(12px)' },
   visible: {
     opacity: 1, y: 0, scale: 1, filter: 'blur(0px)',
     transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
+  },
+};
+
+// Year letters animate upward with amber glow — same spring physics
+const yearLetterVariants = {
+  hidden: { opacity: 0, y: 60, scale: 0.6, filter: 'blur(14px)' },
+  visible: {
+    opacity: 1, y: 0, scale: 1, filter: 'blur(0px)',
+    transition: { type: 'spring' as const, stiffness: 280, damping: 20 },
   },
 };
 
@@ -130,7 +149,7 @@ export default function HeroSection() {
     );
     if (canvas.parentElement) observer.observe(canvas.parentElement);
 
-    const alphaMultiplier = isDark ? 0.6 : 0.22;
+    const alphaMultiplier = isDark ? 0.65 : 0.45;
 
     const render = (now: number) => {
       if (!isVisible) return;
@@ -370,7 +389,7 @@ export default function HeroSection() {
                   color: isDark ? '#ffffff' : '#04060f',
                   textShadow: isDark
                     ? '0 0 28px rgba(192,132,252,0.55), 0 0 60px rgba(56,189,248,0.3)'
-                    : '0 2px 10px rgba(124,58,237,0.18)',
+                    : '0 0 20px rgba(124,58,237,0.22), 0 2px 14px rgba(124,58,237,0.15)',
                   willChange: 'transform, opacity',
                   display: 'inline-block',
                 }}
@@ -380,37 +399,55 @@ export default function HeroSection() {
             ))}
           </motion.h1>
 
-          {/* '26 Row */}
-          <motion.div
-            variants={fadeUp(0.85)}
-            initial="hidden"
-            animate="visible"
-            className="flex items-center justify-center gap-3 w-full max-w-xs sm:max-w-md -mt-3 sm:-mt-5"
-          >
+          {/* '26 Row — animated letter-by-letter like INFOGRAM */}
+          <div className="flex items-center justify-center gap-3 w-full max-w-xs sm:max-w-md -mt-3 sm:-mt-5">
+            {/* Left line — expands after '26 finishes */}
             <motion.div
-              initial={{ scaleX: 0, originX: 1 }}
+              initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
-              transition={{ duration: 0.9, delay: 0.8, ease: 'easeOut' }}
-              className={`h-[3px] flex-1 rounded-full ${isDark ? 'bg-gradient-to-l from-amber-400 to-transparent' : 'bg-gradient-to-l from-amber-600 to-transparent'}`}
+              transition={{ duration: 0.85, delay: 1.35, ease: 'easeOut' }}
+              className={`h-[3px] flex-1 rounded-full origin-right ${isDark ? 'bg-gradient-to-l from-amber-400 to-transparent' : 'bg-gradient-to-l from-amber-600 to-transparent'}`}
             />
-            <span
-              className="font-black leading-none select-none tracking-tight"
+
+            {/* '26 — cinematic letter-by-letter spring entrance */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={yearContainerVariants}
+              className="flex items-baseline justify-center leading-none select-none"
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 'clamp(3rem, 13vw, 9rem)',
-                color: isDark ? '#fcd34d' : '#d97706',
-                textShadow: isDark ? '0 0 22px rgba(252,211,77,0.6)' : '0 2px 8px rgba(217,119,6,0.28)',
+                willChange: 'opacity',
               }}
             >
-              &apos;26
-            </span>
+              {yearLetters.map((char, index) => (
+                <motion.span
+                  key={index}
+                  variants={yearLetterVariants}
+                  className="inline-block font-black"
+                  style={{
+                    color: isDark ? '#fcd34d' : '#d97706',
+                    textShadow: isDark
+                      ? '0 0 24px rgba(252,211,77,0.7), 0 0 55px rgba(252,211,77,0.35)'
+                      : '0 2px 10px rgba(217,119,6,0.35)',
+                    willChange: 'transform, opacity',
+                    display: 'inline-block',
+                  }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </motion.div>
+
+            {/* Right line */}
             <motion.div
-              initial={{ scaleX: 0, originX: 0 }}
+              initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
-              transition={{ duration: 0.9, delay: 0.8, ease: 'easeOut' }}
-              className={`h-[3px] flex-1 rounded-full ${isDark ? 'bg-gradient-to-r from-amber-400 to-transparent' : 'bg-gradient-to-r from-amber-600 to-transparent'}`}
+              transition={{ duration: 0.85, delay: 1.35, ease: 'easeOut' }}
+              className={`h-[3px] flex-1 rounded-full origin-left ${isDark ? 'bg-gradient-to-r from-amber-400 to-transparent' : 'bg-gradient-to-r from-amber-600 to-transparent'}`}
             />
-          </motion.div>
+          </div>
         </div>
 
         {/* ── Tagline ── */}
