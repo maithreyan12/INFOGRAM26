@@ -100,7 +100,68 @@ export default function ContactPage() {
                 </p>
               </div>
 
-              {/* Symposium Organizers & Technical Administration Card */}
+              {/* 👑 BOLD HIGH-IMPACT WEBSITE ADMINISTRATOR & DEVELOPER CARD (FIRST) 👑 */}
+              <div className={`p-6 sm:p-7 rounded-3xl border-2 shadow-2xl relative overflow-hidden transition-all ${
+                isDark 
+                  ? 'bg-gradient-to-r from-slate-950 via-purple-950/80 to-slate-950 border-amber-400/60 shadow-[0_0_30px_rgba(252,211,77,0.25)] text-white' 
+                  : 'bg-gradient-to-r from-purple-50 via-white to-amber-50/60 border-purple-600/50 shadow-2xl text-slate-950'
+              }`}>
+                {/* Glowing Corner Badge */}
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border-2 shadow-lg ${
+                      isDark ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-amber-500/20' : 'bg-purple-600 text-white border-purple-500 shadow-purple-600/30'
+                    }`}>
+                      <Code className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full bg-amber-400 text-slate-950 border border-amber-300 font-bold shadow-xs">
+                          ★ WEBSITE ADMINISTRATOR &amp; DEV ★
+                        </span>
+                      </div>
+                      <h3 className={`text-xl sm:text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-950'}`} style={{ fontFamily: 'var(--font-display)' }}>
+                        Maithreyan D
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <a
+                      href="https://maithreyan.in"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider border transition-all shadow-md active:scale-95 ${
+                        isDark 
+                          ? 'bg-amber-400 text-slate-950 border-amber-300 hover:bg-amber-300 shadow-amber-400/20' 
+                          : 'bg-[#7c3aed] text-white border-[#7c3aed] hover:bg-[#6d28d9] shadow-purple-600/30'
+                      }`}
+                    >
+                      <Globe className="w-4 h-4" />
+                      <span>Portfolio (maithreyan.in)</span>
+                      <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+                    </a>
+                    <a
+                      href="tel:+919342706675"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/30 transition-all active:scale-95 whitespace-nowrap"
+                    >
+                      <Phone className="w-4 h-4" />
+                      <span>Call 9342706675</span>
+                    </a>
+                  </div>
+                </div>
+
+                <div className={`pt-3 border-t text-xs font-bold flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
+                  isDark ? 'border-purple-500/20 text-slate-300' : 'border-purple-200 text-slate-700'
+                }`}>
+                  <p>For any website issues, developer support, or portal admin queries</p>
+                  <p className={`font-black ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>
+                    Website: <a href="https://maithreyan.in" target="_blank" rel="noopener noreferrer" className="underline">https://maithreyan.in</a>
+                  </p>
+                </div>
+              </div>
+
+              {/* Student Coordinators Card */}
               <div className={`p-6 rounded-3xl border shadow-xl ${
                 isDark ? 'bg-slate-900/90 border-purple-500/35 text-white' : 'bg-white border-slate-200 text-slate-950'
               }`}>
@@ -110,63 +171,9 @@ export default function ContactPage() {
                       <Users className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <h3 className={`font-black text-lg ${isDark ? 'text-white' : 'text-slate-950'}`}>Symposium Organizers &amp; Tech Team</h3>
-                      <p className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Contact our coordinators &amp; website administrator</p>
+                      <h3 className={`font-black text-lg ${isDark ? 'text-white' : 'text-slate-950'}`}>Student Coordinators</h3>
+                      <p className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Contact our student team for event queries &amp; assistance</p>
                     </div>
-                  </div>
-                </div>
-
-                {/* Featured Lead: Maithreyan D (Website Admin & Developer) */}
-                <div className={`p-5 rounded-2xl border mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
-                  isDark
-                    ? 'bg-slate-950/80 border-purple-500/30'
-                    : 'bg-slate-50/90 border-slate-200'
-                }`}>
-                  <div className="flex items-start sm:items-center gap-3.5">
-                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
-                      isDark ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-purple-500/10 border-purple-500/20 text-[#7c3aed]'
-                    }`}>
-                      <Code className="w-5 h-5" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className={`font-black text-base ${isDark ? 'text-white' : 'text-slate-950'}`}>
-                          Maithreyan D
-                        </span>
-                        <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border whitespace-nowrap ${
-                          isDark ? 'bg-purple-500/20 text-amber-300 border-purple-500/40' : 'bg-[#7c3aed]/10 text-[#7c3aed] border-[#7c3aed]/30'
-                        }`}>
-                          Website Admin &amp; Lead Dev
-                        </span>
-                      </div>
-                      <p className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                        Portfolio: <a href="https://maithreyan.in" target="_blank" rel="noopener noreferrer" className={`underline font-black ${isDark ? 'text-amber-300 hover:text-amber-200' : 'text-[#7c3aed] hover:underline'}`}>maithreyan.in</a>
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2 shrink-0">
-                    <a
-                      href="https://maithreyan.in"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider border transition-all ${
-                        isDark 
-                          ? 'bg-purple-500/20 border-purple-500/40 text-amber-300 hover:bg-purple-500/30' 
-                          : 'bg-[#7c3aed]/10 border-[#7c3aed]/30 text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white'
-                      }`}
-                    >
-                      <Globe className="w-3.5 h-3.5" />
-                      <span>Portfolio</span>
-                      <ExternalLink className="w-3 h-3 opacity-70" />
-                    </a>
-                    <a
-                      href="tel:+919342706675"
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all whitespace-nowrap"
-                    >
-                      <Phone className="w-3.5 h-3.5" />
-                      <span>9342706675</span>
-                    </a>
                   </div>
                 </div>
 
