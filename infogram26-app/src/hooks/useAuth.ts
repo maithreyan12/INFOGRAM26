@@ -133,8 +133,33 @@ export function useAuth() {
             setRole('super_admin');
           }
         } else {
+          // Check if demo user session exists in localStorage
           const savedDemo = typeof window !== 'undefined' ? localStorage.getItem(DEMO_USER_KEY) : null;
-          if (!savedDemo) {
+          if (savedDemo) {
+            try {
+              const parsed = JSON.parse(savedDemo) as DemoSession;
+              setUser({
+                uid: parsed.uid,
+                email: parsed.email,
+                displayName: parsed.displayName,
+                photoURL: null,
+              });
+              setAdminUser({
+                uid: parsed.uid,
+                email: parsed.email,
+                displayName: parsed.displayName,
+                role: parsed.role,
+                assignedEventId: parsed.assignedEventId,
+                createdAt: new Date(),
+                isActive: true,
+              });
+              setRole(parsed.role);
+            } catch (e) {
+              setUser(null);
+              setAdminUser(null);
+              setRole(null);
+            }
+          } else {
             setUser(null);
             setAdminUser(null);
             setRole(null);

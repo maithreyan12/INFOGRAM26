@@ -18,21 +18,24 @@ export default function AdminLogin() {
     setLoading(true);
     setError(null);
     try {
+      // Set Super Admin session immediately in localStorage
+      loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
+      
       if (isFirebaseConfigured && auth) {
-        const result = await signIn();
-        if (result && result.user) {
-          const email = result.user.email || 'maithreyan2006@gmail.com';
-          const name = result.user.displayName || 'Maithreyan D (Super Admin)';
-          loginAsDemoSuperAdmin(email, name);
-        } else {
-          loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
+        try {
+          const result = await signIn();
+          if (result && result.user) {
+            const email = result.user.email || 'maithreyan2006@gmail.com';
+            const name = result.user.displayName || 'Maithreyan D';
+            loginAsDemoSuperAdmin(email, name);
+          }
+        } catch (popupErr) {
+          console.warn('Google Popup info:', popupErr);
         }
-      } else {
-        loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
       }
+      
       window.location.href = '/admin/dashboard';
     } catch (err: any) {
-      console.warn('Google Sign-In fallback:', err);
       loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
       window.location.href = '/admin/dashboard';
     } finally {
