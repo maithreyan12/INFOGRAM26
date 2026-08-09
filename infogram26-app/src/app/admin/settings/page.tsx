@@ -55,65 +55,68 @@ export default function SettingsPage() {
         </section>
 
         {/* PAYMENT SETTINGS */}
-        <section className="glass-card bg-white/5 border border-white/10 rounded-2xl p-6">
-          <h2 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Razorpay Configuration</h2>
+        <section className="rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl p-6 sm:p-8">
+          <h2 className="text-lg font-black text-white mb-6 border-b border-gray-800 pb-4">
+            Razorpay Configuration
+          </h2>
           <div className="mb-6">
             <label className="inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="relative w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
-              <span className="ml-3 text-sm font-medium text-white">Enable Razorpay Gateway</span>
+              <div className="relative w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+              <span className="ml-3 text-xs font-black uppercase tracking-wider text-white">Enable Razorpay Gateway</span>
             </label>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Razorpay Key ID</label>
-              <input type="text" className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white font-mono" placeholder="rzp_test_..." />
+              <label className="block text-xs font-black uppercase text-gray-400 mb-2">Razorpay Key ID</label>
+              <input type="text" className="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 text-xs font-mono font-bold text-[#00d4ff] focus:outline-none focus:border-[#00d4ff]" defaultValue="rzp_test_9028173491" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Razorpay Key Secret</label>
+              <label className="block text-xs font-black uppercase text-gray-400 mb-2">Razorpay Key Secret</label>
               <div className="relative">
-                <input type={showSecret ? "text" : "password"} className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 pr-12 text-white font-mono" placeholder="••••••••••••••••" />
-                <button type="button" onClick={() => setShowSecret(!showSecret)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
-                  {showSecret ? <EyeOff className="w-5 h-5"/> : <Eye className="w-5 h-5"/>}
+                <input type={showSecret ? "text" : "password"} className="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 pr-12 text-xs font-mono font-bold text-white focus:outline-none focus:border-[#00d4ff]" defaultValue="secret_key_infogram26" />
+                <button type="button" onClick={() => setShowSecret(!showSecret)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                  {showSecret ? <EyeOff className="w-4 h-4"/> : <Eye className="w-4 h-4"/>}
                 </button>
               </div>
             </div>
           </div>
           <div className="mt-6 flex justify-end">
-            <button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+            <button className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 active:scale-95 transition-all">
               <Save className="w-4 h-4" /> Save API Keys
             </button>
           </div>
         </section>
 
         {/* UPI SETTINGS */}
-        <section className="glass-card bg-white/5 border border-white/10 rounded-2xl p-6">
-          <h2 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Manual UPI Settings</h2>
+        <section className="rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl p-6 sm:p-8">
+          <h2 className="text-lg font-black text-white mb-6 border-b border-gray-800 pb-4">
+            Manual UPI Settings
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">UPI ID</label>
-                <input type="text" className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white" placeholder="merchant@upi" />
+                <label className="block text-xs font-black uppercase text-gray-400 mb-2">UPI VPA ID</label>
+                <input type="text" className="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 text-xs font-mono font-bold text-[#00d4ff] focus:outline-none focus:border-[#00d4ff]" defaultValue="9342706675@okbizaxis" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Merchant Name</label>
-                <input type="text" className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white" />
+                <label className="block text-xs font-black uppercase text-gray-400 mb-2">Merchant Name</label>
+                <input type="text" className="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-[#00d4ff]" defaultValue="INFOGRAM 26 SYMPOSIUM" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Upload New QR Code</label>
-                <input type="file" accept="image/*" className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-1.5 text-gray-400" />
+                <label className="block text-xs font-black uppercase text-gray-400 mb-2">Upload New QR Code</label>
+                <input type="file" accept="image/*" className="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2 text-xs text-gray-300 font-bold" />
               </div>
             </div>
-            <div className="flex flex-col items-center justify-center bg-gray-900 border border-gray-700 rounded-xl p-4">
-              <p className="text-sm text-gray-400 mb-4">Current QR Preview</p>
-              <div className="w-40 h-40 bg-white rounded-lg flex items-center justify-center border-4 border-white shadow-lg overflow-hidden relative">
-                {/* Placeholder for QR Code */}
+            <div className="flex flex-col items-center justify-center bg-black/60 border border-gray-800 rounded-2xl p-4">
+              <p className="text-xs font-black uppercase tracking-wider text-gray-400 mb-3">Current QR Preview</p>
+              <div className="w-40 h-40 bg-white rounded-2xl flex items-center justify-center border-4 border-[#00d4ff]/30 shadow-xl overflow-hidden relative">
                 <div className="w-full h-full bg-[url('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=infogram26')] bg-cover"></div>
               </div>
             </div>
           </div>
           <div className="mt-6 flex justify-end">
-            <button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+            <button className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 active:scale-95 transition-all">
               <Save className="w-4 h-4" /> Save UPI Info
             </button>
           </div>
