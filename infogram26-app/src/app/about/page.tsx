@@ -515,14 +515,16 @@ export default function AboutPage() {
                 <Laptop className="w-6 h-6 text-amber-400" />
               </div>
               <div>
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
                   <h3 className={`text-lg sm:text-xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Website Architect &amp; Admin</h3>
-                  <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-purple-500/20 text-amber-300 border border-purple-500/30">
+                  <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border shadow-xs ${
+                    isDark ? 'bg-purple-900/60 text-white border-purple-400/40' : 'bg-purple-600 text-white border-purple-700'
+                  }`}>
                     Maithreyan D
                   </span>
                 </div>
                 <p className={`font-bold text-xs sm:text-sm leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                  Designed and engineered with Next.js &amp; Tailwind CSS by <strong className={isDark ? 'text-amber-300' : 'text-[#7c3aed]'}>Maithreyan D</strong>. For any website inquiries or technical assistance:
+                  Designed and engineered with Next.js &amp; Tailwind CSS by <strong className={`font-black ${isDark ? 'text-purple-300' : 'text-purple-700'}`}>Maithreyan D</strong>. For any website inquiries or technical assistance:
                 </p>
               </div>
             </div>
@@ -532,10 +534,10 @@ export default function AboutPage() {
                 href="https://maithreyan.in"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider border transition-all ${
+                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider border transition-all active:scale-95 ${
                   isDark
-                    ? 'bg-purple-500/20 border-purple-500/40 text-amber-300 hover:bg-purple-500/30 shadow-[0_0_12px_rgba(252,211,77,0.3)]'
-                    : 'bg-[#7c3aed]/10 border-[#7c3aed]/30 text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white'
+                    ? 'bg-purple-600 text-white border-purple-500 hover:bg-purple-500 shadow-md shadow-purple-600/30'
+                    : 'bg-purple-600 text-white border-purple-700 hover:bg-purple-700 shadow-md'
                 }`}
               >
                 <Globe className="w-4 h-4" />
