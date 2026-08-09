@@ -6,6 +6,39 @@ import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 
+const titleLetters = ['I', 'N', 'F', 'O', 'G', 'R', 'A', 'M'];
+
+const letterContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.055,
+      delayChildren: 0.12,
+    },
+  },
+};
+
+const letterVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 30, 
+    scale: 0.82,
+    filter: 'blur(10px)',
+  },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    filter: 'blur(0px)',
+    transition: { 
+      type: 'spring' as const,
+      stiffness: 360,
+      damping: 22,
+    },
+  },
+};
+
 export default function HeroSection() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [mounted, setMounted] = useState(false);
@@ -48,8 +81,8 @@ export default function HeroSection() {
     };
     window.addEventListener('resize', handleResize, { passive: true });
 
-    // 40 lightweight floating ambient particles
-    const particleCount = Math.min(Math.floor(width / 30), 40);
+    // 35 lightweight floating ambient particles
+    const particleCount = Math.min(Math.floor(width / 35), 35);
     const particles = Array.from({ length: particleCount }).map(() => ({
       x: Math.random() * width,
       y: Math.random() * height,
@@ -65,7 +98,6 @@ export default function HeroSection() {
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Render ultra-fast GPU particles (No expensive shadowBlur)
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.x += p.speedX;
@@ -176,30 +208,35 @@ export default function HeroSection() {
 
         {/* 3. Title (INFOGRAM) & 4. Year ('26) Row */}
         <div className="relative w-full flex flex-col items-center my-1">
-          {/* 3. INFOGRAM Title */}
+          {/* 3. INFOGRAM Title - CINEMATIC LETTER WAVE REVEAL */}
           <motion.h1
             initial="hidden"
             animate="visible"
-            variants={getItemVariants(3)}
-            className="relative font-black uppercase tracking-tight leading-none text-center select-none"
+            variants={letterContainerVariants}
+            className="relative font-black uppercase tracking-tight leading-none text-center select-none flex items-center justify-center"
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: 'clamp(2.5rem, 12vw, 8rem)',
             }}
           >
-            <span
-              className={`font-black tracking-tight leading-none ${
-                isDark ? 'text-white' : 'text-slate-950'
-              }`}
-              style={{
-                color: isDark ? '#ffffff' : '#070913',
-                textShadow: isDark 
-                  ? '0 0 20px rgba(192, 132, 252, 0.5)' 
-                  : '0 2px 8px rgba(15, 23, 42, 0.1)',
-              }}
-            >
-              INFOGRAM
-            </span>
+            {titleLetters.map((char, index) => (
+              <motion.span
+                key={index}
+                variants={letterVariants}
+                className={`inline-block font-black transition-colors duration-300 ${
+                  isDark ? 'text-white' : 'text-slate-950'
+                }`}
+                style={{
+                  color: isDark ? '#ffffff' : '#070913',
+                  textShadow: isDark 
+                    ? '0 0 25px rgba(192, 132, 252, 0.6), 0 0 55px rgba(56, 189, 248, 0.35)' 
+                    : '0 2px 10px rgba(15, 23, 42, 0.12)',
+                  willChange: 'transform, opacity, filter',
+                }}
+              >
+                {char}
+              </motion.span>
+            ))}
           </motion.h1>
 
           {/* 4. '26 Identity Row */}
@@ -209,9 +246,14 @@ export default function HeroSection() {
             variants={getItemVariants(4)}
             className="flex items-center justify-center gap-3 w-full max-w-xs sm:max-w-md -mt-1 sm:-mt-3"
           >
-            <div className={`h-[2.5px] flex-1 rounded-full ${
-              isDark ? 'bg-amber-400' : 'bg-amber-600'
-            }`} />
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: '100%' }}
+              transition={{ duration: 0.8, delay: 0.5, ease: 'easeOut' }}
+              className={`h-[2.5px] flex-1 rounded-full ${
+                isDark ? 'bg-amber-400' : 'bg-amber-600'
+              }`} 
+            />
             
             <span
               className="font-black leading-none select-none tracking-tight"
@@ -227,9 +269,14 @@ export default function HeroSection() {
               &apos;26
             </span>
 
-            <div className={`h-[2.5px] flex-1 rounded-full ${
-              isDark ? 'bg-amber-400' : 'bg-amber-600'
-            }`} />
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: '100%' }}
+              transition={{ duration: 0.8, delay: 0.5, ease: 'easeOut' }}
+              className={`h-[2.5px] flex-1 rounded-full ${
+                isDark ? 'bg-amber-400' : 'bg-amber-600'
+              }`} 
+            />
           </motion.div>
         </div>
 
