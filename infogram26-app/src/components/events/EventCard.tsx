@@ -17,16 +17,16 @@ export default function EventCard({ event }: EventCardProps) {
   const seatsLeft = event.maxParticipants - (event.registeredCount || 0);
   const seatsPercentage = (seatsLeft / event.maxParticipants) * 100;
 
-  let seatColor = 'text-emerald-500';
-  if (seatsPercentage < 10) seatColor = 'text-red-500';
-  else if (seatsPercentage < 50) seatColor = 'text-amber-500';
+  let seatColor = 'text-emerald-600 dark:text-emerald-400';
+  if (seatsPercentage < 10) seatColor = 'text-red-600 dark:text-red-400';
+  else if (seatsPercentage < 50) seatColor = 'text-amber-600 dark:text-amber-400';
 
   const statusColor =
     event.status === 'live'
-      ? 'text-red-500 border-red-500/30 bg-red-500/10'
+      ? 'text-red-600 dark:text-red-400 border-red-500/40 bg-red-500/10'
       : event.status === 'completed'
-      ? isDark ? 'text-slate-400 border-slate-700 bg-slate-800/50' : 'text-slate-500 border-slate-200 bg-slate-100'
-      : isDark ? 'text-cyan-300 border-cyan-500/30 bg-cyan-500/10' : 'text-cyan-700 border-cyan-200 bg-cyan-50';
+      ? isDark ? 'text-slate-400 border-slate-700 bg-slate-800/50' : 'text-slate-600 border-slate-300 bg-slate-100'
+      : isDark ? 'text-cyan-300 border-cyan-500/40 bg-cyan-500/10' : 'text-cyan-800 border-cyan-300 bg-cyan-50 font-bold';
 
   return (
     <motion.div
@@ -35,39 +35,41 @@ export default function EventCard({ event }: EventCardProps) {
       style={{ willChange: 'transform', WebkitTapHighlightColor: 'transparent' }}
       className="h-full"
     >
-      <div className={`glass-card rounded-2xl overflow-hidden flex flex-col h-full border transition-all duration-300 ${
+      <div className={`rounded-3xl overflow-hidden flex flex-col h-full border transition-all duration-300 ${
         isDark 
-          ? 'bg-slate-900/85 border-purple-500/30 text-white shadow-2xl hover:border-purple-400/50' 
-          : 'bg-white/90 border-slate-200 text-slate-900 shadow-md hover:border-[#7c3aed]/30'
+          ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl hover:border-purple-400/50 backdrop-blur-2xl' 
+          : 'bg-white/95 border-slate-200 text-slate-900 shadow-xl hover:border-[#7c3aed]/40 backdrop-blur-2xl'
       }`}>
         {/* Banner gradient / Image */}
         <div
-          className={`h-28 sm:h-32 relative flex-shrink-0 ${
+          className={`h-32 sm:h-36 relative flex-shrink-0 ${
             event.bannerUrl 
               ? 'bg-cover bg-center' 
               : isTechnical
-                ? 'bg-gradient-to-br from-sky-600/50 via-blue-500/30 to-indigo-600/30'
-                : 'bg-gradient-to-br from-purple-600/50 via-fuchsia-500/30 to-pink-600/30'
+                ? 'bg-gradient-to-br from-indigo-700 via-purple-700 to-sky-700'
+                : 'bg-gradient-to-br from-purple-700 via-fuchsia-700 to-pink-700'
           }`}
           style={event.bannerUrl ? { backgroundImage: `url('${event.bannerUrl}')` } : {}}
         >
-          {event.bannerUrl && <div className="absolute inset-0 bg-black/40" />}
+          {event.bannerUrl && <div className="absolute inset-0 bg-black/30" />}
+          
           {/* Top-left category label */}
-          <div className="absolute top-3 left-3">
+          <div className="absolute top-3 left-3 z-10">
             <span
-              className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border backdrop-blur-md ${
+              className={`text-[11px] font-black uppercase tracking-widest px-3 py-1 rounded-full border backdrop-blur-md shadow-sm ${
                 isTechnical
-                  ? 'bg-sky-500/20 text-sky-400 border-sky-500/30'
-                  : 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+                  ? 'bg-sky-500/20 text-white border-sky-400/40'
+                  : 'bg-purple-500/20 text-white border-purple-400/40'
               }`}
             >
               {isTechnical ? 'Technical' : 'Non-Technical'}
             </span>
           </div>
+
           {/* Top-right status */}
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-3 right-3 z-10">
             <span
-              className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border backdrop-blur-md ${statusColor}`}
+              className={`text-[11px] font-black uppercase tracking-widest px-3 py-1 rounded-full border backdrop-blur-md shadow-sm ${statusColor}`}
             >
               {event.status}
             </span>
@@ -75,33 +77,41 @@ export default function EventCard({ event }: EventCardProps) {
         </div>
 
         {/* Body */}
-        <div className="p-5 flex-grow flex flex-col gap-3">
-          <h3 className={`font-bold text-[clamp(1rem,3.5vw,1.2rem)] leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
+        <div className="p-6 flex-grow flex flex-col gap-3">
+          <h3 className={`font-black text-lg sm:text-xl leading-snug ${
+            isDark ? 'text-white' : 'text-slate-900'
+          }`}>
             {event.name}
           </h3>
 
-          <p className={`text-sm leading-relaxed line-clamp-2 flex-grow font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+          <p className={`text-sm leading-relaxed line-clamp-2 flex-grow font-semibold ${
+            isDark ? 'text-slate-300' : 'text-slate-700'
+          }`}>
             {event.description}
           </p>
 
           {/* Info pills */}
-          <div className="flex flex-col gap-1.5 mt-1">
-            <div className={`flex items-center gap-2 text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-              <Calendar className={`w-3.5 h-3.5 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
+          <div className="flex flex-col gap-2 mt-2 pt-3 border-t border-slate-200/40 dark:border-slate-800">
+            <div className={`flex items-center gap-2.5 text-xs font-bold ${
+              isDark ? 'text-slate-300' : 'text-slate-800'
+            }`}>
+              <Calendar className={`w-4 h-4 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
               <span>{event.startTime} - {event.endTime}</span>
             </div>
 
-            <div className={`flex items-center gap-2 text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-              <MapPin className={`w-3.5 h-3.5 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
+            <div className={`flex items-center gap-2.5 text-xs font-bold ${
+              isDark ? 'text-slate-300' : 'text-slate-800'
+            }`}>
+              <MapPin className={`w-4 h-4 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
               <span className="truncate">{event.venue}</span>
             </div>
 
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/20">
-              <div className="flex items-center font-extrabold text-amber-500 text-sm">
-                <IndianRupee className="w-3.5 h-3.5 mr-0.5" />
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/40 dark:border-slate-800">
+              <div className="flex items-center font-black text-amber-500 text-base">
+                <IndianRupee className="w-4 h-4 mr-0.5" />
                 <span>{event.registrationFee}</span>
               </div>
-              <span className={`text-[11px] font-bold ${seatColor}`}>
+              <span className={`text-xs font-black ${seatColor}`}>
                 {seatsLeft > 0 ? `${seatsLeft} seats left` : 'Registration Full'}
               </span>
             </div>
@@ -110,14 +120,14 @@ export default function EventCard({ event }: EventCardProps) {
           {/* CTA */}
           <Link
             href={`/events/${event.slug}`}
-            className={`mt-2 w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 border ${
+            className={`mt-3 w-full py-3 px-4 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 shadow-md ${
               isDark 
-                ? 'bg-purple-500/20 text-amber-300 border-purple-500/40 hover:bg-purple-500/30' 
-                : 'bg-[#7c3aed]/10 text-[#7c3aed] border-[#7c3aed]/30 hover:bg-[#7c3aed]/20'
+                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:brightness-110' 
+                : 'bg-gradient-to-r from-[#7c3aed] to-[#6366f1] text-white hover:brightness-110'
             }`}
           >
             <span>View Details</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>

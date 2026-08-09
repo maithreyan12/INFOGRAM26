@@ -8,6 +8,8 @@ import {
   Trophy, Lightbulb, Globe, CheckCircle2, Star, FlaskConical,
 } from 'lucide-react';
 
+import { useTheme } from '@/context/ThemeContext';
+
 const revealVariants: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
@@ -56,8 +58,12 @@ const studentActivities = [
 
 /* ── Reusable section header ── */
 function SectionBadge({ label }: { label: string }) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   return (
-    <span className="inline-block mb-3 px-4 py-1 rounded-full text-sky-400 bg-sky-400/10 border border-sky-400/20 text-xs tracking-widest uppercase font-semibold">
+    <span className={`inline-block mb-3 px-4 py-1 rounded-full text-xs tracking-widest uppercase font-bold border ${
+      isDark ? 'bg-purple-500/10 border-purple-500/30 text-amber-300' : 'bg-sky-400/10 border-sky-400/20 text-sky-600'
+    }`}>
       {label}
     </span>
   );
@@ -65,20 +71,27 @@ function SectionBadge({ label }: { label: string }) {
 
 /* ── Card header row: icon + title ── */
 function CardHeader({ icon: Icon, title, color = 'text-[#7c3aed]', bg = 'bg-[#7c3aed]/10' }: { icon: any; title: string; color?: string; bg?: string }) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   return (
     <div className="flex items-center gap-3 mb-4">
-      <div className={`w-8 h-8 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
-        <Icon className={`w-4 h-4 ${color}`} />
+      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+        isDark ? 'bg-purple-500/20 text-amber-300' : bg
+      }`}>
+        <Icon className={`w-4 h-4 ${isDark ? 'text-amber-300' : color}`} />
       </div>
-      <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">{title}</h3>
+      <h3 className={`text-base sm:text-lg font-bold leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{title}</h3>
     </div>
   );
 }
 
 export default function AboutPage() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
     <PublicLayout>
-      <div className="min-h-screen text-slate-900 pb-20">
+      <div className={`min-h-screen pb-20 ${isDark ? 'text-white' : 'text-slate-900'}`}>
 
         {/* ── PAGE HERO ── */}
         <section className="relative pt-28 pb-14 flex flex-col items-center justify-center overflow-hidden">
@@ -89,11 +102,22 @@ export default function AboutPage() {
               </motion.div>
               <motion.h1
                 variants={revealVariants}
-                className="text-3xl sm:text-5xl md:text-7xl font-black gradient-text mb-4 tracking-tight"
+                className="text-3xl sm:text-5xl md:text-7xl font-black mb-4 tracking-tight uppercase"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  background: isDark
+                    ? 'linear-gradient(180deg, #ffffff 0%, #c084fc 50%, #38bdf8 100%)'
+                    : 'linear-gradient(180deg, #0f172a 0%, #6d28d9 55%, #059669 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                  display: 'inline-block',
+                }}
               >
                 About INFOGRAM&apos;26
               </motion.h1>
-              <motion.p variants={revealVariants} className="text-base sm:text-xl text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
+              <motion.p variants={revealVariants} className={`text-base sm:text-xl font-bold max-w-2xl mx-auto leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 Discover the legacy, vision, and passion behind Tamil Nadu&apos;s premier national-level technical symposium.
               </motion.p>
             </motion.div>

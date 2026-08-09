@@ -4,12 +4,16 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
 
+import { useTheme } from '@/context/ThemeContext';
+
 export default function VideoSection() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
   const [showControls, setShowControls] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const isInView = useInView(sectionRef, { once: true, margin: '-80px' });
 
@@ -57,22 +61,23 @@ export default function VideoSection() {
         className="text-center mb-8 sm:mb-10 px-2"
       >
         <span
-          className="inline-block mb-3 px-5 py-1.5 rounded-full text-[#7c3aed] bg-[#7c3aed]/10 border border-[#7c3aed]/25 text-xs tracking-[0.15em] uppercase font-semibold"
+          className={`inline-block mb-3 px-5 py-1.5 rounded-full text-xs tracking-[0.15em] uppercase font-bold border ${
+            isDark ? 'bg-purple-500/10 border-purple-500/30 text-amber-300' : 'bg-[#7c3aed]/10 border-[#7c3aed]/25 text-[#7c3aed]'
+          }`}
           style={{ fontFamily: 'var(--font-heading)' }}
         >
           🎬 Official Promo
         </span>
         <h2
-          className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-3"
+          className={`text-2xl sm:text-4xl md:text-5xl font-black mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}
           style={{ fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}
         >
           Feel the{' '}
-          <span className="gradient-text">INFOGRAM</span>
-          <span className="text-[#7c3aed]">&apos;</span>
-          <span className="gradient-text">26</span>
+          <span className={isDark ? 'text-purple-400' : 'text-[#7c3aed]'}>INFOGRAM</span>
+          <span className={isDark ? 'text-amber-300' : 'text-amber-500'}>&apos;26</span>
           {' '}Energy
         </h2>
-        <p className="text-slate-600 text-sm sm:text-base max-w-lg mx-auto font-medium" style={{ fontFamily: 'var(--font-heading)' }}>
+        <p className={`text-sm sm:text-base max-w-lg mx-auto font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`} style={{ fontFamily: 'var(--font-heading)' }}>
           Experience the most electrifying symposium in Tamil Nadu
         </p>
       </motion.div>

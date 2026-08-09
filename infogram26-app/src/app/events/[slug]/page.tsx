@@ -232,11 +232,15 @@ const demoEvents: Event[] = [
   },
 ];
 
+import { useTheme } from '@/context/ThemeContext';
+
 export default function EventDetailPage() {
   const params = useParams();
   const rawSlug = params.slug as string;
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const { events: storeEvents } = useEventStore();
 
@@ -347,7 +351,7 @@ export default function EventDetailPage() {
 
   return (
     <PublicLayout>
-      <div className="min-h-screen bg-transparent text-slate-900 pb-24">
+      <div className={`min-h-screen bg-transparent pb-24 ${isDark ? 'text-white' : 'text-slate-900'}`}>
         {/* Banner */}
         <div 
           className={`w-full h-64 md:h-80 relative ${
@@ -384,13 +388,15 @@ export default function EventDetailPage() {
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="glass-card p-6 md:p-8 rounded-3xl"
+                className={`glass-card p-6 md:p-8 rounded-3xl border transition-colors duration-300 ${
+                  isDark ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl' : 'bg-white/90 border-slate-200 text-slate-900 shadow-xl'
+                }`}
               >
-                <h2 className="text-2xl font-bold mb-4 flex items-center text-slate-900">
-                  <AlertCircle className="w-6 h-6 mr-3 text-[#7c3aed]" />
+                <h2 className={`text-2xl font-bold mb-4 flex items-center ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  <AlertCircle className={`w-6 h-6 mr-3 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                   About the Event
                 </h2>
-                <p className="text-slate-700 leading-relaxed text-lg font-medium">
+                <p className={`leading-relaxed text-lg font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                   {event.description}
                 </p>
               </motion.div>
@@ -399,22 +405,24 @@ export default function EventDetailPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="glass-card p-6 md:p-8 rounded-3xl"
+                className={`glass-card p-6 md:p-8 rounded-3xl border transition-colors duration-300 ${
+                  isDark ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl' : 'bg-white/90 border-slate-200 text-slate-900 shadow-xl'
+                }`}
               >
-                <h2 className="text-2xl font-bold mb-4 flex items-center text-slate-900">
-                  <Trophy className="w-6 h-6 mr-3 text-[#7c3aed]" />
+                <h2 className={`text-2xl font-bold mb-4 flex items-center ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  <Trophy className={`w-6 h-6 mr-3 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                   Rules &amp; Guidelines
                 </h2>
-                <ul className="space-y-3 text-slate-700 font-medium">
+                <ul className={`space-y-3 font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                   {event.rules && event.rules.length > 0 ? (
                     event.rules.map((rule, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-base leading-relaxed">
-                        <span className="text-[#7c3aed] font-bold shrink-0">{idx + 1}.</span>
+                        <span className={`font-bold shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>{idx + 1}.</span>
                         <span>{rule}</span>
                       </li>
                     ))
                   ) : (
-                    <li className="text-slate-500">Standard symposium rules apply.</li>
+                    <li className={isDark ? 'text-slate-400' : 'text-slate-500'}>Standard symposium rules apply.</li>
                   )}
                 </ul>
               </motion.div>
@@ -425,8 +433,8 @@ export default function EventDetailPage() {
                 transition={{ delay: 0.2 }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
-                <div className="glass-card p-6 rounded-2xl">
-                  <div className="text-xs font-bold uppercase tracking-wider text-[#7c3aed] mb-3">Student Coordinators</div>
+                <div className={`glass-card p-6 rounded-2xl border ${isDark ? 'bg-slate-900/90 border-purple-500/30' : 'bg-white/90 border-slate-200'}`}>
+                  <div className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Student Coordinators</div>
                   {(() => {
                     const names = event.coordinatorName
                       ? event.coordinatorName.split(/&|,|\band\b/i).map((n) => n.trim()).filter(Boolean)
@@ -436,7 +444,7 @@ export default function EventDetailPage() {
                       : [];
 
                     if (names.length === 0) {
-                      return <div className="text-lg font-bold text-slate-900 mb-1">Student Coordinator</div>;
+                      return <div className={`text-lg font-bold mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>Student Coordinator</div>;
                     }
 
                     return (
@@ -444,12 +452,18 @@ export default function EventDetailPage() {
                         {names.map((name, i) => {
                           const phone = numbers[i] || numbers[0] || '';
                           return (
-                            <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-100/70 border border-slate-200/80">
-                              <span className="text-sm font-bold text-slate-900">{name}</span>
+                            <div key={i} className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-xl border ${
+                              isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-slate-100/70 border-slate-200/80'
+                            }`}>
+                              <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{name}</span>
                               {phone && (
                                 <a
                                   href={`tel:+91${phone}`}
-                                  className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-[#7c3aed]/10 border border-[#7c3aed]/30 text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white transition-all w-fit"
+                                  className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border transition-all w-fit ${
+                                    isDark 
+                                      ? 'bg-purple-500/20 border-purple-500/40 text-amber-300 hover:bg-purple-500/30' 
+                                      : 'bg-[#7c3aed]/10 border-[#7c3aed]/30 text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white'
+                                  }`}
                                 >
                                   <Phone className="w-3.5 h-3.5" />
                                   Call {phone}
@@ -462,12 +476,12 @@ export default function EventDetailPage() {
                     );
                   })()}
                 </div>
-                <div className="glass-card p-6 rounded-2xl">
-                  <div className="text-xs font-bold uppercase tracking-wider text-[#7c3aed] mb-2">Organizing Department</div>
-                  <div className="text-base font-bold text-slate-900 mb-1">
+                <div className={`glass-card p-6 rounded-2xl border ${isDark ? 'bg-slate-900/90 border-purple-500/30' : 'bg-white/90 border-slate-200'}`}>
+                  <div className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Organizing Department</div>
+                  <div className={`text-base font-bold mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {event.organizerName || 'Department of IT & Info Club'}
                   </div>
-                  <div className="text-xs text-slate-600 font-medium">C. Abdul Hakeem College of Engg. &amp; Tech.</div>
+                  <div className={`text-xs font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>PERI Institute of Technology</div>
                 </div>
               </motion.div>
             </div>
@@ -482,65 +496,67 @@ export default function EventDetailPage() {
                 {event.status === 'live' && (
                   <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-2xl flex items-center justify-center animate-pulse">
                     <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-                    <span className="text-red-600 font-bold tracking-wider">LIVE NOW</span>
+                    <span className="text-red-500 font-bold tracking-wider">LIVE NOW</span>
                   </div>
                 )}
                 
                 {event.status === 'completed' && (
-                  <div className="glass-card p-4 rounded-2xl text-center">
-                    <span className="text-slate-600 font-bold">Event Completed</span>
+                  <div className={`glass-card p-4 rounded-2xl text-center border ${isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
+                    <span className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Event Completed</span>
                   </div>
                 )}
 
-                <div className="glass-card p-6 md:p-8 rounded-3xl">
-                  <h3 className="text-xl font-bold mb-6 text-slate-900 border-b border-slate-200/80 pb-4">Event Details</h3>
+                <div className={`glass-card p-6 md:p-8 rounded-3xl border transition-colors duration-300 ${
+                  isDark ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl' : 'bg-white/90 border-slate-200 text-slate-900 shadow-xl'
+                }`}>
+                  <h3 className={`text-xl font-bold mb-6 border-b pb-4 ${isDark ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>Event Details</h3>
                   
                   <div className="space-y-6">
                     <div className="flex items-start">
-                      <Calendar className="w-5 h-5 mr-4 text-[#7c3aed] mt-0.5" />
+                      <Calendar className={`w-5 h-5 mr-4 mt-0.5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                       <div>
-                        <div className="text-sm text-slate-500 font-medium">Date</div>
-                        <div className="font-bold text-slate-900">{event.date}</div>
+                        <div className={`text-sm font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Date</div>
+                        <div className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.date}</div>
                       </div>
                     </div>
                     
                     <div className="flex items-start">
-                      <Clock className="w-5 h-5 mr-4 text-[#7c3aed] mt-0.5" />
+                      <Clock className={`w-5 h-5 mr-4 mt-0.5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                       <div>
-                        <div className="text-sm text-slate-500 font-medium">Time</div>
-                        <div className="font-bold text-slate-900">{event.startTime} - {event.endTime}</div>
+                        <div className={`text-sm font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Time</div>
+                        <div className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.startTime} - {event.endTime}</div>
                       </div>
                     </div>
                     
                     <div className="flex items-start">
-                      <MapPin className="w-5 h-5 mr-4 text-[#7c3aed] mt-0.5" />
+                      <MapPin className={`w-5 h-5 mr-4 mt-0.5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                       <div>
-                        <div className="text-sm text-slate-500 font-medium">Venue</div>
-                        <div className="font-bold text-slate-900">{event.venue}</div>
+                        <div className={`text-sm font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Venue</div>
+                        <div className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.venue}</div>
                       </div>
                     </div>
                     
                     <div className="flex items-start">
-                      <IndianRupee className="w-5 h-5 mr-4 text-[#7c3aed] mt-0.5" />
+                      <IndianRupee className={`w-5 h-5 mr-4 mt-0.5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                       <div>
-                        <div className="text-sm text-slate-500 font-medium">Registration Fee</div>
-                        <div className="font-bold text-slate-900 text-xl">₹{event.registrationFee}</div>
+                        <div className={`text-sm font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Registration Fee</div>
+                        <div className="font-extrabold text-amber-500 text-xl">₹{event.registrationFee}</div>
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-slate-200/80">
+                    <div className={`pt-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
                       <div className="flex justify-between text-sm mb-2">
-                        <span className="text-slate-600 font-medium">Seats Available</span>
-                        <span className="font-bold text-slate-900">{seatsLeft} / {event.maxParticipants}</span>
+                        <span className={`font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Seats Available</span>
+                        <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{seatsLeft} / {event.maxParticipants}</span>
                       </div>
-                      <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div className={`w-full h-2.5 rounded-full overflow-hidden ${isDark ? 'bg-slate-950' : 'bg-slate-200'}`}>
                         <div 
                           className={`h-full rounded-full ${progressColor}`}
                           style={{ width: `${100 - seatsPercentage}%` }}
                         ></div>
                       </div>
                       {seatsPercentage < 20 && seatsLeft > 0 && (
-                        <p className="text-xs text-red-600 font-bold mt-2">Hurry! Almost full.</p>
+                        <p className="text-xs text-red-500 font-bold mt-2">Hurry! Almost full.</p>
                       )}
                     </div>
                   </div>
@@ -548,11 +564,13 @@ export default function EventDetailPage() {
                   <div className="mt-8">
                     {event.status === 'upcoming' ? (
                       seatsLeft > 0 ? (
-                        <Link href={`/register?event=${event.slug}`} className="btn-primary w-full block text-center py-4 rounded-full text-lg font-bold shadow-md">
+                        <Link href={`/register?event=${event.slug}`} className="btn-primary w-full block text-center py-4 rounded-full text-lg font-bold shadow-lg">
                           Register for this Event
                         </Link>
                       ) : (
-                        <button disabled className="w-full bg-slate-200 text-slate-400 py-4 rounded-full text-lg font-bold cursor-not-allowed">
+                        <button disabled className={`w-full py-4 rounded-full text-lg font-bold cursor-not-allowed ${
+                          isDark ? 'bg-slate-800 text-slate-500' : 'bg-slate-200 text-slate-400'
+                        }`}>
                           Registration Full
                         </button>
                       )
@@ -560,8 +578,8 @@ export default function EventDetailPage() {
                   </div>
                 </div>
 
-                <div className="glass-card p-6 rounded-2xl space-y-3">
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-600">Need help? Contact Event Organizers</div>
+                <div className={`glass-card p-6 rounded-2xl space-y-3 border ${isDark ? 'bg-slate-900/90 border-purple-500/30' : 'bg-white/90 border-slate-200'}`}>
+                  <div className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Need help? Contact Event Organizers</div>
                   {(() => {
                     const names = event.coordinatorName
                       ? event.coordinatorName.split(/&|,|\band\b/i).map((n) => n.trim()).filter(Boolean)
@@ -572,9 +590,11 @@ export default function EventDetailPage() {
 
                     if (names.length === 0 && numbers.length === 0) {
                       return (
-                        <a href="tel:+919360257573" className="flex items-center justify-between p-2.5 rounded-xl bg-slate-100/70 border border-slate-200 hover:bg-slate-200/80 transition-colors">
-                          <span className="text-sm font-bold text-slate-900">Main Help Desk</span>
-                          <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#7c3aed]/10 text-[#7c3aed]">Call 9360257573</span>
+                        <a href="tel:+919360257573" className={`flex items-center justify-between p-2.5 rounded-xl border transition-colors ${
+                          isDark ? 'bg-slate-950/70 border-slate-800 hover:bg-slate-800' : 'bg-slate-100/70 border-slate-200 hover:bg-slate-200/80'
+                        }`}>
+                          <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Main Help Desk</span>
+                          <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${isDark ? 'bg-purple-500/20 text-amber-300' : 'bg-[#7c3aed]/10 text-[#7c3aed]'}`}>Call 9360257573</span>
                         </a>
                       );
                     }
@@ -585,14 +605,18 @@ export default function EventDetailPage() {
                           const name = names[i] || `Coordinator ${i + 1}`;
                           const phone = numbers[i] || numbers[0] || '9360257573';
                           return (
-                            <div key={i} className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-100/70 border border-slate-200/80">
+                            <div key={i} className={`flex items-center justify-between gap-2 p-2.5 rounded-xl border ${
+                              isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-slate-100/70 border-slate-200/80'
+                            }`}>
                               <div>
-                                <div className="text-sm font-bold text-slate-900">{name}</div>
-                                <div className="text-[11px] text-slate-500 font-semibold">Coordinator · {phone}</div>
+                                <div className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{name}</div>
+                                <div className={`text-[11px] font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Coordinator · {phone}</div>
                               </div>
                               <a
                                 href={`tel:+91${phone}`}
-                                className="w-10 h-10 rounded-full bg-[#7c3aed]/10 flex items-center justify-center text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white transition-colors shrink-0"
+                                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors shrink-0 ${
+                                  isDark ? 'bg-purple-500/20 text-amber-300 hover:bg-purple-500/30' : 'bg-[#7c3aed]/10 text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white'
+                                }`}
                                 title={`Call ${name} (${phone})`}
                               >
                                 <Phone className="w-4 h-4" />

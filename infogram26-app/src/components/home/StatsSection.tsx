@@ -3,6 +3,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useEffect, useState } from 'react';
 import { Calendar, Users, Building, Trophy } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
 
 const stats = [
   { id: 1, label: 'Events', value: 15, suffix: '+', icon: Calendar, color: 'text-[#7c3aed]', bg: 'bg-[#7c3aed]/10', border: 'border-[#7c3aed]/20' },
@@ -40,6 +41,9 @@ function AnimatedCounter({ value, prefix = '', suffix = '' }: { value: number; p
 }
 
 export default function StatsSection() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
     <section className="relative z-10 section-padding">
       <div className="container-xl mx-auto px-4">
@@ -60,17 +64,23 @@ export default function StatsSection() {
                   damping: 24,
                 }}
                 style={{ willChange: 'transform, opacity', WebkitTapHighlightColor: 'transparent' }}
-                className="glass-card p-4 sm:p-6 md:p-8 rounded-2xl flex flex-col items-center text-center cursor-default select-none border border-[#00d4ff]/10"
+                className={`glass-card p-4 sm:p-6 md:p-8 rounded-2xl flex flex-col items-center text-center cursor-default select-none border transition-all duration-300 ${
+                  isDark 
+                    ? 'bg-slate-900/85 border-purple-500/30 text-white shadow-2xl hover:border-purple-400/50' 
+                    : 'bg-white/90 border-slate-200 text-slate-900 shadow-md hover:border-[#7c3aed]/30'
+                }`}
               >
                 <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl ${stat.bg} border ${stat.border} flex items-center justify-center mb-3 sm:mb-4`}>
                   <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
                 </div>
-                <div className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-1 ${stat.color}`} style={{ fontFamily: 'var(--font-display)' }}>
+                <div className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-1 ${
+                  isDark && stat.color === 'text-[#7c3aed]' ? 'text-purple-400' : stat.color
+                }`} style={{ fontFamily: 'var(--font-display)' }}>
                   <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
                 </div>
-                <p className="text-[10px] sm:text-xs text-slate-600 font-bold uppercase tracking-widest" style={{ fontFamily: 'var(--font-heading)' }}>
+                <div className={`text-xs sm:text-sm font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`} style={{ fontFamily: 'var(--font-heading)' }}>
                   {stat.label}
-                </p>
+                </div>
               </motion.div>
             );
           })}

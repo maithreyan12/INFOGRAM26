@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 // @ts-ignore
 import { db, isFirebaseConfigured } from '@/lib/firebase/config';
+import { useTheme } from '@/context/ThemeContext';
 
 type Sponsor = {
   id: string;
@@ -25,6 +26,8 @@ const DEMO_SPONSORS: Sponsor[] = [
 
 export default function SponsorsSection() {
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     async function fetchSponsors() {
@@ -37,7 +40,6 @@ export default function SponsorsSection() {
           setSponsors(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Sponsor)));
         }
       } catch (error) {
-        
         setSponsors(DEMO_SPONSORS);
       }
     }
@@ -50,20 +52,24 @@ export default function SponsorsSection() {
 
   const getBorderColor = (tier: string) => {
     switch (tier) {
-      case 'gold': return 'border-yellow-400/30';
-      case 'silver': return 'border-gray-400/30';
-      case 'bronze': return 'border-orange-400/30';
-      default: return 'border-white/10';
+      case 'gold': return 'border-amber-400/50';
+      case 'silver': return 'border-slate-400/50';
+      case 'bronze': return 'border-amber-600/50';
+      default: return isDark ? 'border-purple-500/30' : 'border-slate-200';
     }
   };
 
   return (
     <section className="section-padding overflow-hidden py-20 bg-transparent">
       <div className="container-xl mx-auto px-4 text-center mb-12">
-        <span className="section-badge inline-block px-4 py-1 rounded-full bg-[#7c3aed]/10 border border-[#7c3aed]/20 text-[#7c3aed] text-sm font-semibold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+        <span className={`section-badge inline-block px-4 py-1 rounded-full text-sm font-semibold mb-4 border ${
+          isDark ? 'bg-purple-500/10 border-purple-500/30 text-amber-300' : 'bg-[#7c3aed]/10 border-[#7c3aed]/20 text-[#7c3aed]'
+        }`} style={{ fontFamily: 'var(--font-heading)' }}>
           Our Sponsors
         </span>
-        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4" style={{ fontFamily: 'var(--font-display)' }}>Trusted by Leading Organizations</h2>
+        <h2 className={`text-3xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`} style={{ fontFamily: 'var(--font-display)' }}>
+          Trusted by Leading Organizations
+        </h2>
       </div>
 
       <div className="relative flex overflow-x-hidden w-full group py-8">
@@ -71,16 +77,18 @@ export default function SponsorsSection() {
           {[...sponsors, ...sponsors, ...sponsors].map((sponsor, index) => (
             <div 
               key={`${sponsor.id}-${index}`}
-              className={`glass-card flex items-center gap-3 px-6 py-3 rounded-full border ${getBorderColor(sponsor.tier)} hover:scale-105 transition-transform shrink-0`}
+              className={`glass-card flex items-center gap-3 px-6 py-3 rounded-full border ${getBorderColor(sponsor.tier)} hover:scale-105 transition-all duration-300 shrink-0 ${
+                isDark ? 'bg-slate-900/80 text-white shadow-xl' : 'bg-white/90 text-slate-900 shadow-md'
+              }`}
             >
-              <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-800 overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center font-bold text-amber-500 overflow-hidden">
                 {sponsor.logoUrl ? (
                   <img src={sponsor.logoUrl} alt={sponsor.name} className="w-full h-full object-cover" />
                 ) : (
                   getInitials(sponsor.name)
                 )}
               </div>
-              <span className="text-slate-900 font-bold">{sponsor.name}</span>
+              <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{sponsor.name}</span>
             </div>
           ))}
         </div>

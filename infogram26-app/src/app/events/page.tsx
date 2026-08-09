@@ -231,12 +231,16 @@ const demoEvents: Event[] = [
   },
 ];
 
+import { useTheme } from '@/context/ThemeContext';
+
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'All' | 'Technical' | 'Non-Technical'>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const { events: storeEvents } = useEventStore();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -313,17 +317,32 @@ export default function EventsPage() {
 
   return (
     <PublicLayout>
-      <div className="min-h-screen text-slate-900 pb-20">
+      <div className={`min-h-screen pb-20 ${isDark ? 'text-white' : 'text-slate-900'}`}>
         {/* HERO SECTION */}
-        <section className="relative pt-32 pb-12 flex flex-col items-center justify-center overflow-hidden">
+        <section className="relative pt-28 pb-12 flex flex-col items-center justify-center overflow-hidden">
           <div className="container-xl relative z-10 text-center px-4">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="text-5xl md:text-7xl font-bold gradient-text mb-6" style={{ fontFamily: 'var(--font-display)' }}>Explore Events</h1>
-              <p className="text-xl text-slate-600 font-medium max-w-2xl mx-auto">
+              <h1 
+                className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight mb-4 uppercase" 
+                style={{ 
+                  fontFamily: 'var(--font-display)',
+                  background: isDark
+                    ? 'linear-gradient(180deg, #ffffff 0%, #c084fc 50%, #38bdf8 100%)'
+                    : 'linear-gradient(180deg, #0f172a 0%, #6d28d9 55%, #059669 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                  display: 'inline-block',
+                }}
+              >
+                Explore Events
+              </h1>
+              <p className={`text-base sm:text-xl max-w-2xl mx-auto font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 Discover the perfect challenge for your skills from our wide range of technical and non-technical events.
               </p>
             </motion.div>
@@ -331,18 +350,26 @@ export default function EventsPage() {
         </section>
 
         {/* CONTROLS SECTION */}
-        <section className="container-xl px-4 mb-12">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 glass-card p-4 rounded-2xl">
+        <section className="container-xl px-4 mb-10">
+          <div className={`flex flex-col md:flex-row justify-between items-center gap-5 p-4 sm:p-5 rounded-3xl border transition-colors duration-300 ${
+            isDark ? 'bg-slate-900/90 border-purple-500/30 shadow-2xl backdrop-blur-2xl' : 'bg-white/95 border-slate-200 shadow-xl backdrop-blur-2xl'
+          }`}>
             {/* TABS */}
-            <div className="flex space-x-2 bg-slate-100/80 p-1.5 rounded-xl w-full md:w-auto overflow-x-auto border border-slate-200/60">
+            <div className={`flex space-x-2 p-1.5 rounded-2xl w-full md:w-auto overflow-x-auto border ${
+              isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-slate-100 border-slate-300'
+            }`}>
               {['All', 'Technical', 'Non-Technical'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  className={`px-6 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${
+                  className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${
                     activeTab === tab 
-                      ? 'bg-[#7c3aed] text-white shadow-md' 
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                      ? isDark 
+                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg' 
+                        : 'bg-gradient-to-r from-[#7c3aed] to-[#6366f1] text-white shadow-md'
+                      : isDark
+                        ? 'text-slate-300 hover:text-white hover:bg-slate-800'
+                        : 'text-slate-700 hover:text-slate-900 hover:bg-white/80 font-bold'
                   }`}
                   style={{ fontFamily: 'var(--font-heading)' }}
                 >
@@ -352,16 +379,20 @@ export default function EventsPage() {
             </div>
 
             {/* SEARCH */}
-            <div className="relative w-full md:w-auto md:min-w-[300px]">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-slate-400" />
+            <div className="relative w-full md:w-auto md:min-w-[320px]">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className={`h-4 w-4 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
               </div>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search events..."
-                className="w-full bg-white/90 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#7c3aed] transition-all shadow-xs"
+                className={`w-full rounded-2xl pl-11 pr-4 py-2.5 text-xs font-bold transition-all border ${
+                  isDark 
+                    ? 'bg-slate-950/90 border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-amber-400' 
+                    : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-500 focus:bg-white focus:outline-none focus:border-[#7c3aed] shadow-xs'
+                }`}
               />
             </div>
           </div>
@@ -369,7 +400,7 @@ export default function EventsPage() {
 
         {/* EVENTS GRID */}
         <section className="container-xl px-4">
-          <div className="mb-6 text-slate-600 font-bold">
+          <div className={`mb-6 text-sm font-black uppercase tracking-wider ${isDark ? 'text-amber-300' : 'text-slate-800'}`}>
             {filteredEvents.length} events found
           </div>
 

@@ -47,13 +47,6 @@ const STEPS = [
   { number: 4, label: 'Review', icon: ClipboardList },
 ];
 
-const inputClass =
-  'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#00d4ff]/60 focus:bg-white/8 transition-all duration-200';
-const labelClass = 'block text-xs font-semibold text-white/60 uppercase tracking-wider mb-2';
-const errorClass = 'text-red-400 text-xs mt-1.5';
-const selectClass =
-  'w-full bg-[#071422] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00d4ff]/60 transition-all duration-200 cursor-pointer';
-
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [idFile, setIdFile] = useState<File | null>(null);
@@ -67,19 +60,23 @@ export default function RegisterPage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
-  const inputClass = `w-full rounded-xl px-4 py-3 text-sm transition-all duration-200 border ${
+  // Dynamic Theme-aware Style Tokens
+  const inputStyle = `w-full rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all duration-200 border ${
     isDark
-      ? 'bg-slate-950/80 border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-amber-400'
-      : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#7c3aed]'
+      ? 'bg-slate-950/90 border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20'
+      : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed]/20 shadow-xs'
   }`;
-  const labelClass = `block text-xs font-bold uppercase tracking-wider mb-2 ${
-    isDark ? 'text-slate-200' : 'text-slate-900'
+
+  const labelStyle = `block text-xs font-black uppercase tracking-wider mb-2 ${
+    isDark ? 'text-amber-300' : 'text-slate-900'
   }`;
-  const errorClass = 'text-red-500 text-xs mt-1.5 font-semibold';
-  const selectClass = `w-full rounded-xl px-4 py-3 text-sm transition-all duration-200 cursor-pointer border ${
+
+  const errorStyle = 'text-red-500 text-xs mt-1.5 font-bold';
+
+  const selectStyle = `w-full rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all duration-200 cursor-pointer border ${
     isDark
       ? 'bg-slate-950 border-slate-700 text-white focus:outline-none focus:border-amber-400'
-      : 'bg-white border-slate-300 text-slate-900 focus:outline-none focus:border-[#7c3aed]'
+      : 'bg-slate-50 border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:border-[#7c3aed] shadow-xs'
   }`;
 
   const {
@@ -185,8 +182,8 @@ export default function RegisterPage() {
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="text-center mb-10">
-            <div className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider mb-4 border ${
-              isDark ? 'bg-purple-500/10 border-purple-500/30 text-amber-300' : 'bg-[#7c3aed]/10 border-[#7c3aed]/20 text-[#7c3aed]'
+            <div className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black uppercase tracking-wider mb-4 border ${
+              isDark ? 'bg-purple-500/10 border-purple-500/30 text-amber-300' : 'bg-[#7c3aed]/10 border-[#7c3aed]/25 text-[#7c3aed]'
             }`}>
               ⚡ Registration Open
             </div>
@@ -206,7 +203,7 @@ export default function RegisterPage() {
             >
               INFOGRAM&apos;26
             </h1>
-            <p className={`text-xs sm:text-sm font-extrabold uppercase tracking-[0.16em] ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+            <p className={`text-xs sm:text-sm font-black uppercase tracking-[0.16em] ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
               NATIONAL LEVEL TECHNICAL SYMPOSIUM
             </p>
           </div>
@@ -214,7 +211,7 @@ export default function RegisterPage() {
           {/* Step Indicators */}
           <div className="mb-10">
             <div className="flex items-center justify-between relative mb-3">
-              <div className={`absolute left-0 right-0 top-5 h-px mx-12 z-0 ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
+              <div className={`absolute left-0 right-0 top-5 h-1 mx-12 z-0 rounded-full ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
                 <motion.div
                   className={`h-full rounded-full ${isDark ? 'bg-gradient-to-r from-amber-300 to-purple-400' : 'bg-gradient-to-r from-[#7c3aed] to-[#059669]'}`}
                   initial={{ width: '0%' }}
@@ -229,17 +226,17 @@ export default function RegisterPage() {
                 return (
                   <div key={s.number} className="flex flex-col items-center gap-2 z-10">
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                        done ? (isDark ? 'bg-amber-300 border-amber-300 text-slate-950 font-bold' : 'bg-[#7c3aed] border-[#7c3aed] text-white')
-                          : active ? (isDark ? 'bg-purple-500/20 border-amber-300 text-amber-300 font-bold' : 'bg-[#7c3aed]/15 border-[#7c3aed] text-[#7c3aed] font-bold')
-                          : (isDark ? 'bg-slate-900 border-slate-700 text-slate-500' : 'bg-white border-slate-200 text-slate-400')
+                      className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                        done ? (isDark ? 'bg-amber-300 border-amber-300 text-slate-950 font-black' : 'bg-[#7c3aed] border-[#7c3aed] text-white font-black')
+                          : active ? (isDark ? 'bg-purple-500/20 border-amber-300 text-amber-300 font-black shadow-lg ring-4 ring-amber-300/20' : 'bg-[#7c3aed] border-[#7c3aed] text-white font-black shadow-lg ring-4 ring-[#7c3aed]/20')
+                          : (isDark ? 'bg-slate-900 border-slate-700 text-slate-500' : 'bg-white border-slate-300 text-slate-500 shadow-xs')
                       }`}
                     >
-                      {done ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-4 h-4" />}
+                      {done ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                     </div>
                     <span
-                      className={`text-[10px] font-bold uppercase tracking-wider hidden sm:block transition-colors duration-300 ${
-                        active ? (isDark ? 'text-amber-300' : 'text-[#7c3aed]') : done ? (isDark ? 'text-slate-200' : 'text-slate-700') : (isDark ? 'text-slate-500' : 'text-slate-400')
+                      className={`text-xs font-black uppercase tracking-wider hidden sm:block transition-colors duration-300 ${
+                        active ? (isDark ? 'text-amber-300' : 'text-[#7c3aed]') : done ? (isDark ? 'text-slate-200' : 'text-slate-900') : (isDark ? 'text-slate-500' : 'text-slate-600')
                       }`}
                     >
                       {s.label}
@@ -258,71 +255,71 @@ export default function RegisterPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className={`glass-card p-6 sm:p-8 rounded-3xl border transition-colors duration-300 ${
+              className={`p-6 sm:p-10 rounded-3xl border transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl' 
-                  : 'bg-white/90 border-slate-200 text-slate-900 shadow-xl'
+                  ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl backdrop-blur-2xl' 
+                  : 'bg-white/95 border-slate-200 text-slate-900 shadow-2xl backdrop-blur-2xl'
               }`}
             >
               {/* STEP 1 */}
               {step === 1 && (
                 <div>
-                  <h2 className={`text-xl font-bold mb-6 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    <User className={`w-5 h-5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Personal Information
+                  <h2 className={`text-xl sm:text-2xl font-black mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <User className={`w-6 h-6 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Personal Information
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className={labelClass}>Full Name *</label>
-                      <input {...register('fullName')} className={inputClass} placeholder="Enter your full name" />
-                      {errors.fullName && <p className={errorClass}>{errors.fullName.message}</p>}
+                      <label className={labelStyle}>Full Name *</label>
+                      <input {...register('fullName')} className={inputStyle} placeholder="Enter your full name" />
+                      {errors.fullName && <p className={errorStyle}>{errors.fullName.message}</p>}
                     </div>
                     <div>
-                      <label className={labelClass}>Email Address *</label>
-                      <input {...register('email')} type="email" className={inputClass} placeholder="your@email.com" />
-                      {errors.email && <p className={errorClass}>{errors.email.message}</p>}
+                      <label className={labelStyle}>Email Address *</label>
+                      <input {...register('email')} type="email" className={inputStyle} placeholder="your@email.com" />
+                      {errors.email && <p className={errorStyle}>{errors.email.message}</p>}
                     </div>
                     <div>
-                      <label className={labelClass}>Phone Number *</label>
-                      <input {...register('phone')} className={inputClass} placeholder="10-digit number" maxLength={10} />
-                      {errors.phone && <p className={errorClass}>{errors.phone.message}</p>}
+                      <label className={labelStyle}>Phone Number *</label>
+                      <input {...register('phone')} className={inputStyle} placeholder="10-digit number" maxLength={10} />
+                      {errors.phone && <p className={errorStyle}>{errors.phone.message}</p>}
                     </div>
                     <div>
-                      <label className={labelClass}>College Name *</label>
-                      <input {...register('college')} className={inputClass} placeholder="Your college name" />
-                      {errors.college && <p className={errorClass}>{errors.college.message}</p>}
+                      <label className={labelStyle}>College Name *</label>
+                      <input {...register('college')} className={inputStyle} placeholder="Your college name" />
+                      {errors.college && <p className={errorStyle}>{errors.college.message}</p>}
                     </div>
                     <div>
-                      <label className={labelClass}>Department *</label>
-                      <input {...register('department')} className={inputClass} placeholder="e.g. B.E Computer Science" />
-                      {errors.department && <p className={errorClass}>{errors.department.message}</p>}
+                      <label className={labelStyle}>Department *</label>
+                      <input {...register('department')} className={inputStyle} placeholder="e.g. B.E Computer Science" />
+                      {errors.department && <p className={errorStyle}>{errors.department.message}</p>}
                     </div>
                     <div>
-                      <label className={labelClass}>Register Number *</label>
-                      <input {...register('registerNumber')} className={inputClass} placeholder="College register number" />
-                      {errors.registerNumber && <p className={errorClass}>{errors.registerNumber.message}</p>}
+                      <label className={labelStyle}>Register Number *</label>
+                      <input {...register('registerNumber')} className={inputStyle} placeholder="College register number" />
+                      {errors.registerNumber && <p className={errorStyle}>{errors.registerNumber.message}</p>}
                     </div>
                     <div>
-                      <label className={labelClass}>Year of Study *</label>
-                      <select {...register('year')} className={selectClass}>
+                      <label className={labelStyle}>Year of Study *</label>
+                      <select {...register('year')} className={selectStyle}>
                         <option value="" className={isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}>Select Year</option>
                         <option value="1st" className={isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}>1st Year</option>
                         <option value="2nd" className={isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}>2nd Year</option>
                         <option value="3rd" className={isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}>3rd Year</option>
                         <option value="4th" className={isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}>4th Year</option>
                       </select>
-                      {errors.year && <p className={errorClass}>{errors.year.message}</p>}
+                      {errors.year && <p className={errorStyle}>{errors.year.message}</p>}
                     </div>
                     <div>
-                      <label className={labelClass}>Gender *</label>
-                      <div className="flex gap-5 mt-3">
+                      <label className={labelStyle}>Gender *</label>
+                      <div className="flex gap-6 mt-3">
                         {['Male', 'Female', 'Other'].map(g => (
-                          <label key={g} className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" value={g} {...register('gender')} className="accent-[#7c3aed] w-4 h-4" />
-                            <span className={`text-sm font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>{g}</span>
+                          <label key={g} className="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" value={g} {...register('gender')} className="accent-[#7c3aed] w-5 h-5 cursor-pointer" />
+                            <span className={`text-sm font-black ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{g}</span>
                           </label>
                         ))}
                       </div>
-                      {errors.gender && <p className={errorClass}>{errors.gender.message}</p>}
+                      {errors.gender && <p className={errorStyle}>{errors.gender.message}</p>}
                     </div>
                   </div>
                 </div>
@@ -331,13 +328,13 @@ export default function RegisterPage() {
               {/* STEP 2 */}
               {step === 2 && (
                 <div>
-                  <h2 className={`text-xl font-bold mb-6 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    <Upload className={`w-5 h-5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> College ID Upload
+                  <h2 className={`text-xl sm:text-2xl font-black mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <Upload className={`w-6 h-6 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> College ID Upload
                   </h2>
                   <div
-                    className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all duration-300 cursor-pointer ${
+                    className={`border-2 border-dashed rounded-3xl p-10 text-center transition-all duration-300 cursor-pointer ${
                       dragOver ? (isDark ? 'border-amber-300 bg-amber-300/10' : 'border-[#7c3aed] bg-[#7c3aed]/10')
-                        : idFile ? 'border-emerald-500/50 bg-emerald-500/5'
+                        : idFile ? 'border-emerald-500/50 bg-emerald-500/10'
                         : isDark ? 'border-slate-700 hover:border-amber-300/40 hover:bg-slate-800/50' : 'border-slate-300 hover:border-[#7c3aed]/40 hover:bg-slate-50'
                     }`}
                     onDragOver={e => { e.preventDefault(); setDragOver(true); }}
@@ -349,27 +346,27 @@ export default function RegisterPage() {
                       onChange={e => e.target.files?.[0] && handleFileSelection(e.target.files[0])} />
                     {idFile ? (
                       <div className="flex flex-col items-center gap-3">
-                        <div className="w-16 h-16 bg-emerald-500/15 rounded-full flex items-center justify-center">
+                        <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center">
                           <CheckCircle className="w-8 h-8 text-emerald-500" />
                         </div>
-                        <p className="text-emerald-600 font-bold">{idFile.name}</p>
-                        <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Click to change file</p>
+                        <p className="text-emerald-600 font-extrabold text-base">{idFile.name}</p>
+                        <p className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Click to change file</p>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-3">
                         <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isDark ? 'bg-purple-500/10' : 'bg-[#7c3aed]/10'}`}>
                           <Upload className={`w-8 h-8 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                         </div>
-                        <p className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Drag & drop your College ID</p>
-                        <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>or click to browse • JPG, PNG, PDF accepted</p>
-                        <div className="btn-primary px-5 py-2 rounded-full text-sm font-bold mt-2">Choose File</div>
+                        <p className={`font-black text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>Drag & drop your College ID</p>
+                        <p className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>or click to browse • JPG, PNG, PDF accepted</p>
+                        <div className="px-6 py-2.5 rounded-full text-sm font-bold mt-2 bg-gradient-to-r from-[#7c3aed] to-[#6366f1] text-white shadow-md">Choose File</div>
                       </div>
                     )}
                   </div>
                   {idPreview && (
                     <div className="mt-6">
-                      <p className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Preview</p>
-                      <img src={idPreview} alt="ID Preview" className="max-h-56 mx-auto rounded-xl border border-slate-300 shadow-lg" />
+                      <p className={`text-xs font-black uppercase tracking-wider mb-3 ${isDark ? 'text-slate-400' : 'text-slate-700'}`}>Preview</p>
+                      <img src={idPreview} alt="ID Preview" className="max-h-56 mx-auto rounded-2xl border border-slate-300 shadow-lg" />
                     </div>
                   )}
                 </div>
@@ -378,14 +375,14 @@ export default function RegisterPage() {
               {/* STEP 3 */}
               {step === 3 && (
                 <div>
-                  <h2 className={`text-xl font-bold mb-2 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    <Calendar className={`w-5 h-5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Select Events
+                  <h2 className={`text-xl sm:text-2xl font-black mb-2 flex items-center gap-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <Calendar className={`w-6 h-6 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Select Events
                   </h2>
-                  <p className={`text-sm mb-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Select one or more events to participate in</p>
+                  <p className={`text-sm font-bold mb-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Select one or more events to participate in</p>
 
                   {techEvents.length > 0 && (
                     <div className="mb-6">
-                      <p className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>🔧 Technical Events</p>
+                      <p className={`text-xs font-black uppercase tracking-wider mb-3 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>🔧 Technical Events</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {techEvents.map(event => {
                           const sel = selectedEvents.includes(event.id);
@@ -393,12 +390,12 @@ export default function RegisterPage() {
                             <div key={event.id} onClick={() => toggleEvent(event.id)}
                               className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
                                 sel 
-                                  ? isDark ? 'border-amber-300 bg-amber-300/10' : 'border-[#7c3aed] bg-[#7c3aed]/10'
+                                  ? isDark ? 'border-amber-300 bg-amber-300/10' : 'border-[#7c3aed] bg-[#7c3aed]/10 ring-2 ring-[#7c3aed]/30'
                                   : isDark ? 'border-slate-800 bg-slate-950/40 hover:border-slate-700' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
                               }`}
                             >
                               <div className="flex justify-between items-start mb-1.5">
-                                <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.name}</h3>
+                                <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.name}</h3>
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                                   sel 
                                     ? isDark ? 'border-amber-300 bg-amber-300' : 'border-[#7c3aed] bg-[#7c3aed]'
@@ -407,7 +404,7 @@ export default function RegisterPage() {
                                   {sel && <span className={`text-[10px] font-black ${isDark ? 'text-black' : 'text-white'}`}>✓</span>}
                                 </div>
                               </div>
-                              <p className={`text-xs mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{event.time}</p>
+                              <p className={`text-xs mb-1 font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{event.time}</p>
                               <p className="text-amber-500 font-extrabold text-sm">₹{event.fee}</p>
                             </div>
                           );
@@ -418,7 +415,7 @@ export default function RegisterPage() {
 
                   {nonTechEvents.length > 0 && (
                     <div className="mb-6">
-                      <p className="text-teal-500 text-xs font-bold uppercase tracking-wider mb-3">🎭 Non-Technical Events</p>
+                      <p className="text-teal-600 font-black text-xs uppercase tracking-wider mb-3">🎭 Non-Technical Events</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {nonTechEvents.map(event => {
                           const sel = selectedEvents.includes(event.id);
@@ -426,19 +423,19 @@ export default function RegisterPage() {
                             <div key={event.id} onClick={() => toggleEvent(event.id)}
                               className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
                                 sel 
-                                  ? 'border-teal-500 bg-teal-500/10'
+                                  ? 'border-teal-500 bg-teal-500/10 ring-2 ring-teal-500/30'
                                   : isDark ? 'border-slate-800 bg-slate-950/40 hover:border-slate-700' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
                               }`}
                             >
                               <div className="flex justify-between items-start mb-1.5">
-                                <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.name}</h3>
+                                <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.name}</h3>
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                                   sel ? 'border-teal-500 bg-teal-500' : isDark ? 'border-slate-700' : 'border-slate-300'
                                 }`}>
                                   {sel && <span className="text-white text-[10px] font-black">✓</span>}
                                 </div>
                               </div>
-                              <p className={`text-xs mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{event.time}</p>
+                              <p className={`text-xs mb-1 font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{event.time}</p>
                               <p className="text-amber-500 font-extrabold text-sm">₹{event.fee}</p>
                             </div>
                           );
@@ -447,16 +444,16 @@ export default function RegisterPage() {
                     </div>
                   )}
 
-                  <div className={`mt-4 p-4 rounded-2xl border flex justify-between items-center ${
-                    isDark ? 'bg-purple-500/10 border-purple-500/30' : 'bg-[#7c3aed]/5 border-[#7c3aed]/20'
+                  <div className={`mt-4 p-5 rounded-2xl border flex justify-between items-center ${
+                    isDark ? 'bg-purple-500/10 border-purple-500/30' : 'bg-[#7c3aed]/10 border-[#7c3aed]/20'
                   }`}>
                     <div>
-                      <p className={`text-xs uppercase font-bold tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Selected</p>
-                      <p className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{selectedEvents.length} event{selectedEvents.length !== 1 ? 's' : ''}</p>
+                      <p className={`text-xs uppercase font-black tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Selected</p>
+                      <p className={`font-black text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>{selectedEvents.length} event{selectedEvents.length !== 1 ? 's' : ''}</p>
                     </div>
                     <div className="text-right">
-                      <p className={`text-xs uppercase font-bold tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Total Fee</p>
-                      <p className="text-amber-500 font-black text-2xl">₹{getTotalFee()}</p>
+                      <p className={`text-xs uppercase font-black tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Total Fee</p>
+                      <p className="text-amber-500 font-black text-3xl">₹{getTotalFee()}</p>
                     </div>
                   </div>
                 </div>
@@ -465,12 +462,12 @@ export default function RegisterPage() {
               {/* STEP 4 */}
               {step === 4 && (
                 <div>
-                  <h2 className={`text-xl font-bold mb-6 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    <ClipboardList className={`w-5 h-5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Review & Submit
+                  <h2 className={`text-xl sm:text-2xl font-black mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <ClipboardList className={`w-6 h-6 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Review & Submit
                   </h2>
                   <div className="space-y-5">
                     <div className={`rounded-2xl p-5 border ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                      <h3 className={`text-xs font-bold uppercase tracking-wider mb-4 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Personal Details</h3>
+                      <h3 className={`text-xs font-black uppercase tracking-wider mb-4 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Personal Details</h3>
                       <div className="grid grid-cols-2 gap-y-3 gap-x-6">
                         {[
                           ['Name', formData.fullName], ['Email', formData.email],
@@ -479,15 +476,15 @@ export default function RegisterPage() {
                           ['Year', formData.year], ['Gender', formData.gender],
                         ].map(([key, val]) => (
                           <div key={key}>
-                            <p className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{key}</p>
-                            <p className={`text-sm font-bold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{val}</p>
+                            <p className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{key}</p>
+                            <p className={`text-sm font-black truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{val}</p>
                           </div>
                         ))}
                       </div>
                     </div>
 
                     <div className={`rounded-2xl p-5 border ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                      <h3 className={`text-xs font-bold uppercase tracking-wider mb-4 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Selected Events</h3>
+                      <h3 className={`text-xs font-black uppercase tracking-wider mb-4 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Selected Events</h3>
                       <ul className="space-y-2">
                         {selectedEvents.map(id => {
                           const event = events.find(e => e.id === id);
@@ -500,8 +497,8 @@ export default function RegisterPage() {
                         })}
                       </ul>
                       <div className={`mt-4 pt-3 border-t flex justify-between items-center ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
-                        <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Total Amount</span>
-                        <span className="text-amber-500 font-black text-xl">₹{getTotalFee()}</span>
+                        <span className={`font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>Total Amount</span>
+                        <span className="text-amber-500 font-black text-2xl">₹{getTotalFee()}</span>
                       </div>
                     </div>
                   </div>
@@ -509,15 +506,15 @@ export default function RegisterPage() {
               )}
 
               {/* Navigation Buttons */}
-              <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-200/20">
+              <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-200/40">
                 {step > 1 ? (
                   <button
                     type="button"
                     onClick={() => setStep(step - 1)}
-                    className={`px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 border transition-all ${
+                    className={`px-6 py-3 rounded-full text-sm font-black flex items-center gap-2 border transition-all ${
                       isDark 
                         ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700' 
-                        : 'bg-slate-100 border-slate-300 text-slate-800 hover:bg-slate-200'
+                        : 'bg-slate-100 border-slate-300 text-slate-900 hover:bg-slate-200'
                     }`}
                   >
                     <ChevronLeft className="w-4 h-4" /> Back
@@ -533,7 +530,7 @@ export default function RegisterPage() {
                       (step === 2 && !idFile) ||
                       (step === 3 && selectedEvents.length === 0)
                     }
-                    className="btn-primary px-7 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-8 py-3.5 rounded-full text-sm font-black flex items-center gap-2 bg-gradient-to-r from-[#7c3aed] to-[#6366f1] text-white shadow-xl hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                   >
                     Next <ChevronRight className="w-4 h-4" />
                   </button>
@@ -542,7 +539,7 @@ export default function RegisterPage() {
                     type="button"
                     onClick={onSubmit}
                     disabled={isSubmitting}
-                    className="btn-primary px-8 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg"
+                    className="px-8 py-3.5 rounded-full text-sm font-black flex items-center gap-2 bg-gradient-to-r from-[#7c3aed] to-[#059669] text-white shadow-xl hover:brightness-110"
                   >
                     {isSubmitting ? (
                       <>
