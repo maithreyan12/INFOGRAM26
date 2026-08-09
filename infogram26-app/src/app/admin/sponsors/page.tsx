@@ -12,35 +12,43 @@ export default function SponsorsPage() {
     <AdminLayout>
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Sponsors</h1>
-          <p className="text-gray-400 mt-1">Manage event partners and sponsors</p>
+          <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
+            Sponsors &amp; Partners
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm font-bold text-gray-400">
+            Manage event partners and sponsor branding tiers
+          </p>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn-primary flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-white font-medium">
-          <Plus className="w-5 h-5" /> Add Sponsor
+        <button onClick={() => setShowModal(true)} className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 active:scale-95 transition-all">
+          <Plus className="w-4 h-4" /> Add Sponsor
         </button>
       </div>
 
       <div className="space-y-8">
         {['Title Sponsor', 'Gold Sponsor', 'Silver Sponsor'].map((tier) => (
-          <div key={tier} className="glass-card bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-            <div className="bg-white/5 px-6 py-4 border-b border-white/10">
-              <h2 className="text-lg font-bold text-white">{tier}</h2>
+          <div key={tier} className="rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl overflow-hidden">
+            <div className="bg-black/40 px-6 py-4 border-b border-gray-800 flex items-center justify-between">
+              <h2 className="text-base font-black text-white">{tier}</h2>
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#00d4ff] px-2.5 py-0.5 rounded-full bg-[#00d4ff]/10 border border-[#00d4ff]/30">
+                Official Tier
+              </span>
             </div>
             <div className="p-4 space-y-3">
-              {/* Dummy row */}
-              <div className="flex items-center gap-4 bg-gray-900 border border-gray-800 p-4 rounded-xl hover:border-gray-700 transition-colors group">
+              <div className="flex items-center gap-4 bg-black/50 border border-gray-800 p-4 rounded-2xl hover:border-gray-700 transition-colors group">
                 <button className="cursor-grab active:cursor-grabbing text-gray-500 hover:text-gray-300">
                   <GripVertical className="w-5 h-5" />
                 </button>
-                <div className="w-16 h-16 bg-white rounded flex items-center justify-center p-2">
-                  <div className="w-full h-full bg-gray-200 rounded"></div>
+                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center p-2 shrink-0">
+                  <div className="w-full h-full bg-slate-950 rounded-lg flex items-center justify-center text-white font-black text-xs">
+                    LOGO
+                  </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-white">TechCorp Inc.</h3>
-                  <a href="#" className="text-sm text-blue-400 hover:underline">https://techcorp.example.com</a>
+                  <h3 className="font-black text-white text-base">TechCorp Inc.</h3>
+                  <a href="#" className="text-xs text-[#00d4ff] font-mono hover:underline">https://techcorp.example.com</a>
                 </div>
-                <button className="text-gray-500 hover:text-red-400 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Trash2 className="w-5 h-5" />
+                <button className="text-gray-500 hover:text-red-400 p-2 transition-all">
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>

@@ -38,78 +38,78 @@ export default function OrganizersPage() {
     <AdminLayout>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Event Admins / Organizers</h1>
-          <p className="text-gray-400 mt-1">Manage event coordinators and their assigned event privileges</p>
+          <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
+            Event Admins / Organizers
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm font-bold text-gray-400">
+            Manage event coordinators and their assigned event privileges
+          </p>
         </div>
         <button 
           onClick={() => setShowModal(true)} 
-          className="btn-primary flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-5 py-2.5 rounded-xl text-white font-medium shadow-lg shadow-purple-600/30 transition-all transform hover:scale-105"
+          className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] px-5 py-2.5 rounded-xl text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 transition-all active:scale-95"
         >
-          <UserPlus className="w-5 h-5" /> Add New Event Admin
+          <UserPlus className="w-4 h-4" /> Add New Event Admin
         </button>
       </div>
 
-      <div className="glass-card bg-white/5 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+      <div className="rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-300">
-            <thead className="text-xs uppercase bg-white/5 border-b border-white/10 text-gray-400 font-semibold tracking-wider">
+          <table className="w-full text-left text-xs font-bold">
+            <thead className="text-[10px] uppercase tracking-wider border-b border-gray-800 bg-black/40 text-gray-300">
               <tr>
                 <th className="px-6 py-4">Event Admin Name</th>
                 <th className="px-6 py-4">Login Email</th>
                 <th className="px-6 py-4">Assigned Event</th>
                 <th className="px-6 py-4">Phone</th>
-                <th className="px-6 py-4 text-center">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-6 py-4">Role Status</th>
+                <th className="px-6 py-4 text-right">Assign Event</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-gray-800/80">
               {organizers.map((org) => {
-                const evt = events.find((e) => e.id === org.assignedEventId);
+                const assignedEvt = events.find((e) => e.id === org.assignedEventId);
                 return (
-                  <tr key={org.uid} className="hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4 font-semibold text-white">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs border border-blue-500/30">
-                          {org.displayName.charAt(0)}
-                        </div>
-                        <span>{org.displayName}</span>
-                      </div>
+                  <tr key={org.uid} className="hover:bg-gray-800/50 transition-colors">
+                    <td className="px-6 py-4 font-black text-sm text-white">
+                      {org.displayName}
                     </td>
-                    <td className="px-6 py-4 text-gray-300">
+                    <td className="px-6 py-4 text-gray-300 font-mono">
                       <div className="flex items-center gap-1.5">
-                        <Mail className="w-3.5 h-3.5 text-gray-500" />
+                        <Mail className="w-3.5 h-3.5 text-[#00d4ff]" />
                         <span>{org.email}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      {evt ? (
-                        <span className="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-purple-400" />
-                          {evt.name}
+                      {assignedEvt ? (
+                        <span className="px-3 py-1 rounded-full text-xs font-black bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                          {assignedEvt.name}
                         </span>
                       ) : (
-                        <span className="text-gray-500 text-xs italic">Unassigned</span>
+                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                          General Admin
+                        </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-gray-400 text-xs">
-                      {org.phone || 'N/A'}
+                    <td className="px-6 py-4 text-gray-300 font-mono">
+                      {org.phone || '9360257573'}
                     </td>
-                    <td className="px-6 py-4 text-center">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
-                        org.isActive 
-                          ? 'bg-green-500/10 text-green-400 border-green-500/20' 
-                          : 'bg-red-500/10 text-red-400 border-red-500/20'
-                      }`}>
-                        {org.isActive ? 'Active' : 'Inactive'}
+                    <td className="px-6 py-4">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        {org.role}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button 
-                        onClick={() => updateOrganizer(org.uid, { isActive: !org.isActive })}
-                        className="text-xs text-purple-400 hover:text-purple-300 font-medium underline"
+                      <select
+                        value={org.assignedEventId || ''}
+                        onChange={(e) => updateOrganizer(org.uid, { assignedEventId: e.target.value })}
+                        className="bg-black/60 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#00d4ff]"
                       >
-                        {org.isActive ? 'Deactivate' : 'Activate'}
-                      </button>
+                        <option value="">-- Assign Event --</option>
+                        {events.map((e) => (
+                          <option key={e.id} value={e.id}>{e.name}</option>
+                        ))}
+                      </select>
                     </td>
                   </tr>
                 );

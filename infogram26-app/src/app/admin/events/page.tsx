@@ -118,59 +118,59 @@ export default function EventsPage() {
     <AdminLayout>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className={`text-2xl sm:text-3xl font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Events Management</h1>
-          <p className={`mt-1 text-xs sm:text-sm font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Create events and assign dedicated Event Admins (Organizers)</p>
+          <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
+            Events Management
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm font-bold text-gray-400">
+            Create events and assign dedicated Event Admins (Organizers)
+          </p>
         </div>
         <button 
           onClick={openCreateModal}
-          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 px-5 py-2.5 rounded-xl text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-purple-600/30 transition-all active:scale-95"
+          className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] px-5 py-2.5 rounded-xl text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 transition-all active:scale-95"
         >
           <Plus className="w-4 h-4" /> Create New Event
         </button>
       </div>
 
       {/* Events Table */}
-      <div className={`rounded-3xl border shadow-xl overflow-hidden ${
-        isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
-      }`}>
+      <div className="rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-bold">
-            <thead className={`text-[10px] uppercase tracking-wider border-b ${
-              isDark ? 'bg-slate-950/80 text-slate-300 border-slate-800' : 'bg-slate-100 text-slate-700 border-slate-200'
-            }`}>
+            <thead className="text-[10px] uppercase tracking-wider border-b border-gray-800 bg-black/40 text-gray-300">
               <tr>
                 <th className="px-6 py-4">Event Name</th>
                 <th className="px-6 py-4">Category</th>
-                <th className="px-6 py-4">Date & Venue</th>
+                <th className="px-6 py-4">Date &amp; Venue</th>
                 <th className="px-6 py-4">Assigned Event Admin</th>
                 <th className="px-6 py-4">Fee</th>
                 <th className="px-6 py-4 text-center">Registrations</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-gray-800/80">
               {events.map((evt) => {
                 const org = organizers.find((o) => o.uid === evt.organizerUid || o.assignedEventId === evt.id);
                 return (
-                  <tr key={evt.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4 font-semibold text-white">
+                  <tr key={evt.id} className="hover:bg-gray-800/50 transition-colors">
+                    <td className="px-6 py-4 font-black text-sm text-white">
                       <div className="flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-purple-400" />
+                        <Tag className="w-4 h-4 text-[#00d4ff]" />
                         <span>{evt.name}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 capitalize">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${
                         evt.category === 'technical' 
-                          ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
-                          : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                          ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' 
+                          : 'bg-teal-500/20 text-teal-300 border-teal-500/30'
                       }`}>
                         {evt.category}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-xs space-y-1">
-                      <div className="flex items-center gap-1.5 text-gray-300">
-                        <Calendar className="w-3.5 h-3.5 text-purple-400" /> {evt.date}
+                      <div className="flex items-center gap-1.5 text-gray-200">
+                        <Calendar className="w-3.5 h-3.5 text-[#00d4ff]" /> {evt.date}
                       </div>
                       <div className="flex items-center gap-1.5 text-gray-400">
                         <MapPin className="w-3.5 h-3.5 text-gray-500" /> {evt.venue}
@@ -178,38 +178,38 @@ export default function EventsPage() {
                     </td>
                     <td className="px-6 py-4">
                       {org ? (
-                        <div className="flex items-center gap-2 bg-purple-950/40 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-lg text-xs font-medium w-fit">
-                          <UserCheck className="w-4 h-4 text-purple-400 shrink-0" />
+                        <div className="flex items-center gap-2 bg-[#00d4ff]/10 text-white border border-[#00d4ff]/30 px-3 py-1.5 rounded-xl text-xs font-bold w-fit">
+                          <UserCheck className="w-4 h-4 text-[#00d4ff] shrink-0" />
                           <div>
-                            <p className="font-semibold text-white">{org.displayName}</p>
-                            <p className="text-[10px] text-purple-300/70">{org.email}</p>
+                            <p className="font-black text-white">{org.displayName}</p>
+                            <p className="text-[10px] text-gray-400">{org.email}</p>
                           </div>
                         </div>
                       ) : (
-                        <span className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
+                        <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-xl">
                           Unassigned
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 font-semibold text-white">
+                    <td className="px-6 py-4 font-black text-white">
                       {evt.registrationFee > 0 ? `₹${evt.registrationFee}` : 'Free'}
                     </td>
-                    <td className="px-6 py-4 text-center font-medium">
-                      <span className="bg-gray-800 px-3 py-1 rounded-full border border-gray-700 text-xs">
+                    <td className="px-6 py-4 text-center font-black">
+                      <span className="bg-black/60 px-3 py-1 rounded-full border border-gray-800 text-xs text-amber-400">
                         {evt.registeredCount} / {evt.maxParticipants}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
                       <button 
                         onClick={() => openEditModal(evt)} 
-                        className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
+                        className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-xl transition-all"
                         title="Edit Event & Admin"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => deleteEvent(evt.id)} 
-                        className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg transition-all"
+                        className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl transition-all"
                         title="Delete Event"
                       >
                         <Trash2 className="w-4 h-4" />

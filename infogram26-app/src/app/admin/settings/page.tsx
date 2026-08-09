@@ -11,42 +11,44 @@ export default function SettingsPage() {
   return (
     <AdminLayout>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Global Settings</h1>
-        <p className="text-gray-400 mt-1">Configure application parameters and integrations</p>
+        <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
+          Global Settings
+        </h1>
+        <p className="mt-1 text-xs sm:text-sm font-bold text-gray-400">
+          Configure application parameters, contact details, and payment gateways
+        </p>
       </div>
 
       <div className="space-y-8 max-w-4xl">
         {/* EVENT SETTINGS */}
-        <section className="glass-card bg-white/5 border border-white/10 rounded-2xl p-6">
-          <h2 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Event Configuration</h2>
+        <section className="rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl p-6 sm:p-8">
+          <h2 className="text-lg font-black text-white mb-6 border-b border-gray-800 pb-4">
+            Event Configuration
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Symposium Dates</label>
-              <input type="text" placeholder="e.g. Oct 15 - 16, 2026" className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white" />
+              <label className="block text-xs font-black uppercase text-gray-400 mb-2">Symposium Dates</label>
+              <input type="text" defaultValue="August 22, 2026" className="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-[#00d4ff]" />
             </div>
             <div className="flex flex-col justify-center">
-              <label className="block text-sm font-medium text-gray-400 mb-2">Registration Status</label>
+              <label className="block text-xs font-black uppercase text-gray-400 mb-2">Registration Status</label>
               <label className="inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" defaultChecked />
-                <div className="relative w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                <span className="ml-3 text-sm font-medium text-white">Registrations Open</span>
+                <div className="relative w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00d4ff]"></div>
+                <span className="ml-3 text-xs font-black uppercase tracking-wider text-white">Registrations Open</span>
               </label>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Contact Email</label>
-              <input type="email" className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white" />
+              <label className="block text-xs font-black uppercase text-gray-400 mb-2">Contact Email</label>
+              <input type="email" defaultValue="info@cahcet.edu.in" className="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-[#00d4ff]" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Contact Phone</label>
-              <input type="text" className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-400 mb-2">College Address</label>
-              <textarea rows={2} className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white"></textarea>
+              <label className="block text-xs font-black uppercase text-gray-400 mb-2">Contact Phone</label>
+              <input type="text" defaultValue="9342706675" className="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-[#00d4ff]" />
             </div>
           </div>
           <div className="mt-6 flex justify-end">
-            <button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+            <button className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 active:scale-95 transition-all">
               <Save className="w-4 h-4" /> Save Event Settings
             </button>
           </div>
