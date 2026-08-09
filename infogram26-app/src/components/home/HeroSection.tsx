@@ -384,30 +384,31 @@ export default function HeroSection() {
               <motion.span
                 key={index}
                 variants={letterVariants}
-                className="inline-block font-black cursor-pointer"
+                className="inline-block font-black cursor-pointer select-none"
                 style={{
                   color: isDark ? '#ffffff' : '#04060f',
                   textShadow: isDark
                     ? '0 0 28px rgba(192,132,252,0.55), 0 0 60px rgba(56,189,248,0.3)'
                     : '0 0 20px rgba(124,58,237,0.22), 0 2px 14px rgba(124,58,237,0.15)',
-                  willChange: 'transform, opacity',
+                  willChange: 'transform',
                   display: 'inline-block',
                   WebkitTapHighlightColor: 'transparent',
                   touchAction: 'manipulation',
                 }}
                 whileHover={{
-                  scale: 1.18,
-                  y: -8,
-                  color: isDark ? '#c084fc' : '#7c3aed',
-                  textShadow: isDark
-                    ? '0 0 35px rgba(192,132,252,0.9), 0 0 70px rgba(56,189,248,0.6), 0 -4px 20px rgba(192,132,252,0.5)'
-                    : '0 0 30px rgba(124,58,237,0.55), 0 0 55px rgba(124,58,237,0.3)',
+                  scale: 1.2,
+                  y: -10,
+                  filter: isDark
+                    ? 'brightness(1.6) drop-shadow(0 0 16px rgba(192,132,252,0.9))'
+                    : 'brightness(1.0) drop-shadow(0 0 12px rgba(124,58,237,0.6))',
                   transition: { type: 'spring', stiffness: 600, damping: 18 },
                 }}
                 whileTap={{
                   scale: 0.88,
                   y: 4,
-                  color: isDark ? '#e879f9' : '#6d28d9',
+                  filter: isDark
+                    ? 'brightness(2.0) drop-shadow(0 0 20px rgba(192,132,252,1))'
+                    : 'brightness(0.85) drop-shadow(0 0 16px rgba(124,58,237,0.8))',
                   transition: { type: 'spring', stiffness: 800, damping: 20 },
                 }}
               >
@@ -442,30 +443,31 @@ export default function HeroSection() {
                 <motion.span
                   key={index}
                   variants={yearLetterVariants}
-                  className="inline-block font-black cursor-pointer"
+                  className="inline-block font-black cursor-pointer select-none"
                   style={{
                     color: isDark ? '#fcd34d' : '#d97706',
                     textShadow: isDark
                       ? '0 0 24px rgba(252,211,77,0.7), 0 0 55px rgba(252,211,77,0.35)'
                       : '0 2px 10px rgba(217,119,6,0.35)',
-                    willChange: 'transform, opacity',
+                    willChange: 'transform',
                     display: 'inline-block',
                     WebkitTapHighlightColor: 'transparent',
                     touchAction: 'manipulation',
                   }}
                   whileHover={{
-                    scale: 1.18,
-                    y: -8,
-                    color: isDark ? '#fde68a' : '#b45309',
-                    textShadow: isDark
-                      ? '0 0 40px rgba(252,211,77,1), 0 0 80px rgba(252,211,77,0.6), 0 -6px 24px rgba(252,211,77,0.5)'
-                      : '0 0 28px rgba(217,119,6,0.7), 0 0 50px rgba(217,119,6,0.4)',
+                    scale: 1.2,
+                    y: -10,
+                    filter: isDark
+                      ? 'brightness(1.5) drop-shadow(0 0 18px rgba(252,211,77,1))'
+                      : 'brightness(1.1) drop-shadow(0 0 14px rgba(217,119,6,0.7))',
                     transition: { type: 'spring', stiffness: 600, damping: 18 },
                   }}
                   whileTap={{
                     scale: 0.88,
                     y: 5,
-                    color: isDark ? '#f59e0b' : '#92400e',
+                    filter: isDark
+                      ? 'brightness(2.0) drop-shadow(0 0 24px rgba(252,211,77,1))'
+                      : 'brightness(0.85) drop-shadow(0 0 18px rgba(217,119,6,0.9))',
                     transition: { type: 'spring', stiffness: 800, damping: 20 },
                   }}
                 >

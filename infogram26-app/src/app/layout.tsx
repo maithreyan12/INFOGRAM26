@@ -115,37 +115,8 @@ export default function RootLayout({
       </head>
       <body className="antialiased font-sans transition-colors duration-500">
         <ThemeProvider>
-          {/* Aurora Background — global, behind everything */}
-          <div className="aurora-bg" aria-hidden="true">
-            <div
-              className="absolute rounded-full aurora-blob-1"
-              style={{
-                width: '75vw',
-                height: '75vw',
-                background: 'radial-gradient(circle, rgba(124,58,237,0.25) 0%, rgba(56,189,248,0.18) 50%, transparent 70%)',
-                top: '-15%',
-                left: '-15%',
-                filter: 'blur(90px)',
-                opacity: 0.85,
-                willChange: 'transform',
-                transform: 'translateZ(0)',
-              }}
-            />
-            <div
-              className="absolute rounded-full aurora-blob-2"
-              style={{
-                width: '70vw',
-                height: '70vw',
-                background: 'radial-gradient(circle, rgba(56,189,248,0.25) 0%, rgba(52,211,153,0.20) 50%, transparent 70%)',
-                bottom: '-15%',
-                right: '-15%',
-                filter: 'blur(90px)',
-                opacity: 0.8,
-                willChange: 'transform',
-                transform: 'translateZ(0)',
-              }}
-            />
-          </div>
+          {/* Aurora Background — global pseudo-element blobs via CSS */}
+          <div className="aurora-bg" aria-hidden="true" />
 
           <div className="relative z-10 min-h-screen">
             {children}
