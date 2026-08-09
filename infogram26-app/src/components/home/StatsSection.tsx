@@ -78,7 +78,7 @@ export default function StatsSection() {
                 }`} style={{ fontFamily: 'var(--font-display)' }}>
                   <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
                 </div>
-                <div className={`text-xs sm:text-sm font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`} style={{ fontFamily: 'var(--font-heading)' }}>
+                <div className={`text-xs sm:text-sm font-black uppercase tracking-wider ${isDark ? 'text-slate-200' : 'text-slate-950'}`} style={{ fontFamily: 'var(--font-heading)' }}>
                   {stat.label}
                 </div>
               </motion.div>

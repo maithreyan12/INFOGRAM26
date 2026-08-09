@@ -77,7 +77,7 @@ export default function VideoSection() {
           <span className={isDark ? 'text-amber-300' : 'text-amber-500'}>&apos;26</span>
           {' '}Energy
         </h2>
-        <p className={`text-sm sm:text-base max-w-lg mx-auto font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`} style={{ fontFamily: 'var(--font-heading)' }}>
+        <p className={`text-sm sm:text-base max-w-lg mx-auto font-black ${isDark ? 'text-slate-200' : 'text-slate-900'}`} style={{ fontFamily: 'var(--font-heading)' }}>
           Experience the most electrifying symposium in Tamil Nadu
         </p>
       </motion.div>
