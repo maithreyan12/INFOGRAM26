@@ -117,34 +117,40 @@ export default function ContactPage() {
                 </div>
 
                 {/* Featured Lead: Maithreyan D (Website Admin & Developer) */}
-                <div className={`p-4 rounded-2xl border mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                <div className={`p-5 rounded-2xl border mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
                   isDark
-                    ? 'bg-gradient-to-r from-purple-950/60 via-slate-950 to-slate-900 border-purple-500/40'
-                    : 'bg-gradient-to-r from-purple-50 via-slate-50 to-indigo-50 border-purple-200'
+                    ? 'bg-slate-950/80 border-purple-500/30'
+                    : 'bg-slate-50/90 border-slate-200'
                 }`}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
-                      <Code className="w-4.5 h-4.5 text-amber-400" />
+                  <div className="flex items-start sm:items-center gap-3.5">
+                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
+                      isDark ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-purple-500/10 border-purple-500/20 text-[#7c3aed]'
+                    }`}>
+                      <Code className="w-5 h-5" />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-950'}`}>Maithreyan D</span>
-                        <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-purple-500/25 text-amber-300 border border-purple-500/40">
-                          Website Admin &amp; Dev
+                    <div className="space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`font-black text-base ${isDark ? 'text-white' : 'text-slate-950'}`}>
+                          Maithreyan D
+                        </span>
+                        <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border whitespace-nowrap ${
+                          isDark ? 'bg-purple-500/20 text-amber-300 border-purple-500/40' : 'bg-[#7c3aed]/10 text-[#7c3aed] border-[#7c3aed]/30'
+                        }`}>
+                          Website Admin &amp; Lead Dev
                         </span>
                       </div>
-                      <span className={`text-xs font-bold ${isDark ? 'text-amber-300' : 'text-purple-700'}`}>
-                        Portfolio: <a href="https://maithreyan.in" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80 font-black">maithreyan.in</a>
-                      </span>
+                      <p className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                        Portfolio: <a href="https://maithreyan.in" target="_blank" rel="noopener noreferrer" className={`underline font-black ${isDark ? 'text-amber-300 hover:text-amber-200' : 'text-[#7c3aed] hover:underline'}`}>maithreyan.in</a>
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <a
                       href="https://maithreyan.in"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider border transition-all ${
+                      className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider border transition-all ${
                         isDark 
                           ? 'bg-purple-500/20 border-purple-500/40 text-amber-300 hover:bg-purple-500/30' 
                           : 'bg-[#7c3aed]/10 border-[#7c3aed]/30 text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white'
@@ -156,7 +162,7 @@ export default function ContactPage() {
                     </a>
                     <a
                       href="tel:+919342706675"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all whitespace-nowrap"
                     >
                       <Phone className="w-3.5 h-3.5" />
                       <span>9342706675</span>
