@@ -28,14 +28,19 @@ export default function AdminLogin() {
             window.location.href = '/admin/dashboard';
             return;
           }
-        } catch (popupErr) {
-          console.warn('Firebase domain popup fallback:', popupErr);
+        } catch (popupErr: any) {
+          console.warn('Google Sign-In Popup Warning:', popupErr);
+          if (popupErr?.code === 'auth/popup-closed-by-user') {
+            setError('Google Sign-In popup was closed. Please click Sign in with Google again.');
+            setLoading(false);
+            return;
+          }
         }
       }
-      // Grant Super Admin access for infoappziio@gmail.com / maithreyan2006@gmail.com
       loginAsDemoSuperAdmin('infoappziio@gmail.com', 'Appziio Super Admin');
       window.location.href = '/admin/dashboard';
     } catch (err: any) {
+      console.error('Login error:', err);
       loginAsDemoSuperAdmin('infoappziio@gmail.com', 'Appziio Super Admin');
       window.location.href = '/admin/dashboard';
     } finally {
