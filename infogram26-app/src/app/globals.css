@@ -47,9 +47,9 @@
     --glass-shadow: 0 10px 35px rgba(15, 23, 42, 0.05), 0 2px 8px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255,255,255,0.9);
     --glass-shadow-hover: 0 24px 60px rgba(124, 58, 237, 0.12), 0 0 45px rgba(16, 185, 129, 0.08), inset 0 1px 0 #ffffff;
 
-    /* Premium Typography */
-    --font-display: var(--font-orbitron), 'Orbitron', system-ui, sans-serif;
-    --font-heading: var(--font-space-grotesk), var(--font-outfit), 'Space Grotesk', sans-serif;
+    /* Premium Modern Typography — Outfit & Plus Jakarta Sans */
+    --font-display: var(--font-outfit), 'Outfit', system-ui, sans-serif;
+    --font-heading: var(--font-outfit), 'Outfit', system-ui, sans-serif;
     --font-body: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
 
     /* Radii */
