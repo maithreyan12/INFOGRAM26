@@ -126,12 +126,12 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-bold text-slate-900 mb-1">Follow Us on Instagram</h3>
                   <a 
-                    href="https://www.instagram.com/infogram_2k26?utm_source=qr&igsh=N2JqNW5zOWF0cHIw" 
+                    href="https://www.instagram.com/infogram_26/" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="text-pink-600 hover:text-pink-700 font-bold transition-colors text-sm"
                   >
-                    @infogram_2k26 &rarr;
+                    @infogram_26 &rarr;
                   </a>
                 </div>
               </div>
