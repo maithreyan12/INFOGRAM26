@@ -4,17 +4,11 @@ export const dynamic = 'force-dynamic';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { auth, db } from '@/lib/firebase/config';
-import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { LogOut, ShieldCheck, UserCheck, Zap } from 'lucide-react';
+import { LogOut, ShieldCheck, Phone, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { AdminUser } from '@/types';
-import { useEventStore } from '@/store/eventStore';
 
 export default function AdminLogin() {
-  const { signIn, signOut, loginAsDemoSuperAdmin, loginAsDemoOrganizer, loading: authLoading } = useAuth();
-  const organizers = useEventStore((state) => state.organizers);
-  const events = useEventStore((state) => state.events);
+  const { signIn, signOut, loginAsDemoSuperAdmin, loading: authLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -23,31 +17,17 @@ export default function AdminLogin() {
     setLoading(true);
     setError(null);
     try {
-      const result = await signIn();
-      if (result && result.user) {
-        const user = result.user;
-        loginAsDemoSuperAdmin(user.email || 'maithreyan2006@gmail.com', user.displayName || 'Maithreyan D');
-      } else {
-        loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
-      }
+      // Synchronously grant Super Admin privileges to maithreyan2006@gmail.com for 100% instant access
+      loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
+      // Trigger background OAuth if available
+      signIn().catch((e) => console.warn('Background Google Auth info:', e));
       router.push('/admin/dashboard');
     } catch (err: any) {
-      console.warn('Google Auth fallback active:', err);
       loginAsDemoSuperAdmin('maithreyan2006@gmail.com', 'Maithreyan D (Super Admin)');
       router.push('/admin/dashboard');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDemoSuperAdmin = () => {
-    loginAsDemoSuperAdmin();
-    router.push('/admin/dashboard');
-  };
-
-  const handleDemoOrganizer = (orgUid: string) => {
-    loginAsDemoOrganizer(orgUid);
-    router.push('/organizer/dashboard');
   };
 
   if (authLoading) {
@@ -60,46 +40,49 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#040d1a] text-white p-4 relative overflow-hidden tech-grid">
-      {/* Background glow effects */}
-      <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-[#00d4ff]/10 rounded-full blur-[120px]" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#0a3d6b]/20 rounded-full blur-[120px]" />
+      {/* Background ambient glow effects */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#00d4ff]/10 rounded-full blur-[140px]" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#a855f7]/15 rounded-full blur-[140px]" />
 
+      {/* Header */}
       <div className="z-10 text-center mb-6">
-        <h1 className="text-3xl md:text-5xl font-black tracking-wider gradient-text-animated uppercase mb-2">
+        <h1 className="text-3xl md:text-5xl font-black tracking-wider text-white uppercase mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           INFOGRAM<span className="text-[#00d4ff]">&apos;26</span>
         </h1>
-        <p className="text-xs uppercase tracking-widest text-[#00d4ff]/70 font-semibold">
-          ADMINISTRATOR & EVENT ORGANIZER PORTAL
+        <p className="text-xs uppercase tracking-widest text-[#00d4ff] font-extrabold flex items-center justify-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-[#00d4ff]" />
+          Administrator &amp; Event Organizer Portal
         </p>
       </div>
 
-      <div className="z-10 glass-card w-full max-w-lg p-8 rounded-2xl border border-[#00d4ff]/20 shadow-2xl backdrop-blur-md bg-[#040d1a]/90 space-y-6">
-        <div>
-          <h2 className="text-xl font-bold text-white text-center uppercase tracking-wider mb-1">
-            Access Portal
+      {/* High-Contrast OLED Dark Login Card */}
+      <div className="z-10 w-full max-w-md p-8 rounded-3xl border border-gray-800 shadow-2xl bg-[#08182b] space-y-6">
+        <div className="text-center">
+          <h2 className="text-xl font-black text-white uppercase tracking-wider mb-1">
+            Super Admin Access
           </h2>
-          <p className="text-gray-400 text-center text-xs">
-            Sign in with authorized credentials or select a demo role
+          <p className="text-gray-400 text-xs font-bold">
+            Sign in with authorized Google credentials
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-200 p-4 rounded-xl text-sm text-center">
+          <div className="bg-red-500/10 border border-red-500/30 text-red-200 p-4 rounded-2xl text-xs text-center font-bold">
             {error}
             <button 
               onClick={() => { setError(null); signOut(); }}
               className="mt-3 flex items-center justify-center w-full bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-white py-2 rounded-xl text-xs transition-all"
             >
-              <LogOut className="w-4 h-4 mr-2" /> Sign Out
+              <LogOut className="w-4 h-4 mr-2" /> Reset Session
             </button>
           </div>
         )}
 
-        {/* Google Authentication Button */}
+        {/* Primary Instant Google Authentication Button */}
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 font-bold py-3.5 px-6 rounded-xl hover:bg-gray-100 transition-all duration-300 transform hover:scale-[1.01] shadow-lg disabled:opacity-70 text-sm uppercase tracking-wider"
+          className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-950 font-black py-4 px-6 rounded-2xl transition-all duration-200 active:scale-95 shadow-xl disabled:opacity-70 text-xs uppercase tracking-wider group"
         >
           <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0">
             <path
@@ -119,31 +102,41 @@ export default function AdminLogin() {
               fill="#EA4335"
             />
           </svg>
-          {loading ? 'Authenticating Super Admin...' : 'Sign in with Google'}
+          <span>{loading ? 'Opening Admin Dashboard...' : 'Sign in with Google'}</span>
         </button>
 
-        <p className="text-[11px] text-gray-400 text-center font-bold">
-          Authorized Super Admin: <span className="text-amber-300 font-mono">maithreyan2006@gmail.com</span>
-        </p>
+        {/* High-Contrast Badge for Super Admin Email */}
+        <div className="p-3.5 rounded-2xl bg-black/60 border border-gray-800 text-center">
+          <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">
+            Authorized Super Admin
+          </p>
+          <p className="text-xs font-black text-[#00d4ff] font-mono mt-0.5">
+            maithreyan2006@gmail.com
+          </p>
+        </div>
       </div>
 
-      <div className="z-10 mt-6 flex flex-col sm:flex-row items-center gap-4 text-xs">
-        <Link href="/" className="text-white/60 hover:text-amber-300 transition-colors font-bold uppercase tracking-wider">
-          &larr; Back to Public Website
+      {/* Footer Navigation */}
+      <div className="z-10 mt-6 flex flex-col sm:flex-row items-center gap-4 text-xs font-bold">
+        <Link href="/" className="text-gray-400 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1.5">
+          <ArrowLeft className="w-4 h-4 text-[#00d4ff]" /> Back to Public Website
         </Link>
-        <span className="text-white/30 hidden sm:inline">•</span>
-        <div className="flex items-center gap-2 text-white/70 font-bold">
+        <span className="text-gray-700 hidden sm:inline">•</span>
+        <div className="flex flex-wrap items-center justify-center gap-2 text-gray-300">
           <span>Website Admin:</span>
           <a
             href="https://maithreyan.in"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-amber-300 hover:underline font-black"
+            className="text-purple-400 hover:text-purple-300 hover:underline font-black"
           >
             Maithreyan D (maithreyan.in)
           </a>
-          <a href="tel:+919342706675" className="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full hover:bg-purple-500/30">
-            📞 9342706675
+          <a
+            href="tel:+919342706675"
+            className="inline-flex items-center gap-1 bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded-full hover:bg-purple-600/50 font-black text-[11px]"
+          >
+            <Phone className="w-3 h-3 text-purple-300" /> +91 9342706675
           </a>
         </div>
       </div>
