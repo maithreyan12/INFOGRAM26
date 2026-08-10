@@ -180,10 +180,10 @@ export default function AboutPage() {
                     <MapPin className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                     <span>Hakeem Nagar, Melvisharam, Ranipet District, Tamil Nadu – 632 509 <strong className="text-red-500 font-black text-xs uppercase tracking-wider ml-1">(Open Maps 📍)</strong></span>
                   </a>
-                  <div className={`flex items-center gap-2.5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                  <a href="tel:+918248963928" className={`flex items-center gap-2.5 font-bold transition-all hover:underline ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-800 hover:text-[#7c3aed]'}`}>
                     <Phone className="w-4 h-4 text-[#7c3aed] shrink-0" />
-                    <span>+91 4172 267387</span>
-                  </div>
+                    <span>HOD: Dr. S. Umamaheswari (8248963928)</span>
+                  </a>
                   <div className={`flex items-center gap-2.5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                     <Mail className="w-4 h-4 text-[#7c3aed] shrink-0" />
                     <span>info@cahcet.edu.in</span>
