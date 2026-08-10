@@ -271,18 +271,12 @@ function PaymentContent() {
                   {/* UPI QR */}
                   <div className="bg-white/4 rounded-2xl p-6 text-center border border-white/8">
                     <p className="text-white/60 text-sm mb-4">Scan QR code or use UPI ID below</p>
-                    <div className="bg-white p-3 rounded-xl inline-block mb-4 shadow-lg">
-                      {settings?.upiQrCodeUrl ? (
-                        <img src={settings.upiQrCodeUrl} alt="UPI QR" className="w-44 h-44 object-cover" />
-                      ) : (
-                        <div className="w-44 h-44 flex items-center justify-center bg-gray-100 rounded-lg">
-                          <div className="text-center">
-                            <div className="text-4xl mb-2">📱</div>
-                            <p className="text-gray-500 text-xs">QR Code</p>
-                            <p className="text-gray-500 text-xs">will appear here</p>
-                          </div>
-                        </div>
-                      )}
+                    <div className="bg-white p-3 rounded-xl inline-block mb-4 shadow-lg border-2 border-[#00d4ff]/40">
+                      <img 
+                        src={settings?.upiQrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`upi://pay?pa=${settings?.upiId || '9342706675@okbizaxis'}&pn=INFOGRAM26&am=${registration?.totalFee || 350}&cu=INR`)}`} 
+                        alt="UPI QR Code" 
+                        className="w-48 h-48 object-cover rounded-lg" 
+                      />
                     </div>
 
                     <div className="bg-white/6 rounded-xl p-3 flex items-center justify-between gap-3 border border-white/10">
