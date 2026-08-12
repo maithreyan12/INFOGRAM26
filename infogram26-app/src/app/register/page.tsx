@@ -27,18 +27,19 @@ const personalInfoSchema = z.object({
 
 type PersonalInfoForm = z.infer<typeof personalInfoSchema>;
 
-const demoEvents = [
-  { id: 'demo-1', name: 'Code Clash', category: 'Technical', fee: 150, time: '09:00 AM - 11:00 AM' },
-  { id: 'demo-2', name: 'Web Warriors', category: 'Technical', fee: 200, time: '11:00 AM - 01:00 PM' },
-  { id: 'demo-3', name: 'Debug Dash', category: 'Technical', fee: 150, time: '02:00 PM - 04:00 PM' },
-  { id: 'demo-4', name: 'AI Arena', category: 'Technical', fee: 200, time: '09:00 AM - 12:00 PM' },
-  { id: 'demo-5', name: 'Paper Presentation', category: 'Technical', fee: 100, time: '10:00 AM - 12:00 PM' },
-  { id: 'demo-6', name: 'Project Expo', category: 'Technical', fee: 200, time: '09:00 AM - 05:00 PM' },
-  { id: 'demo-7', name: 'Pixel Perfect', category: 'Non-Technical', fee: 100, time: '01:00 PM - 03:00 PM' },
-  { id: 'demo-8', name: 'Treasure Hunt', category: 'Non-Technical', fee: 100, time: '11:00 AM - 01:00 PM' },
-  { id: 'demo-9', name: 'Quiz Quest', category: 'Non-Technical', fee: 100, time: '02:00 PM - 03:30 PM' },
-  { id: 'demo-10', name: 'Connections', category: 'Non-Technical', fee: 100, time: '10:00 AM - 12:00 PM' },
-];
+import { OFFICIAL_EVENTS } from '@/lib/eventsData';
+
+const demoEvents = OFFICIAL_EVENTS.map(e => ({
+  id: e.id,
+  slug: e.slug,
+  name: e.name,
+  category: e.category === 'technical' ? 'Technical' : 'Non-Technical',
+  fee: e.registrationFee,
+  maxParticipants: e.maxParticipants,
+  time: `${e.startTime} - ${e.endTime}`,
+  coordinatorName: e.coordinatorName,
+  rules: e.rules,
+}));
 
 const STEPS = [
   { number: 1, label: 'Personal Info', icon: User },
@@ -52,7 +53,7 @@ export default function RegisterPage() {
   const [idFile, setIdFile] = useState<File | null>(null);
   const [idPreview, setIdPreview] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>(demoEvents);
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -92,11 +93,44 @@ export default function RegisterPage() {
   const formData = watch();
 
   useEffect(() => {
+    // Check URL query param for preselected event
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const preselected = params.get('event');
+      if (preselected) {
+        const normPre = preselected.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const match = demoEvents.find(
+          e => e.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normPre || e.id === preselected
+        );
+        if (match) {
+          setSelectedEvents([match.id]);
+        }
+      }
+    }
+
     const fetchEvents = async () => {
       try {
         if (!db) { setEvents(demoEvents); return; }
         const snap = await getDocs(collection(db, 'events'));
-        setEvents(snap.empty ? demoEvents : snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        if (snap.empty) {
+          setEvents(demoEvents);
+        } else {
+          const dbEvts = snap.docs.map(d => {
+            const data = d.data();
+            return {
+              id: d.id,
+              slug: data.slug || d.id,
+              name: data.name,
+              category: data.category === 'technical' || data.category === 'Technical' ? 'Technical' : 'Non-Technical',
+              fee: data.registrationFee ?? data.fee ?? 50,
+              maxParticipants: data.maxParticipants ?? 2,
+              time: data.startTime && data.endTime ? `${data.startTime} - ${data.endTime}` : 'Full Day',
+              coordinatorName: data.coordinatorName,
+              rules: data.rules,
+            };
+          });
+          setEvents(dbEvts.length > 0 ? dbEvts : demoEvents);
+        }
       } catch { setEvents(demoEvents); }
     };
     fetchEvents();

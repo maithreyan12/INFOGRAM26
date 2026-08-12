@@ -476,8 +476,57 @@ export default function AboutPage() {
           </div>
         </section>
 
+        <section className="container-xl px-4 py-6">
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            variants={revealVariants}
+            className={`p-6 sm:p-10 rounded-3xl border shadow-xl ${
+              isDark ? 'bg-slate-900/90 border-purple-500/30 text-white' : 'bg-white border-slate-200 text-slate-950'
+            }`}
+          >
+            <div className="text-center mb-8">
+              <SectionBadge label="Leadership" />
+              <h2 className={`text-2xl sm:text-4xl font-black uppercase ${isDark ? 'text-white' : 'text-slate-950'}`} style={{ fontFamily: 'var(--font-display)' }}>
+                College &amp; Symposium Authorities
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className={`p-5 rounded-2xl border text-center ${
+                isDark ? 'bg-slate-950/80 border-purple-500/20' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className={`text-[11px] font-black uppercase tracking-wider mb-1 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Chief Patron</div>
+                <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Janab Dr. S. Ziauddin Ahmed</div>
+              </div>
+
+              <div className={`p-5 rounded-2xl border text-center ${
+                isDark ? 'bg-slate-950/80 border-purple-500/20' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className={`text-[11px] font-black uppercase tracking-wider mb-1 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Chairman</div>
+                <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Janab V. Mohammed Rizwanullah</div>
+              </div>
+
+              <div className={`p-5 rounded-2xl border text-center ${
+                isDark ? 'bg-slate-950/80 border-purple-500/20' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className={`text-[11px] font-black uppercase tracking-wider mb-1 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Patrons</div>
+                <div className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Dr. M. Sasikumar <span className="text-xs font-bold text-slate-400">(Principal)</span></div>
+                <div className={`text-sm font-black mt-1 ${isDark ? 'text-white' : 'text-slate-950'}`}>Dr. A. MD Muzaffar Hussain <span className="text-xs font-bold text-slate-400">(Vice-Principal)</span></div>
+              </div>
+
+              <div className={`p-5 rounded-2xl border text-center ${
+                isDark ? 'bg-slate-950/80 border-purple-500/20' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className={`text-[11px] font-black uppercase tracking-wider mb-1 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>HOD &amp; Convenors</div>
+                <div className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Dr. S. Umamaheswari <span className="text-xs font-bold text-slate-400">(Prof &amp; Head/IT)</span></div>
+                <div className={`text-xs font-bold mt-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Convenors: Mr. M. Mohamed Rafe (AP/IT), Mrs. I. Abdulla (AP/IT)</div>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
         {/* ── PARENT ORG BANNER ── */}
-        <section className="container-xl px-4 py-10">
+        <section className="container-xl px-4 py-6">
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true }}
             variants={revealVariants}
