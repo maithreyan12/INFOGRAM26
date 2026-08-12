@@ -42,38 +42,66 @@ export const viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "INFOGRAM'26 — National Level Technical Symposium",
-    template: "%s | INFOGRAM'26",
+    default: "INFogram'26 — National Level Technical Symposium | CAHCET Dept of IT",
+    template: "%s | INFogram'26",
   },
   description:
-    "INFOGRAM'26 is the National Level Technical Symposium organized by the Department of Information Technology, C. Abdul Hakeem College of Engineering & Technology. Register now for exciting technical and non-technical events.",
+    "INFogram'26 is the National Level Technical Symposium organized by the Department of Information Technology, C. Abdul Hakeem College of Engineering & Technology. Designed & Engineered by Maithreyan D (https://maithreyan.in). Register now for exciting technical and non-technical events.",
   keywords: [
+    "INFogram'26",
     "INFOGRAM'26",
+    "INFogram 26",
+    "INFOGRAM26",
     'National Level Technical Symposium',
-    'C. Abdul Hakeem College',
+    'C. Abdul Hakeem College of Engineering & Technology',
+    'CAHCET',
     'Department of Information Technology',
+    'Maithreyan D',
+    'Maithreyan D Portfolio',
+    'maithreyan.in',
+    'Maithreyan Developer',
     'Technical Events',
     'Non-Technical Events',
     'Engineering Symposium',
+    'Melvisharam',
+    'Codestorm',
+    'Tech Talks',
+    'Hack Forge',
+    'Battle Verse',
+    'Quest X',
     '2026',
   ],
-  authors: [{ name: 'Appziio Technologies', url: 'https://appziio.com' }],
-  creator: 'Appziio Technologies',
-  publisher: 'Department of Information Technology, C. Abdul Hakeem College of Engineering & Technology',
+  authors: [
+    { name: 'Maithreyan D', url: 'https://maithreyan.in' },
+    { name: 'Department of IT, CAHCET', url: 'https://cahcet.edu.in' }
+  ],
+  creator: 'Maithreyan D (https://maithreyan.in)',
+  publisher: 'Maithreyan D & Department of Information Technology, CAHCET',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://infogram26.vercel.app'),
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    title: "INFOGRAM'26 — National Level Technical Symposium",
+    url: 'https://infogram26.vercel.app',
+    title: "INFogram'26 — National Level Technical Symposium | CAHCET",
     description:
-      "National Level Technical Symposium organized by the Department of Information Technology, C. Abdul Hakeem College of Engineering & Technology.",
-    siteName: "INFOGRAM'26",
+      "Official portal for INFogram'26 National Level Technical Symposium by Department of IT, CAHCET. Engineered & Developed by Maithreyan D (https://maithreyan.in).",
+    siteName: "INFogram'26",
+    images: [
+      {
+        url: '/logo.png',
+        width: 800,
+        height: 800,
+        alt: 'INFogram26 Symposium Logo',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "INFOGRAM'26 — National Level Technical Symposium",
+    title: "INFogram'26 — National Level Technical Symposium | CAHCET",
     description:
-      "National Level Technical Symposium organized by the Department of Information Technology, C. Abdul Hakeem College of Engineering & Technology.",
+      "National Level Technical Symposium by Department of IT, CAHCET. Engineered & Developed by Maithreyan D (https://maithreyan.in).",
+    creator: '@maithreyan',
+    images: ['/logo.png'],
   },
   icons: {
     icon: [
@@ -93,11 +121,77 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
     },
+  },
+  other: {
+    'author': 'Maithreyan D',
+    'developer': 'Maithreyan D (https://maithreyan.in)',
+    'portfolio': 'https://maithreyan.in',
   },
 };
 
 import { ThemeProvider } from '@/context/ThemeContext';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': 'https://infogram26.vercel.app/#website',
+      'url': 'https://infogram26.vercel.app',
+      'name': "INFogram'26",
+      'description': 'National Level Technical Symposium organized by Department of IT, CAHCET',
+      'author': {
+        '@type': 'Person',
+        '@id': 'https://maithreyan.in/#person',
+        'name': 'Maithreyan D',
+        'url': 'https://maithreyan.in',
+        'jobTitle': 'Website Architect & Software Engineer',
+        'sameAs': ['https://maithreyan.in']
+      },
+      'creator': {
+        '@type': 'Person',
+        'name': 'Maithreyan D',
+        'url': 'https://maithreyan.in'
+      }
+    },
+    {
+      '@type': 'Person',
+      '@id': 'https://maithreyan.in/#person',
+      'name': 'Maithreyan D',
+      'url': 'https://maithreyan.in',
+      'jobTitle': 'Full Stack Engineer & Web Architect',
+      'sameAs': ['https://maithreyan.in']
+    },
+    {
+      '@type': 'Event',
+      'name': "INFogram'26 National Level Technical Symposium",
+      'startDate': '2026-08-22T09:00:00+05:30',
+      'endDate': '2026-08-22T17:00:00+05:30',
+      'eventAttendanceMode': 'https://schema.org/OfflineEventAttendanceMode',
+      'eventStatus': 'https://schema.org/EventScheduled',
+      'location': {
+        '@type': 'Place',
+        'name': 'C. Abdul Hakeem College of Engineering & Technology',
+        'address': {
+          '@type': 'PostalAddress',
+          'addressLocality': 'Melvisharam',
+          'addressRegion': 'Tamil Nadu',
+          'postalCode': '632509',
+          'addressCountry': 'IN'
+        }
+      },
+      'organizer': {
+        '@type': 'Organization',
+        'name': 'Department of Information Technology, CAHCET',
+        'url': 'https://infogram26.vercel.app'
+      }
+    }
+  ]
+};
 
 export default function RootLayout({
   children,
@@ -112,6 +206,13 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="author" href="https://maithreyan.in" />
+        <meta name="author" content="Maithreyan D" />
+        <meta name="developer" content="Maithreyan D (https://maithreyan.in)" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body className="antialiased font-sans transition-colors duration-500">
         <ThemeProvider>
