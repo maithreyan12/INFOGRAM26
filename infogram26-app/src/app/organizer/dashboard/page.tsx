@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import OrganizerLayout from '@/components/admin/OrganizerLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useEventStore } from '@/store/eventStore';
+import { formatTimeRange } from '@/lib/eventsData';
 import { Users, CheckCircle, Clock, Calendar, Edit3, Award, Trophy } from 'lucide-react';
 import Link from 'next/link';
 
@@ -97,7 +98,7 @@ export default function OrganizerDashboard() {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-gray-400 text-sm font-medium mb-1">Schedule & Time</p>
-              <h3 className="text-xl font-bold text-white">{event.startTime} - {event.endTime}</h3>
+              <h3 className="text-xl font-bold text-white">{formatTimeRange(event.startTime, event.endTime)}</h3>
               <p className="text-gray-400 text-xs mt-2 font-medium">{event.date}</p>
             </div>
             <div className="p-3 bg-purple-500/20 rounded-xl text-purple-400">

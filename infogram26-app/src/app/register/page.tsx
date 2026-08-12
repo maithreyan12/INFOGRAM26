@@ -27,7 +27,7 @@ const personalInfoSchema = z.object({
 
 type PersonalInfoForm = z.infer<typeof personalInfoSchema>;
 
-import { OFFICIAL_EVENTS } from '@/lib/eventsData';
+import { OFFICIAL_EVENTS, formatTimeRange } from '@/lib/eventsData';
 
 const demoEvents = OFFICIAL_EVENTS.map(e => ({
   id: e.id,
@@ -36,7 +36,7 @@ const demoEvents = OFFICIAL_EVENTS.map(e => ({
   category: e.category === 'technical' ? 'Technical' : 'Non-Technical',
   fee: e.registrationFee,
   maxParticipants: e.maxParticipants,
-  time: `${e.startTime} - ${e.endTime}`,
+  time: formatTimeRange(e.startTime, e.endTime),
   coordinatorName: e.coordinatorName,
   rules: e.rules,
 }));
@@ -124,7 +124,7 @@ export default function RegisterPage() {
               category: data.category === 'technical' || data.category === 'Technical' ? 'Technical' : 'Non-Technical',
               fee: data.registrationFee ?? data.fee ?? 50,
               maxParticipants: data.maxParticipants ?? 2,
-              time: data.startTime && data.endTime ? `${data.startTime} - ${data.endTime}` : 'Full Day',
+              time: data.startTime && data.endTime ? formatTimeRange(data.startTime, data.endTime) : 'Full Day',
               coordinatorName: data.coordinatorName,
               rules: data.rules,
             };

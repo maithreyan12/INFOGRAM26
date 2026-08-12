@@ -12,7 +12,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 
 import { useEventStore } from '@/store/eventStore';
 
-import { OFFICIAL_EVENTS } from '@/lib/eventsData';
+import { OFFICIAL_EVENTS, formatTimeRange } from '@/lib/eventsData';
 const demoEvents: Event[] = OFFICIAL_EVENTS;
 
 import { useTheme } from '@/context/ThemeContext';
@@ -296,7 +296,7 @@ export default function EventDetailPage() {
                       <Clock className={`w-5 h-5 mr-4 mt-0.5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                       <div>
                         <div className={`text-sm font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Time</div>
-                        <div className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.startTime} - {event.endTime}</div>
+                        <div className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatTimeRange(event.startTime, event.endTime)}</div>
                       </div>
                     </div>
                     

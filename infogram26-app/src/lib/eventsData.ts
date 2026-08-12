@@ -1,5 +1,29 @@
 import { Event } from '@/types';
 
+export function formatTime(timeStr?: string): string {
+  if (!timeStr) return '';
+  const trimmed = timeStr.trim();
+  if (!trimmed) return '';
+  if (/am|pm/i.test(trimmed)) return trimmed;
+  const parts = trimmed.split(':');
+  let h = parseInt(parts[0], 10);
+  if (isNaN(h)) return trimmed;
+  const m = parts[1] ? parts[1].padStart(2, '0') : '00';
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12;
+  if (h === 0) h = 12;
+  const formattedH = h.toString().padStart(2, '0');
+  return `${formattedH}:${m} ${ampm}`;
+}
+
+export function formatTimeRange(start?: string, end?: string): string {
+  if (!start) return '';
+  const formattedStart = formatTime(start);
+  if (!end) return formattedStart;
+  const formattedEnd = formatTime(end);
+  return `${formattedStart} – ${formattedEnd}`;
+}
+
 export const OFFICIAL_EVENTS: Event[] = [
   // ── 1. TECHNICAL EVENTS ──
   {

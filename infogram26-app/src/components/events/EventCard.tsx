@@ -6,6 +6,8 @@ import { Calendar, MapPin, IndianRupee, ArrowRight } from 'lucide-react';
 import { Event } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
 
+import { formatTimeRange } from '@/lib/eventsData';
+
 interface EventCardProps {
   event: Event;
 }
@@ -96,7 +98,7 @@ export default function EventCard({ event }: EventCardProps) {
               isDark ? 'text-slate-300' : 'text-slate-800'
             }`}>
               <Calendar className={`w-4 h-4 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
-              <span>{event.startTime} - {event.endTime}</span>
+              <span>{formatTimeRange(event.startTime, event.endTime)}</span>
             </div>
 
             <div className={`flex items-center gap-2.5 text-xs font-bold ${

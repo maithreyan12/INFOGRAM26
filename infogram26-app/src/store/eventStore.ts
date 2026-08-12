@@ -203,7 +203,7 @@ export const useEventStore = create<EventState>()(
       },
     }),
     {
-      name: 'infogram26-event-store-v9', // bumped version clears stale localStorage
+      name: 'infogram26-event-store-v11', // bumped version clears stale localStorage
     }
   )
 );
