@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import PublicLayout from '@/components/layout/PublicLayout';
-import { Calendar, MapPin, IndianRupee, Clock, Users, Phone, AlertCircle, ArrowLeft, Trophy } from 'lucide-react';
+import { Calendar, MapPin, IndianRupee, Clock, Users, Phone, AlertCircle, ArrowLeft, Trophy, UserCheck } from 'lucide-react';
 import { Event } from '@/types';
 import { db, isFirebaseConfigured } from '@/lib/firebase/config';
 import { collection, getDocs, query, where } from 'firebase/firestore';
@@ -307,6 +307,16 @@ export default function EventDetailPage() {
                         <div className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.venue}</div>
                       </div>
                     </div>
+
+                    {event.staffIncharge && (
+                      <div className="flex items-start">
+                        <UserCheck className={`w-5 h-5 mr-4 mt-0.5 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
+                        <div>
+                          <div className={`text-sm font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Staff In-charge</div>
+                          <div className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.staffIncharge.replace(/;/g, ', ')}</div>
+                        </div>
+                      </div>
+                    )}
                     
                     <div className="flex items-start">
                       <IndianRupee className={`w-5 h-5 mr-4 mt-0.5 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />

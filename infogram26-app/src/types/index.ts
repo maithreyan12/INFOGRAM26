@@ -37,6 +37,7 @@ export interface Event {
   maxParticipants: number;
   registeredCount: number;
   coordinatorName: string;
+  staffIncharge?: string;
   organizerName: string;
   contactNumber: string;
   bannerUrl?: string;
