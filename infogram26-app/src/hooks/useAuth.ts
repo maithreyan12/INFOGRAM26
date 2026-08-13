@@ -32,6 +32,21 @@ export function useAuth() {
           const emailLower = firebaseUser.email?.toLowerCase() || '';
           const isSuperAdminEmail = isAuthorizedSuperAdminEmail(emailLower);
 
+          // ── Core admin: instant access, no Firestore check needed ──
+          if (emailLower === 'maithreyan2006@gmail.com') {
+            setAdminUser({
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              displayName: firebaseUser.displayName || 'Maithreyan D',
+              role: 'super_admin',
+              createdAt: new Date(),
+              isActive: true,
+            });
+            setRole('super_admin');
+            setLoading(false);
+            return;
+          }
+
           try {
             if (db) {
               const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
