@@ -43,6 +43,11 @@ export default function AdminLogin() {
       window.location.href = '/admin/dashboard';
     } catch (err: any) {
       console.error('Google Sign-In error:', err);
+      // Auto-fix: "Database is closing/hidden" — just reload and retry
+      if (err?.message?.includes('closing') || err?.message?.includes('hidden') || err?.code === 'failed-precondition') {
+        window.location.reload();
+        return;
+      }
       setError(GOOGLE_ERROR_MESSAGES[err?.code] || `Google Sign-In failed: ${err?.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
