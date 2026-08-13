@@ -83,7 +83,7 @@ export default function Header() {
             className="flex items-center gap-2.5 group active:scale-95 transition-transform duration-150 cursor-pointer"
             style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
           >
-            <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center overflow-hidden shrink-0 bg-black border transition-all duration-200 ${
+            <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center overflow-hidden shrink-0 bg-black border transition-all duration-200 cursor-pointer ${
               isDark ? 'border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.3)]' : 'border-[#7c3aed]/40 shadow-sm'
             }`}>
               <img 
@@ -92,7 +92,7 @@ export default function Header() {
                 width={44}
                 height={44}
                 decoding="async"
-                className="w-full h-full object-cover rounded-full transform scale-105" 
+                className="w-full h-full object-cover rounded-full transform scale-105 cursor-pointer" 
               />
             </div>
             <span className="text-xs xs:text-sm sm:text-base font-black tracking-wider inline-flex items-center gap-0.5 select-none" style={{ fontFamily: 'var(--font-display)' }}>
