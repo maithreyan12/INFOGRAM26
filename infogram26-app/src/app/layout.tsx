@@ -295,6 +295,9 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="shortcut icon" href="/favicon.ico" />
 
+        {/* Google Search Console Verification */}
+        <meta name="google-site-verification" content="google641d054d0ba645c6" />
+
         {/* Canonical & Author */}
         <link rel="canonical" href={SITE_URL} />
         <link rel="author" href="https://maithreyan.in" />
