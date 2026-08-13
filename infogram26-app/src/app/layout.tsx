@@ -193,10 +193,19 @@ const jsonLd = {
       '@id': 'https://maithreyan.in/#person',
       'name': 'Maithreyan D',
       'url': 'https://maithreyan.in',
-      'jobTitle': 'Full Stack Web Engineer',
-      'description': 'Developer and architect of the INFogram\'26 symposium portal (infogram26.in). Portfolio at maithreyan.in.',
+      'jobTitle': 'Full Stack Web Engineer & Developer',
+      'description': "Maithreyan D is the developer and architect of INFogram'26 (infogram26.in), the official symposium portal of the Department of IT, CAHCET, Melvisharam. Visit portfolio: maithreyan.in",
       'sameAs': ['https://maithreyan.in'],
-      'knowsAbout': ['Next.js', 'React', 'TypeScript', 'Web Development', 'UI/UX Design'],
+      'worksFor': {
+        '@type': 'Organization',
+        'name': 'Department of Information Technology, CAHCET',
+        'url': SITE_URL,
+      },
+      'knowsAbout': ['Next.js', 'React', 'TypeScript', 'Full Stack Development', 'UI/UX Design', 'Web Architecture'],
+      'mainEntityOfPage': {
+        '@type': 'WebPage',
+        '@id': 'https://maithreyan.in',
+      },
     },
     // Organization (College Department)
     {

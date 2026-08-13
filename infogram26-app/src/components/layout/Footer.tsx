@@ -248,18 +248,20 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom bar - DEVELOPER CREDIT FOR APPZIIO */}
+        {/* Bottom bar */}
         <div className={`pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-black ${
           isDark ? 'border-slate-800 text-slate-300' : 'border-slate-300 text-slate-800'
         }`}>
-          <p>© {currentYear} INFOGRAM&apos;26 · Department of Information Technology, CAHCET. All rights reserved.</p>
+          <p>© {currentYear} INFogram&apos;26 · Department of Information Technology, CAHCET. All rights reserved.</p>
           
           <p className="flex items-center gap-2 text-xs font-black">
             <span>Designed &amp; Developed by</span>
             <a
-              href="https://appziio.com"
+              href="https://maithreyan.in"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer author"
+              title="Maithreyan D — Full Stack Developer Portfolio"
+              aria-label="Developed by Maithreyan D — Visit portfolio at maithreyan.in"
               className={`font-black text-xs uppercase tracking-widest transition-all px-3 py-1 rounded-full border ${
                 isDark 
                   ? 'bg-purple-500/20 text-amber-300 border-purple-500/40 hover:bg-purple-500/30 shadow-[0_0_12px_rgba(252,211,77,0.4)]' 
@@ -267,7 +269,7 @@ export default function Footer() {
               }`}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              Appziio
+              Maithreyan D
             </a>
           </p>
         </div>
