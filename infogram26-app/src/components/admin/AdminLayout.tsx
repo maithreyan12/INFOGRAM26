@@ -14,7 +14,6 @@ const NAV_LINKS = [
   { name: 'Events', path: '/admin/events', icon: Calendar },
   { name: 'Registrations', path: '/admin/registrations', icon: Users },
   { name: 'Payments', path: '/admin/payments', icon: CreditCard },
-  { name: 'Gallery', path: '/admin/gallery', icon: ImageIcon },
   { name: 'Sponsors', path: '/admin/sponsors', icon: Star },
   { name: 'Organizers', path: '/admin/organizers', icon: UserCheck },
   { name: 'Notifications', path: '/admin/notifications', icon: Bell },
