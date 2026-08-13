@@ -80,7 +80,7 @@ export default function Header() {
           {/* Logo */}
           <Link 
             href="/" 
-            className="flex items-center gap-2.5 group active:scale-95 transition-transform duration-150"
+            className="flex items-center gap-2.5 group active:scale-95 transition-transform duration-150 cursor-pointer"
             style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
           >
             <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center overflow-hidden shrink-0 bg-black border transition-all duration-200 ${
