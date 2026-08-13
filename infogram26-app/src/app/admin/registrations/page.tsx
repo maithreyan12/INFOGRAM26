@@ -2,11 +2,43 @@
 export const dynamic = 'force-dynamic';
 
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Search, Filter, Download, Eye } from 'lucide-react';
+import { Search, Filter, Download } from 'lucide-react';
 import { useLiveRegistrations } from '@/hooks/useLiveRegistrations';
+import * as XLSX from 'xlsx';
+import { toast } from 'react-hot-toast';
 
 export default function RegistrationsPage() {
-  const { registrations } = useLiveRegistrations();
+  const { registrations, loading } = useLiveRegistrations();
+
+  const exportToExcel = () => {
+    if (!registrations.length) { toast.error('No registrations to export'); return; }
+    const rows = registrations.map((r, i) => ({
+      'S.No':              i + 1,
+      'Applicant ID':      r.applicantId || '',
+      'Full Name':         r.personalInfo?.fullName || '',
+      'College':           r.personalInfo?.college || '',
+      'Department':        r.personalInfo?.department || '',
+      'Year':              r.personalInfo?.year || '',
+      'Register Number':   r.personalInfo?.registerNumber || '',
+      'Email':             r.personalInfo?.email || '',
+      'Phone':             r.personalInfo?.phone || '',
+      'Gender':            r.personalInfo?.gender || '',
+      'Events Registered': (r.eventNames || r.events || []).join(', '),
+      'Total Fee (₹)':     r.totalFee || 0,
+      'Payment Status':    r.status || '',
+      'Payment / UTR ID':  r.utrNumber || r.paymentId || '',
+      'Ticket ID':         r.ticketId || '',
+      'Registered On':     r.createdAt ? new Date(r.createdAt as any).toLocaleString('en-IN') : '',
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    // Auto column widths
+    ws['!cols'] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length + 2, 16) }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Registrations');
+    const filename = `INFOGRAM26_Registrations_${new Date().toISOString().slice(0,10)}.xlsx`;
+    XLSX.writeFile(wb, filename);
+    toast.success(`Downloaded: ${filename}`);
+  };
 
   return (
     <AdminLayout>
@@ -19,8 +51,12 @@ export default function RegistrationsPage() {
             Manage and view all registered symposium attendees across events
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 transition-all active:scale-95">
-          <Download className="w-4 h-4" /> Export CSV
+        <button
+          onClick={exportToExcel}
+          disabled={loading || registrations.length === 0}
+          className="flex items-center gap-2 bg-green-500 hover:bg-green-400 text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-green-500/20 transition-all active:scale-95 disabled:opacity-50"
+        >
+          <Download className="w-4 h-4" /> Export Excel ({registrations.length})
         </button>
       </div>
 
