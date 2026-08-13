@@ -3,10 +3,10 @@ export const dynamic = 'force-dynamic';
 
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Search, Filter, Download, Eye } from 'lucide-react';
-import { useEventStore } from '@/store/eventStore';
+import { useLiveRegistrations } from '@/hooks/useLiveRegistrations';
 
 export default function RegistrationsPage() {
-  const registrations = useEventStore((state) => state.registrations);
+  const { registrations } = useLiveRegistrations();
 
   return (
     <AdminLayout>
@@ -66,14 +66,14 @@ export default function RegistrationsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800/80">
-              {registrations?.map((reg: any) => (
+              {registrations?.map((reg) => (
                 <tr key={reg.id} className="hover:bg-gray-800/50 transition-colors">
                   <td className="px-6 py-4 font-mono text-[#00d4ff] font-black">{reg.applicantId}</td>
-                  <td className="px-6 py-4 font-black text-white text-sm">{reg.fullName}</td>
-                  <td className="px-6 py-4 text-gray-300 font-bold">{reg.college}</td>
+                  <td className="px-6 py-4 font-black text-white text-sm">{reg.personalInfo?.fullName}</td>
+                  <td className="px-6 py-4 text-gray-300 font-bold">{reg.personalInfo?.college}</td>
                   <td className="px-6 py-4 text-gray-400">
-                    <div>{reg.email}</div>
-                    <div className="text-[11px] text-gray-500 font-mono">{reg.phone}</div>
+                    <div>{reg.personalInfo?.email}</div>
+                    <div className="text-[11px] text-gray-500 font-mono">{reg.personalInfo?.phone}</div>
                   </td>
                   <td className="px-6 py-4 font-black text-amber-400">₹{reg.totalFee}</td>
                   <td className="px-6 py-4 text-right">

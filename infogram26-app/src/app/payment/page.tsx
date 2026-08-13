@@ -1,19 +1,36 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { db, storage } from '@/lib/firebase/config';
 import { doc, getDoc, addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import PublicLayout from '@/components/layout/PublicLayout';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { CheckCircle, Upload, AlertCircle, Copy, Smartphone } from 'lucide-react';
+import { CheckCircle, Upload, AlertCircle, Copy, ShieldCheck, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
 
 const inputClass =
   'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#00d4ff]/60 transition-all duration-200';
 const labelClass = 'block text-xs font-semibold text-white/60 uppercase tracking-wider mb-2';
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (window.Razorpay) { resolve(true); return; }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 function PaymentContent() {
   const searchParams = useSearchParams();
@@ -28,7 +45,13 @@ function PaymentContent() {
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentDone, setPaymentDone] = useState(false);
-  const [ticketId, setTicketId] = useState('');
+
+  // Razorpay is the primary payment method. If it fails to load, errors
+  // creating the order, or the user backs out of checkout, we fall back
+  // to the UPI QR + UTR verification flow instead of leaving them stuck.
+  const [razorpayAvailable, setRazorpayAvailable] = useState(true);
+  const [showQrFallback, setShowQrFallback] = useState(false);
+  const [isPayingWithRazorpay, setIsPayingWithRazorpay] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,7 +96,196 @@ function PaymentContent() {
     navigator.clipboard.writeText(upiId).then(() => toast.success('UPI ID copied!'));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Shared success path for BOTH Razorpay and UPI/QR payments: records the
+  // payment, marks the registration paid, generates the ticket, syncs to
+  // Sheets, then redirects. `newId` is captured in a local variable (not
+  // read back from state) so the redirect always targets the real ticket.
+  const finalizePayment = useCallback(async (paymentDetails: {
+    method: 'razorpay' | 'upi';
+    razorpayOrderId?: string;
+    razorpayPaymentId?: string;
+    razorpaySignature?: string;
+    utrNumber?: string;
+    proofUrl?: string;
+  }) => {
+    if (!registration) return;
+
+    if (registration.id === 'mock_reg_123' || !db || !storage) {
+      setPaymentDone(true);
+      toast.success('Payment confirmed! Generating your ticket...');
+      setTimeout(() => router.push('/ticket/mock_ticket_123'), 2000);
+      return;
+    }
+
+    const paymentRef = await addDoc(collection(db, 'payments'), {
+      registrationId: registration.id,
+      amount: registration.totalFee,
+      method: paymentDetails.method,
+      razorpayOrderId: paymentDetails.razorpayOrderId || null,
+      razorpayPaymentId: paymentDetails.razorpayPaymentId || null,
+      razorpaySignature: paymentDetails.razorpaySignature || null,
+      utrNumber: paymentDetails.utrNumber || null,
+      proofUrl: paymentDetails.proofUrl || null,
+      status: 'success',
+      createdAt: serverTimestamp(),
+    });
+
+    await updateDoc(doc(db, 'registrations', registration.id), {
+      status: 'paid',
+      paymentId: paymentRef.id,
+      ...(paymentDetails.utrNumber ? { utrNumber: paymentDetails.utrNumber } : {}),
+    });
+
+    const ticketNumber = `TKT-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+    const qrData = JSON.stringify({
+      ticketNumber,
+      applicantId: registration.applicantId,
+      name: registration.personalInfo?.fullName,
+      events: registration.eventNames || registration.events,
+      verified: true,
+    });
+
+    const newTicketRef = await addDoc(collection(db, 'tickets'), {
+      ticketNumber,
+      applicantId: registration.applicantId,
+      registrationId: registration.id,
+      studentName: registration.personalInfo?.fullName,
+      email: registration.personalInfo?.email,
+      phone: registration.personalInfo?.phone,
+      college: registration.personalInfo?.college,
+      department: registration.personalInfo?.department,
+      year: registration.personalInfo?.year,
+      events: registration.eventNames || registration.events,
+      totalAmount: registration.totalFee,
+      paymentMethod: paymentDetails.method,
+      utrNumber: paymentDetails.utrNumber || null,
+      qrData,
+      status: 'valid',
+      issueDate: serverTimestamp(),
+    });
+
+    try {
+      await fetch('/api/sheets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicantId: registration.applicantId,
+          ticketNumber,
+          name: registration.personalInfo?.fullName,
+          email: registration.personalInfo?.email,
+          phone: registration.personalInfo?.phone,
+          college: registration.personalInfo?.college,
+          department: registration.personalInfo?.department,
+          year: registration.personalInfo?.year,
+          events: (registration.eventNames || registration.events || []).join(', '),
+          amount: registration.totalFee,
+          paymentMethod: paymentDetails.method,
+          utrNumber: paymentDetails.utrNumber || '',
+          status: 'paid',
+        }),
+      });
+    } catch (sheetErr) {
+      console.warn('Google Sheets save failed (non-critical):', sheetErr);
+    }
+
+    const newTicketId = newTicketRef.id;
+    setPaymentDone(true);
+    toast.success('Payment confirmed! Generating your ticket...');
+    setTimeout(() => router.push(`/ticket/${newTicketId}`), 2000);
+  }, [registration, router]);
+
+  const handleRazorpayPayment = async () => {
+    if (!registration) return;
+    setIsPayingWithRazorpay(true);
+    try {
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error('Razorpay checkout script failed to load');
+      }
+
+      const orderRes = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: registration.totalFee,
+          receipt: `rcpt_${registration.id}`,
+          registrationId: registration.id,
+        }),
+      });
+      const orderData = await orderRes.json();
+      if (!orderRes.ok || !orderData.id) {
+        throw new Error(orderData.error || 'Could not create Razorpay order');
+      }
+
+      const razorpay = new window.Razorpay({
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.id,
+        name: settings?.merchantName || 'INFOGRAM 26',
+        description: `Registration fee — ${registration.applicantId}`,
+        prefill: {
+          name: registration.personalInfo?.fullName,
+          email: registration.personalInfo?.email,
+          contact: registration.personalInfo?.phone,
+        },
+        theme: { color: '#00d4ff' },
+        handler: async (response: any) => {
+          try {
+            const verifyRes = await fetch('/api/payment/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                registrationId: registration.id,
+              }),
+            });
+            const verifyData = await verifyRes.json();
+            if (!verifyRes.ok || !verifyData.success) {
+              throw new Error('Payment verification failed');
+            }
+            await finalizePayment({
+              method: 'razorpay',
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            });
+          } catch (err) {
+            console.error('Razorpay verification failed:', err);
+            toast.error('Could not verify your Razorpay payment. Please pay via UPI QR instead.');
+            setShowQrFallback(true);
+          } finally {
+            setIsPayingWithRazorpay(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            // User closed the checkout without paying — let them retry
+            // Razorpay or use the QR fallback, don't force either.
+            setIsPayingWithRazorpay(false);
+          },
+        },
+      });
+
+      razorpay.on('payment.failed', () => {
+        toast.error('Razorpay payment failed. You can retry, or pay via UPI QR below.');
+        setShowQrFallback(true);
+        setIsPayingWithRazorpay(false);
+      });
+
+      razorpay.open();
+    } catch (err) {
+      console.error('Razorpay unavailable, falling back to UPI QR:', err);
+      setRazorpayAvailable(false);
+      setShowQrFallback(true);
+      setIsPayingWithRazorpay(false);
+      toast.error('Razorpay is unavailable right now. Please pay via UPI QR below.');
+    }
+  };
+
+  const handleUtrSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!utrNumber.trim() || utrNumber.trim().length < 12) {
       toast.error('Please enter a valid 12-digit UTR number');
@@ -88,96 +300,12 @@ function PaymentContent() {
     setIsSubmitting(true);
     try {
       let proofUrl = '';
-      let paymentRef: any = null;
-
       if (registration.id !== 'mock_reg_123' && db && storage) {
-        // Upload screenshot
         const storageRef = ref(storage, `payment-proofs/${registration.id}-${Date.now()}`);
         await uploadBytes(storageRef, screenshot);
         proofUrl = await getDownloadURL(storageRef);
-
-        // Save payment record
-        paymentRef = await addDoc(collection(db, 'payments'), {
-          registrationId: registration.id,
-          amount: registration.totalFee,
-          method: 'upi',
-          utrNumber: utrNumber.trim(),
-          proofUrl,
-          status: 'success',
-          createdAt: serverTimestamp(),
-        });
-
-        // Update registration status
-        await updateDoc(doc(db, 'registrations', registration.id), {
-          status: 'paid',
-          paymentId: paymentRef.id,
-          utrNumber: utrNumber.trim(),
-        });
-
-        // Generate ticket
-        const ticketNumber = `TKT-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
-        const qrData = JSON.stringify({
-          ticketNumber,
-          applicantId: registration.applicantId,
-          name: registration.personalInfo?.fullName,
-          events: registration.eventNames || registration.events,
-          verified: true,
-        });
-
-        const newTicketRef = await addDoc(collection(db, 'tickets'), {
-          ticketNumber,
-          applicantId: registration.applicantId,
-          registrationId: registration.id,
-          studentName: registration.personalInfo?.fullName,
-          email: registration.personalInfo?.email,
-          phone: registration.personalInfo?.phone,
-          college: registration.personalInfo?.college,
-          department: registration.personalInfo?.department,
-          year: registration.personalInfo?.year,
-          events: registration.eventNames || registration.events,
-          totalAmount: registration.totalFee,
-          utrNumber: utrNumber.trim(),
-          qrData,
-          status: 'valid',
-          issueDate: serverTimestamp(),
-        });
-
-        // Save to Google Sheets
-        try {
-          await fetch('/api/sheets', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              applicantId: registration.applicantId,
-              ticketNumber,
-              name: registration.personalInfo?.fullName,
-              email: registration.personalInfo?.email,
-              phone: registration.personalInfo?.phone,
-              college: registration.personalInfo?.college,
-              department: registration.personalInfo?.department,
-              year: registration.personalInfo?.year,
-              events: (registration.eventNames || registration.events || []).join(', '),
-              amount: registration.totalFee,
-              utrNumber: utrNumber.trim(),
-              status: 'paid',
-            }),
-          });
-        } catch (sheetErr) {
-          console.warn('Google Sheets save failed (non-critical):', sheetErr);
-        }
-
-        setTicketId(newTicketRef.id);
-      } else {
-        // Mock mode
-        setTicketId('mock_ticket_123');
       }
-
-      setPaymentDone(true);
-      toast.success('Payment confirmed! Generating your ticket...');
-
-      setTimeout(() => {
-        router.push(`/ticket/${ticketId || 'mock_ticket_123'}`);
-      }, 2000);
+      await finalizePayment({ method: 'upi', utrNumber: utrNumber.trim(), proofUrl });
     } catch (err) {
       console.error('Payment submission failed:', err);
       toast.error('Something went wrong. Please try again.');
@@ -223,7 +351,7 @@ function PaymentContent() {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:items-start">
               {/* Order Summary */}
               <div className="lg:col-span-2 space-y-4">
                 <div className="glass-card p-6 rounded-2xl">
@@ -261,100 +389,170 @@ function PaymentContent() {
                 </div>
               </div>
 
-              {/* Payment Form */}
-              <div className="lg:col-span-3">
-                <form onSubmit={handleSubmit} className="glass-card p-6 rounded-2xl space-y-6">
-                  <h2 className="text-white font-bold text-lg flex items-center gap-2">
-                    <Smartphone className="text-[#00d4ff] w-5 h-5" /> Pay via UPI
-                  </h2>
-
-                  {/* UPI QR */}
-                  <div className="bg-white/4 rounded-2xl p-6 text-center border border-white/8">
-                    <p className="text-white/60 text-sm mb-4">Scan QR code or use UPI ID below</p>
-                    <div className="bg-white p-3 rounded-xl inline-block mb-4 shadow-lg border-2 border-[#00d4ff]/40">
-                      <img 
-                        src={settings?.upiQrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`upi://pay?pa=${settings?.upiId || '9342706675@okbizaxis'}&pn=INFOGRAM26&am=${registration?.totalFee || 350}&cu=INR`)}`} 
-                        alt="UPI QR Code" 
-                        className="w-48 h-48 object-cover rounded-lg" 
-                      />
-                    </div>
-
-                    <div className="bg-white/6 rounded-xl p-3 flex items-center justify-between gap-3 border border-white/10">
-                      <div className="text-left">
-                        <p className="text-white/40 text-xs">UPI ID</p>
-                        <p className="text-white font-mono font-semibold text-sm">{settings?.upiId || 'infogram26@upi'}</p>
-                      </div>
-                      <button type="button" onClick={copyUpiId}
-                        className="text-[#00d4ff] p-2 rounded-lg hover:bg-[#00d4ff]/10 transition-colors flex-shrink-0">
-                        <Copy className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <p className="text-white/40 text-xs mt-3">Merchant: <span className="text-white/60 font-medium">{settings?.merchantName || 'INFOGRAM 26'}</span></p>
-                  </div>
-
-                  {/* Amount to pay reminder */}
-                  <div className="flex items-center gap-3 bg-[#00d4ff]/8 border border-[#00d4ff]/20 rounded-xl px-4 py-3">
-                    <AlertCircle className="text-[#00d4ff] w-4 h-4 flex-shrink-0" />
-                    <p className="text-white/70 text-sm">
-                      Pay exactly <strong className="text-[#ffd700]">₹{registration?.totalFee}</strong> via UPI, then fill the details below.
+              {/* Payment Methods */}
+              <div className="lg:col-span-3 space-y-4">
+                {/* Razorpay — primary */}
+                {razorpayAvailable && (
+                  <div className="glass-card p-6 rounded-2xl space-y-4">
+                    <h2 className="text-white font-bold text-lg flex items-center gap-2">
+                      <ShieldCheck className="text-[#00d4ff] w-5 h-5" /> Pay Securely with Razorpay
+                    </h2>
+                    <p className="text-white/60 text-sm">
+                      Cards, UPI, netbanking &amp; wallets — instantly verified, ticket generated right after payment.
                     </p>
-                  </div>
-
-                  {/* UTR Number */}
-                  <div>
-                    <label className={labelClass}>UTR / Transaction Reference Number *</label>
-                    <input
-                      type="text"
-                      required
-                      value={utrNumber}
-                      onChange={e => setUtrNumber(e.target.value.replace(/\D/g, '').slice(0, 12))}
-                      className={inputClass}
-                      placeholder="Enter 12-digit UTR number"
-                      maxLength={12}
-                    />
-                    <p className="text-white/30 text-xs mt-1.5">Found in your UPI app under transaction details</p>
-                  </div>
-
-                  {/* Screenshot Upload */}
-                  <div>
-                    <label className={labelClass}>Payment Screenshot *</label>
-                    <div
-                      className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 ${
-                        screenshot ? 'border-green-400/50 bg-green-400/5' : 'border-white/15 hover:border-[#00d4ff]/40 hover:bg-[#00d4ff]/5'
-                      }`}
-                      onClick={() => document.getElementById('screenshot-upload')?.click()}
+                    <button
+                      type="button"
+                      onClick={handleRazorpayPayment}
+                      disabled={isPayingWithRazorpay}
+                      className="w-full btn-primary py-4 rounded-xl font-bold text-base flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      <input type="file" id="screenshot-upload" className="hidden" accept="image/*"
-                        onChange={e => e.target.files?.[0] && handleScreenshotChange(e.target.files[0])} />
-                      {screenshotPreview ? (
-                        <div className="space-y-3">
-                          <img src={screenshotPreview} alt="Screenshot" className="max-h-36 mx-auto rounded-lg border border-white/10" />
-                          <p className="text-green-400 text-xs font-semibold">{screenshot?.name}</p>
-                          <p className="text-white/40 text-xs">Click to change</p>
-                        </div>
+                      {isPayingWithRazorpay ? (
+                        <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Opening Razorpay...</>
                       ) : (
-                        <div className="flex flex-col items-center gap-2">
-                          <Upload className="w-8 h-8 text-white/30" />
-                          <p className="text-white/60 text-sm font-medium">Upload payment screenshot</p>
-                          <p className="text-white/30 text-xs">Click to browse • PNG, JPG accepted</p>
-                        </div>
+                        <><ShieldCheck className="w-5 h-5" /> Pay ₹{registration?.totalFee} with Razorpay</>
                       )}
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting || !utrNumber || utrNumber.length < 12 || !screenshot}
-                    className="w-full btn-primary py-4 rounded-xl font-bold text-base flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? (
-                      <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Confirming Payment...</>
-                    ) : (
-                      <><CheckCircle className="w-5 h-5" /> Confirm Payment & Get Ticket</>
+                    </button>
+                    {!showQrFallback && (
+                      <button
+                        type="button"
+                        onClick={() => setShowQrFallback(true)}
+                        className="w-full text-center text-xs font-semibold text-white/40 hover:text-white/70 transition-colors"
+                      >
+                        Trouble with Razorpay? Pay via UPI QR instead
+                      </button>
                     )}
-                  </button>
-                </form>
+                  </div>
+                )}
+
+                {/* Balances column height + sets expectations while Razorpay is the only visible method */}
+                {razorpayAvailable && !showQrFallback && (
+                  <div className="glass-card p-6 rounded-2xl space-y-3">
+                    <h3 className="text-white/80 font-bold text-sm uppercase tracking-wider">What happens next</h3>
+                    <ul className="space-y-2.5 text-sm text-white/60">
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-[#00d4ff] mt-0.5">1.</span>
+                        <span>Razorpay opens in a secure popup — pay with card, UPI, netbanking, or wallet.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-[#00d4ff] mt-0.5">2.</span>
+                        <span>Payment is verified automatically the moment it completes.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-[#00d4ff] mt-0.5">3.</span>
+                        <span>Your QR ticket is generated instantly — no manual review needed.</span>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+
+                {/* UPI QR + UTR — fallback */}
+                {(showQrFallback || !razorpayAvailable) && (
+                  <form onSubmit={handleUtrSubmit} className="glass-card p-6 rounded-2xl space-y-6">
+                    <h2 className="text-white font-bold text-lg flex items-center gap-2">
+                      <QrCode className="text-[#00d4ff] w-5 h-5" /> Pay via UPI QR
+                    </h2>
+                    {!razorpayAvailable && (
+                      <div className="flex items-center gap-3 bg-amber-500/8 border border-amber-500/20 rounded-xl px-4 py-3">
+                        <AlertCircle className="text-amber-400 w-4 h-4 flex-shrink-0" />
+                        <p className="text-white/70 text-sm">Razorpay is currently unavailable. Please use UPI instead.</p>
+                      </div>
+                    )}
+
+                    {/* UPI QR */}
+                    <div className="bg-white/4 rounded-2xl p-6 text-center border border-white/8">
+                      <p className="text-white/60 text-sm mb-4">Scan QR code or use UPI ID below</p>
+                      <div className="bg-white p-3 rounded-xl inline-block mb-4 shadow-lg">
+                        {settings?.upiQrCodeUrl ? (
+                          <img src={settings.upiQrCodeUrl} alt="UPI QR" className="w-44 h-44 object-cover" />
+                        ) : (
+                          <div className="w-44 h-44 flex items-center justify-center bg-gray-100 rounded-lg">
+                            <div className="text-center">
+                              <div className="text-4xl mb-2">📱</div>
+                              <p className="text-gray-500 text-xs">QR Code</p>
+                              <p className="text-gray-500 text-xs">will appear here</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="bg-white/6 rounded-xl p-3 flex items-center justify-between gap-3 border border-white/10">
+                        <div className="text-left">
+                          <p className="text-white/40 text-xs">UPI ID</p>
+                          <p className="text-white font-mono font-semibold text-sm">{settings?.upiId || 'infogram26@upi'}</p>
+                        </div>
+                        <button type="button" onClick={copyUpiId}
+                          className="text-[#00d4ff] p-2 rounded-lg hover:bg-[#00d4ff]/10 transition-colors flex-shrink-0">
+                          <Copy className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <p className="text-white/40 text-xs mt-3">Merchant: <span className="text-white/60 font-medium">{settings?.merchantName || 'INFOGRAM 26'}</span></p>
+                    </div>
+
+                    {/* Amount to pay reminder */}
+                    <div className="flex items-center gap-3 bg-[#00d4ff]/8 border border-[#00d4ff]/20 rounded-xl px-4 py-3">
+                      <AlertCircle className="text-[#00d4ff] w-4 h-4 flex-shrink-0" />
+                      <p className="text-white/70 text-sm">
+                        Pay exactly <strong className="text-[#ffd700]">₹{registration?.totalFee}</strong> via UPI, then fill the details below.
+                      </p>
+                    </div>
+
+                    {/* UTR Number */}
+                    <div>
+                      <label className={labelClass}>UTR / Transaction Reference Number *</label>
+                      <input
+                        type="text"
+                        required
+                        value={utrNumber}
+                        onChange={e => setUtrNumber(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                        className={inputClass}
+                        placeholder="Enter 12-digit UTR number"
+                        maxLength={12}
+                      />
+                      <p className="text-white/30 text-xs mt-1.5">Found in your UPI app under transaction details</p>
+                    </div>
+
+                    {/* Screenshot Upload */}
+                    <div>
+                      <label className={labelClass}>Payment Screenshot *</label>
+                      <div
+                        className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 ${
+                          screenshot ? 'border-green-400/50 bg-green-400/5' : 'border-white/15 hover:border-[#00d4ff]/40 hover:bg-[#00d4ff]/5'
+                        }`}
+                        onClick={() => document.getElementById('screenshot-upload')?.click()}
+                      >
+                        <input type="file" id="screenshot-upload" className="hidden" accept="image/*"
+                          onChange={e => e.target.files?.[0] && handleScreenshotChange(e.target.files[0])} />
+                        {screenshotPreview ? (
+                          <div className="space-y-3">
+                            <img src={screenshotPreview} alt="Screenshot" className="max-h-36 mx-auto rounded-lg border border-white/10" />
+                            <p className="text-green-400 text-xs font-semibold">{screenshot?.name}</p>
+                            <p className="text-white/40 text-xs">Click to change</p>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-2">
+                            <Upload className="w-8 h-8 text-white/30" />
+                            <p className="text-white/60 text-sm font-medium">Upload payment screenshot</p>
+                            <p className="text-white/30 text-xs">Click to browse • PNG, JPG accepted</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !utrNumber || utrNumber.length < 12 || !screenshot}
+                      className="w-full btn-primary py-4 rounded-xl font-bold text-base flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? (
+                        <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Confirming Payment...</>
+                      ) : (
+                        <><CheckCircle className="w-5 h-5" /> Confirm Payment & Get Ticket</>
+                      )}
+                    </button>
+                  </form>
+                )}
               </div>
             </div>
           )}

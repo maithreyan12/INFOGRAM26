@@ -21,6 +21,11 @@ export interface AdminUser {
 export type EventCategory = 'technical' | 'non-technical';
 export type EventStatus = 'upcoming' | 'live' | 'completed' | 'cancelled';
 
+export interface Coordinator {
+  name: string;
+  phone: string;
+}
+
 export interface Event {
   id: string;
   slug: string;
@@ -36,6 +41,7 @@ export interface Event {
   registrationFee: number; // in INR
   maxParticipants: number;
   registeredCount: number;
+  coordinators?: Coordinator[];
   coordinatorName: string;
   staffIncharge?: string;
   organizerName: string;
@@ -59,27 +65,36 @@ export interface Winner {
 }
 
 // ─── Registration ────────────────────────────────────────────
-export type RegistrationStatus = 'pending' | 'confirmed' | 'cancelled';
+// Statuses actually written by the registration/payment flow
+// (src/app/register/page.tsx, src/app/payment/page.tsx).
+export type RegistrationStatus = 'pending_payment' | 'paid' | 'cancelled';
 
-export interface Registration {
-  id: string;
-  applicantId: string; // INFOGRAM26-XXXXX
+export interface RegistrationPersonalInfo {
   fullName: string;
   college: string;
   department: string;
   year: string;
-  registerNumber: string;
+  registerNumber?: string;
   email: string;
   phone: string;
-  gender: 'male' | 'female' | 'other';
-  collegeIdUrl?: string;
-  selectedEvents: string[]; // event IDs
+  gender?: 'Male' | 'Female' | 'Other';
+}
+
+// Matches the document shape written by src/app/register/page.tsx's addDoc call.
+export interface Registration {
+  id: string;
+  applicantId: string; // APPxxxxxx
+  personalInfo: RegistrationPersonalInfo;
+  idCardUrl?: string;
+  events: string[]; // event IDs
+  eventNames?: string[];
   totalFee: number;
   status: RegistrationStatus;
   paymentId?: string;
+  utrNumber?: string;
   ticketId?: string;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
 }
 
 // ─── Payment ─────────────────────────────────────────────────

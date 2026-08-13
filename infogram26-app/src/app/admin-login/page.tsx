@@ -2,47 +2,48 @@
 export const dynamic = 'force-dynamic';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { auth, isFirebaseConfigured } from '@/lib/firebase/config';
+import { isAuthorizedSuperAdminEmail } from '@/lib/authorizedAdmins';
 import { LogOut, ShieldCheck, Phone, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminLogin() {
-  const { signIn, signOut, loginAsDemoSuperAdmin, loading: authLoading } = useAuth();
+  const { signIn, signOut, loading: authLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+
+  const GOOGLE_ERROR_MESSAGES: Record<string, string> = {
+    'auth/popup-closed-by-user': 'Google Sign-In popup was closed. Please click Sign in with Google again.',
+    'auth/popup-blocked': 'Your browser blocked the Google Sign-In popup. Please allow popups for this site and try again.',
+    'auth/cancelled-popup-request': 'Google Sign-In was cancelled. Please try again.',
+    'auth/unauthorized-domain': 'This domain is not authorized for Google Sign-In. Add it under Firebase Console → Authentication → Settings → Authorized domains.',
+    'auth/operation-not-allowed': 'Google Sign-In is not enabled for this project. Enable it under Firebase Console → Authentication → Sign-in method.',
+    'auth/network-request-failed': 'Network error while contacting Google. Check your connection and try again.',
+  };
 
   const handleGoogleLogin = async () => {
+    if (!isFirebaseConfigured || !auth) {
+      setError('Firebase Authentication is not initialized. Check the Firebase config.');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      if (isFirebaseConfigured && auth) {
-        try {
-          const result = await signIn();
-          if (result && result.user) {
-            const email = result.user.email || 'infoappziio@gmail.com';
-            const name = result.user.displayName || 'Appziio Super Admin';
-            loginAsDemoSuperAdmin(email, name);
-            window.location.href = '/admin/dashboard';
-            return;
-          }
-        } catch (popupErr: any) {
-          console.warn('Google Sign-In Popup Warning:', popupErr);
-          if (popupErr?.code === 'auth/popup-closed-by-user') {
-            setError('Google Sign-In popup was closed. Please click Sign in with Google again.');
-            setLoading(false);
-            return;
-          }
-        }
+      const result = await signIn();
+      if (!result?.user) {
+        setError('Google Sign-In did not return a user. Please try again.');
+        return;
       }
-      loginAsDemoSuperAdmin('infoappziio@gmail.com', 'Appziio Super Admin');
+      if (!isAuthorizedSuperAdminEmail(result.user.email)) {
+        await signOut();
+        setError(`${result.user.email} is not authorized to access the admin panel.`);
+        return;
+      }
       window.location.href = '/admin/dashboard';
     } catch (err: any) {
-      console.error('Login error:', err);
-      loginAsDemoSuperAdmin('infoappziio@gmail.com', 'Appziio Super Admin');
-      window.location.href = '/admin/dashboard';
+      console.error('Google Sign-In error:', err);
+      setError(GOOGLE_ERROR_MESSAGES[err?.code] || `Google Sign-In failed: ${err?.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }

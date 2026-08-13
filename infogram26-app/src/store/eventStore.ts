@@ -194,12 +194,12 @@ export const useEventStore = create<EventState>()(
           }
           return events.find((e) => e.organizerUid === organizerUid);
         }
-        return events[0];
+        return undefined;
       },
 
       getRegistrationsForEvent: (eventId) => {
         const { registrations } = get();
-        return registrations.filter((r) => r.selectedEvents.includes(eventId));
+        return registrations.filter((r) => r.events.includes(eventId));
       },
     }),
     {

@@ -5,9 +5,23 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { useState } from 'react';
 import { Plus, Edit2, Trash2, X, UserCheck, Calendar, MapPin, Clock, Tag } from 'lucide-react';
 import { useEventStore } from '@/store/eventStore';
-import type { Event, EventCategory } from '@/types';
+import type { Event, EventCategory, Coordinator } from '@/types';
 
 import { useTheme } from '@/context/ThemeContext';
+
+// Older events only have joined `coordinatorName` / `contactNumber` strings;
+// pair them up positionally so the edit form can still show separate rows.
+function coordinatorsFromEvent(evt: Event): Coordinator[] {
+  if (evt.coordinators && evt.coordinators.length > 0) return evt.coordinators;
+  const names = evt.coordinatorName
+    ? evt.coordinatorName.split(/&|,|\band\b/i).map((n) => n.trim()).filter(Boolean)
+    : [];
+  const phones = evt.contactNumber
+    ? evt.contactNumber.split(/,|\//).map((n) => n.trim()).filter(Boolean)
+    : [];
+  if (names.length === 0) return [{ name: '', phone: '' }];
+  return names.map((name, i) => ({ name, phone: phones[i] || '' }));
+}
 
 export default function EventsPage() {
   const { events, organizers, addEvent, updateEvent, deleteEvent } = useEventStore();
@@ -26,8 +40,7 @@ export default function EventsPage() {
   const [endTime, setEndTime] = useState('');
   const [registrationFee, setRegistrationFee] = useState<number>(0);
   const [maxParticipants, setMaxParticipants] = useState<number>(200);
-  const [coordinatorName, setCoordinatorName] = useState('');
-  const [contactNumber, setContactNumber] = useState('');
+  const [coordinators, setCoordinators] = useState<Coordinator[]>([{ name: '', phone: '' }]);
   const [rules, setRules] = useState('');
   const [organizerUid, setOrganizerUid] = useState('');
 
@@ -42,8 +55,7 @@ export default function EventsPage() {
     setEndTime('17:00');
     setRegistrationFee(50);
     setMaxParticipants(200);
-    setCoordinatorName('');
-    setContactNumber('');
+    setCoordinators([{ name: '', phone: '' }]);
     setRules('');
     setOrganizerUid(organizers[0]?.uid || '');
     setShowModal(true);
@@ -60,17 +72,31 @@ export default function EventsPage() {
     setEndTime(evt.endTime);
     setRegistrationFee(evt.registrationFee);
     setMaxParticipants(evt.maxParticipants);
-    setCoordinatorName(evt.coordinatorName || '');
-    setContactNumber(evt.contactNumber || '');
+    setCoordinators(coordinatorsFromEvent(evt));
     setRules(evt.rules?.join('\n') || '');
     setOrganizerUid(evt.organizerUid || '');
     setShowModal(true);
+  };
+
+  const updateCoordinator = (index: number, field: keyof Coordinator, value: string) => {
+    setCoordinators((prev) => prev.map((c, i) => (i === index ? { ...c, [field]: value } : c)));
+  };
+
+  const addCoordinator = () => {
+    setCoordinators((prev) => [...prev, { name: '', phone: '' }]);
+  };
+
+  const removeCoordinator = (index: number) => {
+    setCoordinators((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev));
   };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     const assignedOrg = organizers.find((o) => o.uid === organizerUid);
     const parsedRules = rules.split('\n').filter((r) => r.trim().length > 0);
+    const validCoordinators = coordinators.filter((c) => c.name.trim().length > 0);
+    const coordinatorName = validCoordinators.map((c) => c.name.trim()).join(' & ');
+    const contactNumber = validCoordinators.map((c) => c.phone.trim()).filter(Boolean).join(', ');
 
     if (editingEvent) {
       updateEvent(editingEvent.id, {
@@ -83,6 +109,7 @@ export default function EventsPage() {
         endTime,
         registrationFee,
         maxParticipants,
+        coordinators: validCoordinators,
         coordinatorName,
         contactNumber,
         rules: parsedRules.length > 0 ? parsedRules : editingEvent.rules,
@@ -103,6 +130,7 @@ export default function EventsPage() {
         registrationDeadline: date || '2026-08-20',
         registrationFee,
         maxParticipants,
+        coordinators: validCoordinators,
         coordinatorName: coordinatorName || 'Student Coordinator',
         organizerName: assignedOrg?.displayName || 'IT Association',
         contactNumber: contactNumber || '9360257573',
@@ -280,25 +308,46 @@ export default function EventsPage() {
                   </p>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Student Coordinators</label>
-                  <input 
-                    type="text" 
-                    value={coordinatorName} 
-                    onChange={(e) => setCoordinatorName(e.target.value)} 
-                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500" 
-                    placeholder="e.g. Mohammed Dhaniyal & Masood Nawaz"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Contact Numbers (Comma-separated)</label>
-                  <input 
-                    type="text" 
-                    value={contactNumber} 
-                    onChange={(e) => setContactNumber(e.target.value)} 
-                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500" 
-                    placeholder="e.g. 7010155779, 9944410994"
-                  />
+                <div className="md:col-span-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-gray-300">Student Coordinators</label>
+                    <button
+                      type="button"
+                      onClick={addCoordinator}
+                      className="flex items-center gap-1 text-xs font-bold text-[#00d4ff] hover:text-[#00b4d8] transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Coordinator
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {coordinators.map((coordinator, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          type="text"
+                          value={coordinator.name}
+                          onChange={(e) => updateCoordinator(index, 'name', e.target.value)}
+                          className="w-full sm:flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500"
+                          placeholder="Coordinator Name"
+                        />
+                        <input
+                          type="text"
+                          value={coordinator.phone}
+                          onChange={(e) => updateCoordinator(index, 'phone', e.target.value)}
+                          className="w-full sm:flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500"
+                          placeholder="Contact Number"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeCoordinator(index)}
+                          disabled={coordinators.length === 1}
+                          className="p-2.5 bg-red-500/10 hover:bg-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed text-red-400 border border-red-500/30 rounded-xl transition-all shrink-0 self-start sm:self-auto"
+                          title="Remove Coordinator"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="md:col-span-2">

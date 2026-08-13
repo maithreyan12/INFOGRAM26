@@ -5,9 +5,11 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { Users, IndianRupee, Calendar as CalendarIcon, Clock, Plus, Bell, UserCheck, ShieldCheck, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEventStore } from '@/store/eventStore';
+import { useLiveRegistrations } from '@/hooks/useLiveRegistrations';
 
 export default function AdminDashboard() {
-  const { events, organizers, registrations } = useEventStore();
+  const { events, organizers } = useEventStore();
+  const { registrations } = useLiveRegistrations();
 
   const totalRegistrations = registrations.length;
   const totalRevenue = registrations.reduce((sum, r) => sum + r.totalFee, 0);
@@ -199,8 +201,8 @@ export default function AdminDashboard() {
                 {registrations.map((reg) => (
                   <tr key={reg.id} className="transition-colors hover:bg-gray-800/50">
                     <td className="px-4 py-3.5 font-mono text-[#00d4ff] font-bold">{reg.applicantId}</td>
-                    <td className="px-4 py-3.5 font-black text-white">{reg.fullName}</td>
-                    <td className="px-4 py-3.5 text-gray-300">{reg.college}</td>
+                    <td className="px-4 py-3.5 font-black text-white">{reg.personalInfo?.fullName}</td>
+                    <td className="px-4 py-3.5 text-gray-300">{reg.personalInfo?.college}</td>
                     <td className="px-4 py-3.5 text-right">
                       <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase">
                         {reg.status}

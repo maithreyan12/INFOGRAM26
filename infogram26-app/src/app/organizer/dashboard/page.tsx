@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import OrganizerLayout from '@/components/admin/OrganizerLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useEventStore } from '@/store/eventStore';
+import { useLiveRegistrations } from '@/hooks/useLiveRegistrations';
 import { formatTimeRange } from '@/lib/eventsData';
 import { Users, CheckCircle, Clock, Calendar, Edit3, Award, Trophy } from 'lucide-react';
 import Link from 'next/link';
@@ -11,10 +12,10 @@ import Link from 'next/link';
 export default function OrganizerDashboard() {
   const { adminUser } = useAuth();
   const getEventByOrganizer = useEventStore((state) => state.getEventByOrganizer);
-  const getRegistrationsForEvent = useEventStore((state) => state.getRegistrationsForEvent);
+  const { registrations } = useLiveRegistrations();
 
   const event = getEventByOrganizer(adminUser?.uid, adminUser?.assignedEventId);
-  const eventRegistrations = event ? getRegistrationsForEvent(event.id) : [];
+  const eventRegistrations = event ? registrations.filter((r) => r.events.includes(event.id)) : [];
 
   if (!event) {
     return (
@@ -140,12 +141,12 @@ export default function OrganizerDashboard() {
                 {eventRegistrations.map((reg) => (
                   <tr key={reg.id} className="hover:bg-white/5">
                     <td className="px-4 py-3 font-mono text-blue-400 font-medium">{reg.applicantId}</td>
-                    <td className="px-4 py-3 text-white font-semibold">{reg.fullName}</td>
+                    <td className="px-4 py-3 text-white font-semibold">{reg.personalInfo?.fullName}</td>
                     <td className="px-4 py-3 text-xs text-gray-300">
-                      <div>{reg.college}</div>
-                      <div className="text-gray-500">{reg.department} ({reg.year})</div>
+                      <div>{reg.personalInfo?.college}</div>
+                      <div className="text-gray-500">{reg.personalInfo?.department} ({reg.personalInfo?.year})</div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-400">{reg.email}</td>
+                    <td className="px-4 py-3 text-xs text-gray-400">{reg.personalInfo?.email}</td>
                     <td className="px-4 py-3 text-center text-xs">
                       <span className="bg-green-500/20 text-green-400 border border-green-500/30 px-2.5 py-1 rounded-full font-medium">
                         {reg.status}
