@@ -1,7 +1,8 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { auth, isFirebaseConfigured } from '@/lib/firebase/config';
 import { isAuthorizedSuperAdminEmail } from '@/lib/authorizedAdmins';
@@ -9,22 +10,34 @@ import { LogOut, ShieldCheck, Phone, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminLogin() {
-  const { signIn, signOut, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const { signIn, signOut, loading: authLoading, isAdmin, isOrganizer } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // ── Auto-redirect if already logged in ────────────────────────
+  useEffect(() => {
+    if (!authLoading) {
+      if (isAdmin) {
+        router.replace('/admin/dashboard');
+      } else if (isOrganizer) {
+        router.replace('/organizer/dashboard');
+      }
+    }
+  }, [authLoading, isAdmin, isOrganizer, router]);
+
   const GOOGLE_ERROR_MESSAGES: Record<string, string> = {
-    'auth/popup-closed-by-user': 'Google Sign-In popup was closed. Please click Sign in with Google again.',
-    'auth/popup-blocked': 'Your browser blocked the Google Sign-In popup. Please allow popups for this site and try again.',
-    'auth/cancelled-popup-request': 'Google Sign-In was cancelled. Please try again.',
-    'auth/unauthorized-domain': 'This domain is not authorized for Google Sign-In. Add it under Firebase Console → Authentication → Settings → Authorized domains.',
-    'auth/operation-not-allowed': 'Google Sign-In is not enabled for this project. Enable it under Firebase Console → Authentication → Sign-in method.',
-    'auth/network-request-failed': 'Network error while contacting Google. Check your connection and try again.',
+    'auth/popup-closed-by-user': 'Popup was closed. Please try again.',
+    'auth/popup-blocked': 'Popup blocked. Allow popups for this site and try again.',
+    'auth/cancelled-popup-request': 'Sign-In cancelled. Please try again.',
+    'auth/unauthorized-domain': 'Domain not authorized. Contact admin.',
+    'auth/operation-not-allowed': 'Google Sign-In not enabled. Contact admin.',
+    'auth/network-request-failed': 'Network error. Check your connection.',
   };
 
   const handleGoogleLogin = async () => {
     if (!isFirebaseConfigured || !auth) {
-      setError('Firebase Authentication is not initialized. Check the Firebase config.');
+      setError('Firebase is not initialized.');
       return;
     }
     setLoading(true);
@@ -32,39 +45,52 @@ export default function AdminLogin() {
     try {
       const result = await signIn();
       if (!result?.user) {
-        setError('Google Sign-In did not return a user. Please try again.');
+        setError('Sign-In did not return a user. Please try again.');
         return;
       }
       if (!isAuthorizedSuperAdminEmail(result.user.email)) {
         await signOut();
-        setError(`${result.user.email} is not authorized to access the admin panel.`);
+        setError(`${result.user.email} is not authorized.`);
         return;
       }
-      window.location.href = '/admin/dashboard';
+      // Redirect — useEffect above will also catch this
+      router.replace('/admin/dashboard');
     } catch (err: any) {
       console.error('Google Sign-In error:', err);
-      // Auto-fix: "Database is closing/hidden" — just reload and retry
+      // Auto-fix database closing error — reload page
       if (err?.message?.includes('closing') || err?.message?.includes('hidden') || err?.code === 'failed-precondition') {
         window.location.reload();
         return;
       }
-      setError(GOOGLE_ERROR_MESSAGES[err?.code] || `Google Sign-In failed: ${err?.message || 'Unknown error'}`);
+      setError(GOOGLE_ERROR_MESSAGES[err?.code] || `Sign-In failed: ${err?.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
   };
 
+  // Show loading spinner while checking auth state
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#040d1a]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00d4ff]"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#040d1a] text-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00d4ff] mb-4" />
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Checking session...</p>
+      </div>
+    );
+  }
+
+  // If already admin — show redirect spinner (useEffect will navigate)
+  if (isAdmin || isOrganizer) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#040d1a] text-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00d4ff] mb-4" />
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Redirecting to Dashboard...</p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#040d1a] text-white p-4 relative overflow-hidden tech-grid">
-      {/* Background ambient glow effects */}
+      {/* Background ambient glow */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#00d4ff]/10 rounded-full blur-[140px]" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#a855f7]/15 rounded-full blur-[140px]" />
 
@@ -79,7 +105,7 @@ export default function AdminLogin() {
         </p>
       </div>
 
-      {/* High-Contrast OLED Dark Login Card */}
+      {/* Login Card */}
       <div className="z-10 w-full max-w-md p-8 rounded-3xl border border-gray-800 shadow-2xl bg-[#08182b] space-y-6">
         <div className="text-center">
           <h2 className="text-xl font-black text-white uppercase tracking-wider mb-1">
@@ -93,7 +119,7 @@ export default function AdminLogin() {
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-200 p-4 rounded-2xl text-xs text-center font-bold">
             {error}
-            <button 
+            <button
               onClick={() => { setError(null); signOut(); }}
               className="mt-3 flex items-center justify-center w-full bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-white py-2 rounded-xl text-xs transition-all"
             >
@@ -102,35 +128,22 @@ export default function AdminLogin() {
           </div>
         )}
 
-        {/* Primary Instant Google Authentication Button */}
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-950 font-black py-4 px-6 rounded-2xl transition-all duration-200 active:scale-95 shadow-xl disabled:opacity-70 text-xs uppercase tracking-wider group"
+          className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-950 font-black py-4 px-6 rounded-2xl transition-all duration-200 active:scale-95 shadow-xl disabled:opacity-70 text-xs uppercase tracking-wider"
         >
           <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0">
-            <path
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              fill="#4285F4"
-            />
-            <path
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              fill="#34A853"
-            />
-            <path
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              fill="#FBBC05"
-            />
-            <path
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              fill="#EA4335"
-            />
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
           </svg>
-          <span>{loading ? 'Opening Admin Dashboard...' : 'Sign in with Google'}</span>
+          <span>{loading ? 'Signing in...' : 'Sign in with Google'}</span>
         </button>
       </div>
 
-      {/* Footer Navigation */}
+      {/* Footer */}
       <div className="z-10 mt-6 flex flex-col sm:flex-row items-center gap-4 text-xs font-bold">
         <Link href="/" className="text-gray-400 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1.5">
           <ArrowLeft className="w-4 h-4 text-[#00d4ff]" /> Back to Public Website
@@ -138,18 +151,10 @@ export default function AdminLogin() {
         <span className="text-gray-700 hidden sm:inline">•</span>
         <div className="flex flex-wrap items-center justify-center gap-2 text-gray-300">
           <span>Website Admin:</span>
-          <a
-            href="https://maithreyan.in"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-purple-400 hover:text-purple-300 hover:underline font-black"
-          >
+          <a href="https://maithreyan.in" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 hover:underline font-black">
             Maithreyan D (maithreyan.in)
           </a>
-          <a
-            href="tel:+919342706675"
-            className="inline-flex items-center gap-1 bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded-full hover:bg-purple-600/50 font-black text-[11px]"
-          >
+          <a href="tel:+919342706675" className="inline-flex items-center gap-1 bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded-full hover:bg-purple-600/50 font-black text-[11px]">
             <Phone className="w-3 h-3 text-purple-300" /> +91 9342706675
           </a>
         </div>
