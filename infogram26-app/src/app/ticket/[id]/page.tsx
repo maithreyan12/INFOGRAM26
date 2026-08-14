@@ -268,7 +268,7 @@ export default function TicketPage() {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, minWidth: 160 }}>
                 <div style={{ background: '#fff', padding: 12, borderRadius: 12, boxShadow: '0 0 20px rgba(0,212,255,0.2)' }}>
                   <QRCode
-                    value={ticket.qrData || ticket.ticketNumber}
+                    value={typeof window !== 'undefined' ? `${window.location.origin}/ticket/${id}` : `https://www.infogram26.in/ticket/${id}`}
                     size={128}
                     level="H"
                     bgColor="#ffffff"

@@ -90,7 +90,7 @@ export default function ScannerPage() {
     return () => { stopScanner(); };
   }, [stopScanner]);
 
-  /* ── Lookup ticket by QR data, ticket number, or applicant ID ── */
+  /* ── Lookup ticket by QR data, ticket URL, ticket number, or applicant ID ── */
   const lookupTicket = async (input: string) => {
     setSearching(true);
     setTicket(null);
@@ -99,8 +99,14 @@ export default function ScannerPage() {
     try {
       if (!db) { toast.error('Database not connected'); return; }
 
-      // Try parsing QR JSON first
       let searchField = input.trim();
+
+      // Extract ticket ID if full URL is scanned/pasted
+      if (searchField.includes('/ticket/')) {
+        const parts = searchField.split('/ticket/');
+        searchField = parts[parts.length - 1].split('?')[0].split('#')[0].trim();
+      }
+
       let ticketNumber = '';
       let applicantId = '';
 
@@ -109,7 +115,6 @@ export default function ScannerPage() {
         ticketNumber = qrParsed.ticketNumber || '';
         applicantId = qrParsed.applicantId || '';
       } catch {
-        // Not JSON — treat as ticket number or applicant ID
         ticketNumber = searchField;
         applicantId = searchField;
       }
