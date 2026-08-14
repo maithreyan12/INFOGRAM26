@@ -246,7 +246,7 @@ export default function EventDetailPage() {
                   <div className={`text-base font-bold mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {event.organizerName || 'Department of IT & Info Club'}
                   </div>
-                  <div className={`text-xs font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>PERI Institute of Technology</div>
+                  <div className={`text-xs font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>C. Abdul Hakeem College of Engineering &amp; Technology</div>
                 </div>
               </div>
             </div>
