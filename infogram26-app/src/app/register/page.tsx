@@ -6,12 +6,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { db, storage } from '@/lib/firebase/config';
+import { db } from '@/lib/firebase/config';
 import { collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter } from 'next/navigation';
 import PublicLayout from '@/components/layout/PublicLayout';
-import { CheckCircle, User, Upload, Calendar, ClipboardList, ChevronRight, ChevronLeft } from 'lucide-react';
+import { CheckCircle, User, Calendar, ClipboardList, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 
 const personalInfoSchema = z.object({
@@ -41,22 +40,18 @@ const demoEvents = OFFICIAL_EVENTS.map(e => ({
   rules: e.rules,
 }));
 
+// 3 steps — College ID upload removed
 const STEPS = [
   { number: 1, label: 'Personal Info', icon: User },
-  { number: 2, label: 'College ID', icon: Upload },
-  { number: 3, label: 'Select Events', icon: Calendar },
-  { number: 4, label: 'Review', icon: ClipboardList },
+  { number: 2, label: 'Select Events', icon: Calendar },
+  { number: 3, label: 'Review', icon: ClipboardList },
 ];
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
-  const [idFile, setIdFile] = useState<File | null>(null);
-  const [idPreview, setIdPreview] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [events, setEvents] = useState<any[]>(demoEvents);
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
   const router = useRouter();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -141,28 +136,7 @@ export default function RegisterPage() {
       const ok = await trigger();
       if (ok) setStep(2);
     } else if (step === 2) {
-      if (idFile) setStep(3);
-    } else if (step === 3) {
-      if (selectedEvents.length > 0) setStep(4);
-    }
-  };
-
-  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(false);
-    if (e.dataTransfer.files?.[0]) handleFileSelection(e.dataTransfer.files[0]);
-  };
-
-  const handleFileSelection = (file: File) => {
-    if (file.type.startsWith('image/') || file.type === 'application/pdf') {
-      setIdFile(file);
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onloadend = () => setIdPreview(reader.result as string);
-        reader.readAsDataURL(file);
-      } else {
-        setIdPreview(null);
-      }
+      if (selectedEvents.length > 0) setStep(3);
     }
   };
 
@@ -175,30 +149,23 @@ export default function RegisterPage() {
   const generateApplicantId = () => `APP${Math.floor(100000 + Math.random() * 900000)}`;
 
   const onSubmit = async () => {
-    if (!idFile || selectedEvents.length === 0) return;
+    if (selectedEvents.length === 0) return;
     setIsSubmitting(true);
     try {
-      if (!db || !storage) {
+      if (!db) {
         router.push(`/payment?regId=mock_reg_123`);
         return;
       }
-      setUploadProgress(25);
-      const storageRef = ref(storage, `college-ids/${Date.now()}-${idFile.name}`);
-      await uploadBytes(storageRef, idFile);
-      setUploadProgress(60);
-      const idUrl = await getDownloadURL(storageRef);
       const applicantId = generateApplicantId();
       const docRef = await addDoc(collection(db, 'registrations'), {
         applicantId,
         personalInfo: formData,
-        idCardUrl: idUrl,
         events: selectedEvents,
         eventNames: selectedEvents.map(id => events.find(e => e.id === id)?.name).filter(Boolean),
         totalFee: getTotalFee(),
         status: 'pending_payment',
         createdAt: serverTimestamp(),
       });
-      setUploadProgress(100);
       router.push(`/payment?regId=${docRef.id}`);
     } catch (err) {
       console.error('Registration failed:', err);
@@ -206,7 +173,7 @@ export default function RegisterPage() {
     }
   };
 
-  const progressPct = ((step - 1) / 3) * 100;
+  const progressPct = ((step - 1) / 2) * 100;
   const techEvents = events.filter(e => e.category === 'Technical' || !e.category);
   const nonTechEvents = events.filter(e => e.category === 'Non-Technical');
 
@@ -227,8 +194,8 @@ export default function RegisterPage() {
               }`}
               style={{
                 fontFamily: 'var(--font-display)',
-                textShadow: isDark 
-                  ? '0 0 20px rgba(192, 132, 252, 0.5)' 
+                textShadow: isDark
+                  ? '0 0 20px rgba(192, 132, 252, 0.5)'
                   : '0 2px 8px rgba(15, 23, 42, 0.1)',
               }}
             >
@@ -287,12 +254,12 @@ export default function RegisterPage() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
               className={`p-6 sm:p-10 rounded-3xl border transition-colors duration-300 ${
-                isDark 
-                  ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl backdrop-blur-2xl' 
+                isDark
+                  ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl backdrop-blur-2xl'
                   : 'bg-white/95 border-slate-200 text-slate-900 shadow-2xl backdrop-blur-2xl'
               }`}
             >
-              {/* STEP 1 */}
+              {/* STEP 1 — Personal Info */}
               {step === 1 && (
                 <div>
                   <h2 className={`text-xl sm:text-2xl font-black mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -356,55 +323,8 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              {/* STEP 2 */}
+              {/* STEP 2 — Select Events */}
               {step === 2 && (
-                <div>
-                  <h2 className={`text-xl sm:text-2xl font-black mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    <Upload className={`w-6 h-6 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> College ID Upload
-                  </h2>
-                  <div
-                    className={`border-2 border-dashed rounded-3xl p-10 text-center transition-all duration-300 cursor-pointer ${
-                      dragOver ? (isDark ? 'border-amber-300 bg-amber-300/10' : 'border-[#7c3aed] bg-[#7c3aed]/10')
-                        : idFile ? 'border-emerald-500/50 bg-emerald-500/10'
-                        : isDark ? 'border-slate-700 hover:border-amber-300/40 hover:bg-slate-800/50' : 'border-slate-300 hover:border-[#7c3aed]/40 hover:bg-slate-50'
-                    }`}
-                    onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-                    onDragLeave={() => setDragOver(false)}
-                    onDrop={handleFileDrop}
-                    onClick={() => document.getElementById('id-upload')?.click()}
-                  >
-                    <input type="file" id="id-upload" className="hidden" accept="image/*,.pdf"
-                      onChange={e => e.target.files?.[0] && handleFileSelection(e.target.files[0])} />
-                    {idFile ? (
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center">
-                          <CheckCircle className="w-8 h-8 text-emerald-500" />
-                        </div>
-                        <p className="text-emerald-600 font-extrabold text-base">{idFile.name}</p>
-                        <p className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Click to change file</p>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-3">
-                        <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isDark ? 'bg-purple-500/10' : 'bg-[#7c3aed]/10'}`}>
-                          <Upload className={`w-8 h-8 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
-                        </div>
-                        <p className={`font-black text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>Drag & drop your College ID</p>
-                        <p className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>or click to browse • JPG, PNG, PDF accepted</p>
-                        <div className="px-6 py-2.5 rounded-full text-sm font-bold mt-2 bg-gradient-to-r from-[#7c3aed] to-[#6366f1] text-white shadow-md">Choose File</div>
-                      </div>
-                    )}
-                  </div>
-                  {idPreview && (
-                    <div className="mt-6">
-                      <p className={`text-xs font-black uppercase tracking-wider mb-3 ${isDark ? 'text-slate-400' : 'text-slate-700'}`}>Preview</p>
-                      <img src={idPreview} alt="ID Preview" className="max-h-56 mx-auto rounded-2xl border border-slate-300 shadow-lg" />
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* STEP 3 */}
-              {step === 3 && (
                 <div>
                   <h2 className={`text-xl sm:text-2xl font-black mb-2 flex items-center gap-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     <Calendar className={`w-6 h-6 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Select Events
@@ -420,7 +340,7 @@ export default function RegisterPage() {
                           return (
                             <div key={event.id} onClick={() => toggleEvent(event.id)}
                               className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
-                                sel 
+                                sel
                                   ? isDark ? 'border-amber-300 bg-amber-300/10' : 'border-[#7c3aed] bg-[#7c3aed]/10 ring-2 ring-[#7c3aed]/30'
                                   : isDark ? 'border-slate-800 bg-slate-950/40 hover:border-slate-700' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
                               }`}
@@ -428,7 +348,7 @@ export default function RegisterPage() {
                               <div className="flex justify-between items-start mb-1.5">
                                 <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.name}</h3>
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                                  sel 
+                                  sel
                                     ? isDark ? 'border-amber-300 bg-amber-300' : 'border-[#7c3aed] bg-[#7c3aed]'
                                     : isDark ? 'border-slate-700' : 'border-slate-300'
                                 }`}>
@@ -453,7 +373,7 @@ export default function RegisterPage() {
                           return (
                             <div key={event.id} onClick={() => toggleEvent(event.id)}
                               className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
-                                sel 
+                                sel
                                   ? 'border-teal-500 bg-teal-500/10 ring-2 ring-teal-500/30'
                                   : isDark ? 'border-slate-800 bg-slate-950/40 hover:border-slate-700' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
                               }`}
@@ -490,11 +410,11 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              {/* STEP 4 */}
-              {step === 4 && (
+              {/* STEP 3 — Review & Submit */}
+              {step === 3 && (
                 <div>
                   <h2 className={`text-xl sm:text-2xl font-black mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    <ClipboardList className={`w-6 h-6 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Review & Submit
+                    <ClipboardList className={`w-6 h-6 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} /> Review &amp; Submit
                   </h2>
                   <div className="space-y-5">
                     <div className={`rounded-2xl p-5 border ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
@@ -543,8 +463,8 @@ export default function RegisterPage() {
                     type="button"
                     onClick={() => setStep(step - 1)}
                     className={`px-6 py-3 rounded-full text-sm font-black flex items-center gap-2 border transition-all ${
-                      isDark 
-                        ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700' 
+                      isDark
+                        ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
                         : 'bg-slate-100 border-slate-300 text-slate-900 hover:bg-slate-200'
                     }`}
                   >
@@ -552,14 +472,13 @@ export default function RegisterPage() {
                   </button>
                 ) : <div />}
 
-                {step < 4 ? (
+                {step < 3 ? (
                   <button
                     type="button"
                     onClick={handleNext}
                     disabled={
                       (step === 1 && (!formData.fullName || !formData.email || !formData.phone || !formData.college || !formData.department || !formData.registerNumber || !formData.year || !formData.gender)) ||
-                      (step === 2 && !idFile) ||
-                      (step === 3 && selectedEvents.length === 0)
+                      (step === 2 && selectedEvents.length === 0)
                     }
                     className="px-8 py-3.5 rounded-full text-sm font-black flex items-center gap-2 bg-gradient-to-r from-[#7c3aed] to-[#6366f1] text-white shadow-xl hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                   >
@@ -575,7 +494,7 @@ export default function RegisterPage() {
                     {isSubmitting ? (
                       <>
                         <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Processing ({uploadProgress}%)</span>
+                        <span>Processing…</span>
                       </>
                     ) : (
                       <>
