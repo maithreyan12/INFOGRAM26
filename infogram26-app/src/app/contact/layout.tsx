@@ -5,12 +5,12 @@ const SITE_URL = 'https://infogram26.in';
 export const metadata: Metadata = {
   title: "Contact — INFogram'26 | Get in Touch | CAHCET Dept of IT",
   description:
-    "Contact the INFogram'26 team — National Level Technical Symposium by Department of IT, C. Abdul Hakeem College of Engineering & Technology, Melvisharam. Reach out to event coordinators, HOD Dr. S. Umamaheswari, or our student team. 22nd August 2026.",
+    "Contact the INFogram'26 team — National Level Technical Symposium by Department of IT, C. Abdul Hakeem College of Engineering & Technology, Melvisharam. Reach out to event coordinators, HOD Prof. Mohamed Rafee M, or our student team. 22nd August 2026.",
   keywords: [
     "Contact INFogram'26",
     "INFogram 26 Contact",
     "CAHCET IT Department Contact",
-    "Dr. S. Umamaheswari HOD IT",
+    "Prof. Mohamed Rafee M HOD IT",
     "INFogram 2026 Organizers",
     "CAHCET Symposium Contact",
     "Melvisharam Technical Symposium Contact",

@@ -290,8 +290,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className={`font-black text-xs uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>HOD Contact</h3>
-                    <a href="tel:+918248963928" className={`font-black text-sm transition-colors ${isDark ? 'text-slate-100 hover:text-amber-300' : 'text-slate-950 hover:text-[#7c3aed]'}`}>
-                      Dr. S. Umamaheswari (8248963928)
+                    <a href="tel:+919043293530" className={`font-black text-sm transition-colors ${isDark ? 'text-slate-100 hover:text-amber-300' : 'text-slate-950 hover:text-[#7c3aed]'}`}>
+                      Prof. Mohamed Rafee M (9043293530)
                     </a>
                   </div>
                 </div>

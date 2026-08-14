@@ -198,12 +198,12 @@ export default function Footer() {
               <li className="flex items-center gap-3">
                 <Phone className={`w-4 h-4 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                 <a
-                  href="tel:+918248963928"
+                  href="tel:+919043293530"
                   className={`text-sm font-black transition-colors ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
                     }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
-                  HOD: Dr. S. Umamaheswari (8248963928)
+                  HOD: Prof. Mohamed Rafee M (9043293530)
                 </a>
               </li>
               <li className="flex items-center gap-3">

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     'MMES',
     "INFogram'26",
     'Technical Symposium CAHCET',
-    'Dr. S. Umamaheswari HOD IT',
+    'Prof. Mohamed Rafee M HOD IT',
     'Maithreyan D',
   ],
   alternates: {
@@ -80,7 +80,7 @@ const cahcetJsonLd = {
         'postalCode': '632509',
         'addressCountry': 'IN',
       },
-      'telephone': '+918248963928',
+      'telephone': '+919043293530',
       'email': 'info@cahcet.edu.in',
       'geo': {
         '@type': 'GeoCoordinates',

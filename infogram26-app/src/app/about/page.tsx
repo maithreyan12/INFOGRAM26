@@ -180,9 +180,9 @@ export default function AboutPage() {
                     <MapPin className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                     <span>Hakeem Nagar, Melvisharam, Ranipet District, Tamil Nadu – 632 509 <strong className="text-red-500 font-black text-xs uppercase tracking-wider ml-1">(Open Maps 📍)</strong></span>
                   </a>
-                  <a href="tel:+918248963928" className={`flex items-center gap-2.5 font-bold transition-all hover:underline ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-800 hover:text-[#7c3aed]'}`}>
+                  <a href="tel:+919043293530" className={`flex items-center gap-2.5 font-bold transition-all hover:underline ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-800 hover:text-[#7c3aed]'}`}>
                     <Phone className="w-4 h-4 text-[#7c3aed] shrink-0" />
-                    <span>HOD: Dr. S. Umamaheswari (8248963928)</span>
+                    <span>HOD: Prof. Mohamed Rafee M (9043293530)</span>
                   </a>
                   <div className={`flex items-center gap-2.5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                     <Mail className="w-4 h-4 text-[#7c3aed] shrink-0" />
@@ -518,8 +518,8 @@ export default function AboutPage() {
                 isDark ? 'bg-slate-950/80 border-purple-500/20' : 'bg-slate-50 border-slate-200'
               }`}>
                 <div className={`text-[11px] font-black uppercase tracking-wider mb-1 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>HOD &amp; Convenors</div>
-                <div className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Dr. S. Umamaheswari <span className="text-xs font-bold text-slate-400">(Prof &amp; Head/IT)</span></div>
-                <div className={`text-xs font-bold mt-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Convenors: Mr. M. Mohamed Rafe (AP/IT), Mrs. I. Abdulla (AP/IT)</div>
+                <div className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Prof. Mohamed Rafee M <span className="text-xs font-bold text-slate-400">(Prof &amp; Head/IT)</span></div>
+                <div className={`text-xs font-bold mt-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Convenors: Mrs. I. Abdulla (AP/IT)</div>
               </div>
             </div>
           </motion.div>
