@@ -167,6 +167,17 @@ function PaymentContent() {
     loadRazorpayScript().catch((err) => console.warn('Razorpay script preload warning:', err));
   }, []);
 
+  /* ── Auto-trigger Razorpay modal if coming from registration form ── */
+  useEffect(() => {
+    const autoParam = searchParams.get('auto');
+    if (autoParam === 'true' && registration && !loading && !paymentDone && !isPayingWithRazorpay) {
+      const timer = setTimeout(() => {
+        handleRazorpayPayment();
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, registration, loading, paymentDone]);
+
   /* ── Razorpay checkout ── */
   const handleRazorpayPayment = async () => {
     if (!registration) return;
