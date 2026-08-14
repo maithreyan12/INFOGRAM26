@@ -3,13 +3,11 @@ export const dynamic = 'force-dynamic';
 
 import AdminLayout from '@/components/admin/AdminLayout';
 import { IndianRupee, CheckCircle, Clock, AlertCircle } from 'lucide-react';
-import { useLiveRegistrations } from '@/hooks/useLiveRegistrations';
+import { useEventStore } from '@/store/eventStore';
 
 export default function PaymentsPage() {
-  const { registrations } = useLiveRegistrations();
-  const paidRegistrations = registrations.filter((r) => r.status === 'paid');
-  const pendingRegistrations = registrations.filter((r) => r.status === 'pending_payment');
-  const totalRevenue = paidRegistrations.reduce((sum, r) => sum + r.totalFee, 0);
+  const registrations = useEventStore((state) => state.registrations);
+  const totalRevenue = registrations.reduce((sum, r) => sum + r.totalFee, 0);
 
   return (
     <AdminLayout>
@@ -54,7 +52,7 @@ export default function PaymentsPage() {
             </div>
             <div>
               <p className="text-xs font-black uppercase text-gray-400">Verified Registrations</p>
-              <h3 className="text-2xl font-black text-white">{paidRegistrations.length}</h3>
+              <h3 className="text-2xl font-black text-white">{registrations.length}</h3>
             </div>
           </div>
         </div>
@@ -66,7 +64,7 @@ export default function PaymentsPage() {
             </div>
             <div>
               <p className="text-xs font-black uppercase text-gray-400">Pending Review</p>
-              <h3 className="text-2xl font-black text-white">{pendingRegistrations.length}</h3>
+              <h3 className="text-2xl font-black text-white">0</h3>
             </div>
           </div>
         </div>
@@ -86,11 +84,11 @@ export default function PaymentsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800/80">
-              {paidRegistrations.map((reg) => (
+              {registrations.map((reg) => (
                 <tr key={reg.id} className="hover:bg-gray-800/50 transition-colors">
                   <td className="px-6 py-4 font-mono text-[#00d4ff] font-black">{reg.applicantId}</td>
-                  <td className="px-6 py-4 font-black text-white text-sm">{reg.personalInfo?.fullName}</td>
-                  <td className="px-6 py-4 text-gray-300">{reg.personalInfo?.college}</td>
+                  <td className="px-6 py-4 font-black text-white text-sm">{reg.fullName}</td>
+                  <td className="px-6 py-4 text-gray-300">{reg.college}</td>
                   <td className="px-6 py-4 font-black text-emerald-400">₹{reg.totalFee}</td>
                   <td className="px-6 py-4 text-gray-400 uppercase font-mono text-[11px]">UPI / Online</td>
                   <td className="px-6 py-4 text-right">

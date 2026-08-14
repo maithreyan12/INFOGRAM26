@@ -33,8 +33,15 @@ export default function EventsPage() {
           const storeMatch = storeEvents.find(
             s => s.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normDemoSlug || s.id === demo.id
           );
-          // Live store data (what admin/organizer edits write to) always wins over the brochure.
-          return storeMatch ? { ...demo, ...storeMatch } : demo;
+          if (storeMatch) {
+            return {
+              ...demo,
+              registeredCount: storeMatch.registeredCount ?? demo.registeredCount,
+              bannerUrl: storeMatch.bannerUrl || demo.bannerUrl,
+              status: storeMatch.status || demo.status,
+            };
+          }
+          return demo;
         });
 
         if (!db || !isFirebaseConfigured) {
@@ -58,8 +65,13 @@ export default function EventsPage() {
 
             if (firestoreMatch) {
               const dbData = firestoreMatch.data() as Event;
-              // Firestore is the cross-device source of truth — it wins over the local/store copy.
-              return { ...localEv, ...dbData, id: firestoreMatch.id };
+              return {
+                ...localEv,
+                id: firestoreMatch.id,
+                registeredCount: dbData.registeredCount ?? localEv.registeredCount,
+                bannerUrl: dbData.bannerUrl || localEv.bannerUrl,
+                status: dbData.status || localEv.status,
+              };
             }
             return localEv;
           });

@@ -31,24 +31,23 @@ export default function EventDetailPage() {
     const fetchEvent = async () => {
       try {
         const normSlug = rawSlug ? rawSlug.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
-
-        // 1. Start from the brochure entry as a baseline/offline fallback.
-        const brochureEvent = demoEvents.find(e => {
+        
+        // 1. Always resolve base event from official demoEvents list to guarantee 100% brochure accuracy
+        let localEvent = demoEvents.find(e => {
           const eNorm = e.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
           return eNorm === normSlug || e.id === rawSlug;
         });
 
-        // 2. The live event store (which admin/organizer edits write to) always wins over the brochure.
-        const storeMatch = storeEvents.find(e => {
-          const eNorm = e.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
-          return eNorm === normSlug || e.id === rawSlug;
-        });
+        if (!localEvent) {
+          localEvent = storeEvents.find(e => {
+            const eNorm = e.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+            return eNorm === normSlug || e.id === rawSlug;
+          });
+        }
 
-        let resultEvent: Event | null = brochureEvent || storeMatch
-          ? { ...(brochureEvent || {}), ...(storeMatch || {}) } as Event
-          : null;
+        let resultEvent = localEvent ? { ...localEvent } : null;
 
-        // 3. Firestore is the cross-device source of truth — merge it in last so it wins.
+        // 2. Check Firebase if configured for live metrics
         if (db && isFirebaseConfigured) {
           try {
             const eventsRef = collection(db, 'events');
@@ -57,16 +56,28 @@ export default function EventDetailPage() {
               const firestoreMatch = snapshot.docs.find(doc => {
                 const data = doc.data();
                 const dNorm = (data.slug || doc.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-                return dNorm === normSlug || doc.id === rawSlug || doc.id === resultEvent?.id;
+                return dNorm === normSlug || doc.id === rawSlug || doc.id === localEvent?.id;
               });
 
               if (firestoreMatch) {
                 const dbData = firestoreMatch.data() as Event;
-                resultEvent = {
-                  ...(resultEvent || {}),
-                  ...dbData,
-                  id: firestoreMatch.id,
-                } as Event;
+                const dbSlugNorm = (dbData.slug || firestoreMatch.id).toLowerCase().replace(/[^a-z0-9]/g, '');
+                
+                // Always map to official brochure definition from demoEvents
+                const brochureMatch = demoEvents.find(e => {
+                  const eNorm = e.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+                  return eNorm === dbSlugNorm || eNorm === normSlug || e.id === firestoreMatch.id;
+                }) || localEvent;
+
+                if (brochureMatch) {
+                  resultEvent = {
+                    ...brochureMatch,
+                    id: firestoreMatch.id,
+                    registeredCount: dbData.registeredCount ?? brochureMatch.registeredCount,
+                    bannerUrl: dbData.bannerUrl || brochureMatch.bannerUrl,
+                    status: dbData.status || brochureMatch.status,
+                  };
+                }
               }
             }
           } catch (err) {
