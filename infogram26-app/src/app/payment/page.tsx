@@ -390,13 +390,13 @@ function PaymentContent() {
 
   if (loading) return (
     <PublicLayout>
-      <div className="flex justify-center items-center min-h-[60vh]"><LoadingSpinner size="lg" /></div>
+      <div className="flex justify-center items-center min-h-[60vh]" style={{ background: 'linear-gradient(135deg,#070913 0%,#1a0030 100%)', color: 'white' }}><LoadingSpinner size="lg" /></div>
     </PublicLayout>
   );
 
   return (
     <PublicLayout>
-      <div className="min-h-screen pt-28 pb-16 px-4">
+      <div className="min-h-screen pt-28 pb-16 px-4" style={{ background: 'linear-gradient(135deg,#070913 0%,#130025 50%,#070913 100%)', color: 'white' }}>
         <div className="max-w-4xl mx-auto">
 
           {/* ── Header ── */}
@@ -413,7 +413,7 @@ function PaymentContent() {
 
           {/* ── Payment Done ── */}
           {paymentDone ? (
-            <div className="glass-card p-10 text-center rounded-2xl max-w-lg mx-auto">
+            <div className="glass-card p-10 text-center rounded-2xl max-w-lg mx-auto" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
               <div className="w-20 h-20 bg-green-400/15 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="w-10 h-10 text-green-400" />
               </div>
@@ -428,7 +428,7 @@ function PaymentContent() {
 
               {/* ── Order Summary ── */}
               <div className="lg:col-span-2 space-y-4">
-                <div className="glass-card p-6 rounded-2xl">
+                <div className="glass-card p-6 rounded-2xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
                   <h2 className="text-white/60 font-bold text-xs mb-4 uppercase tracking-wider flex items-center gap-2">
                     📋 Order Summary
                   </h2>
@@ -458,7 +458,7 @@ function PaymentContent() {
                     </div>
                   </div>
                 </div>
-                <div className="glass-card p-4 rounded-2xl border border-green-400/15 flex items-center gap-3">
+                <div className="glass-card p-4 rounded-2xl flex items-center gap-3" style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)' }}>
                   <ShieldCheck className="w-7 h-7 text-green-400 flex-shrink-0" />
                   <div>
                     <p className="text-green-400 font-semibold text-sm">100% Secure</p>
@@ -480,7 +480,7 @@ function PaymentContent() {
 
                 {/* ══ MOBILE: UPI App Picker ══ */}
                 {isMobile && !showUtrForm && (
-                  <div className="glass-card rounded-2xl overflow-hidden">
+                  <div className="glass-card rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
                     {/* Amount banner */}
                     <div className="bg-gradient-to-r from-violet-600/30 to-purple-900/30 border-b border-white/8 p-5 text-center">
                       <p className="text-white/50 text-xs uppercase tracking-widest mb-1">Amount to Pay</p>
@@ -554,7 +554,7 @@ function PaymentContent() {
 
                 {/* ══ DESKTOP: QR + Razorpay ══ */}
                 {!isMobile && !showUtrForm && (
-                  <div className="glass-card rounded-2xl overflow-hidden">
+                  <div className="glass-card rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
                     {/* Amount banner */}
                     <div className="bg-gradient-to-r from-violet-600/25 to-purple-900/25 border-b border-white/8 p-5 text-center">
                       <p className="text-white/40 text-xs uppercase tracking-widest mb-1">Amount to Pay</p>
@@ -643,7 +643,7 @@ function PaymentContent() {
 
                 {/* ══ UTR Confirmation Form ══ */}
                 {showUtrForm && (
-                  <form onSubmit={handleUtrSubmit} className="glass-card rounded-2xl overflow-hidden">
+                  <form onSubmit={handleUtrSubmit} className="glass-card rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
                     <div className="bg-gradient-to-r from-green-500/15 to-emerald-600/15 border-b border-green-500/15 p-5">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-green-400/20 rounded-full flex items-center justify-center flex-shrink-0">
