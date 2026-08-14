@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     'MMES',
     "INFogram'26",
     'Technical Symposium CAHCET',
-    'Prof. Mohamed Rafee M HOD IT',
+    'Mr. M. Mohamed Rafe AP IT',
     'Maithreyan D',
   ],
   alternates: {

@@ -182,7 +182,7 @@ export default function AboutPage() {
                   </a>
                   <a href="tel:+919043293530" className={`flex items-center gap-2.5 font-bold transition-all hover:underline ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-800 hover:text-[#7c3aed]'}`}>
                     <Phone className="w-4 h-4 text-[#7c3aed] shrink-0" />
-                    <span>HOD: Prof. Mohamed Rafee M (9043293530)</span>
+                    <span>Staff Coordinator: Mr. M. Mohamed Rafe (9043293530)</span>
                   </a>
                   <div className={`flex items-center gap-2.5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                     <Mail className="w-4 h-4 text-[#7c3aed] shrink-0" />
@@ -517,9 +517,9 @@ export default function AboutPage() {
               <div className={`p-5 rounded-2xl border text-center ${
                 isDark ? 'bg-slate-950/80 border-purple-500/20' : 'bg-slate-50 border-slate-200'
               }`}>
-                <div className={`text-[11px] font-black uppercase tracking-wider mb-1 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>HOD &amp; Convenors</div>
-                <div className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Prof. Mohamed Rafee M <span className="text-xs font-bold text-slate-400">(Prof &amp; Head/IT)</span></div>
-                <div className={`text-xs font-bold mt-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Convenors: Mrs. I. Abdulla (AP/IT)</div>
+                <div className={`text-[11px] font-black uppercase tracking-wider mb-1 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`}>Staff Convenor</div>
+                <div className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-950'}`}>Mr. M. Mohamed Rafe <span className="text-xs font-bold text-slate-400">(Assistant Professor / IT)</span></div>
+                <div className={`text-xs font-bold mt-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Co-Convenor: Mrs. I. Abdulla (AP/IT)</div>
               </div>
             </div>
           </motion.div>

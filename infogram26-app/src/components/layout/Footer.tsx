@@ -203,7 +203,7 @@ export default function Footer() {
                     }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
-                  HOD: Prof. Mohamed Rafee M (9043293530)
+                  Staff: Mr. M. Mohamed Rafe (9043293530)
                 </a>
               </li>
               <li className="flex items-center gap-3">
