@@ -327,8 +327,7 @@
   .glass-card::after { display: none !important; }
   .aurora-blob-1 { animation: none !important; }
   .aurora-blob-2 { animation: none !important; }
-  .aurora-bg::before { animation: none !important; }
-  .aurora-bg::after  { animation: none !important; }
+  /* aurora-bg pseudo-elements removed */
   section {
     content-visibility: auto;
     contain-intrinsic-size: 0 420px;
@@ -493,49 +492,7 @@
   pointer-events: none;
 }
 
-.aurora-bg::before,
-.aurora-bg::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(40px);
-  opacity: 0.12;
-  transform: translate3d(0,0,0);
-  backface-visibility: hidden;
-}
-
-.aurora-bg::before {
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(circle, #00d4ff 0%, transparent 70%);
-  top: -20%;
-  right: -20%;
-  animation: aurora-1 25s ease-in-out infinite;
-}
-
-.aurora-bg::after {
-  width: 50vw;
-  height: 50vw;
-  background: radial-gradient(circle, #0a3d6b 0%, transparent 70%);
-  bottom: -20%;
-  left: -15%;
-  animation: aurora-2 30s ease-in-out infinite;
-}
-
-@media (max-width: 768px) {
-  /* Disable pseudo-element aurora blobs completely on mobile — hero blobs are enough */
-  .aurora-bg::before, .aurora-bg::after {
-    display: none;
-  }
-}
-
-@media (max-width: 1024px) {
-  .aurora-bg::before, .aurora-bg::after {
-    opacity: 0.05;
-    filter: blur(60px);
-    animation-duration: 40s;
-  }
-}
+/* Aurora blob pseudo-elements removed — hero section has its own themed blobs */
 
 
 /* ============================================================

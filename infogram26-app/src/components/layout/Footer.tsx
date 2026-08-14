@@ -257,11 +257,11 @@ export default function Footer() {
           <p className="flex items-center gap-2 text-xs font-black">
             <span>Designed &amp; Developed by</span>
             <a
-              href="https://maithreyan.in"
+              href="https://appziio.com"
               target="_blank"
-              rel="noopener noreferrer author"
-              title="Maithreyan D — Full Stack Developer Portfolio"
-              aria-label="Developed by Maithreyan D — Visit portfolio at maithreyan.in"
+              rel="noopener noreferrer"
+              title="appziio — Web & App Development Studio"
+              aria-label="Developed by appziio"
               className={`font-black text-xs uppercase tracking-widest transition-all px-3 py-1 rounded-full border ${
                 isDark 
                   ? 'bg-purple-500/20 text-amber-300 border-purple-500/40 hover:bg-purple-500/30 shadow-[0_0_12px_rgba(252,211,77,0.4)]' 
@@ -269,7 +269,7 @@ export default function Footer() {
               }`}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              Maithreyan D
+              appziio
             </a>
           </p>
         </div>
