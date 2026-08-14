@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { 
   LayoutDashboard, Calendar, Users, CreditCard, Image as ImageIcon, 
-  Star, UserCheck, Bell, Settings, Home, LogOut, Menu, X, ShieldAlert 
+  Star, UserCheck, Bell, Settings, Home, LogOut, Menu, X, ShieldAlert, ScanLine 
 } from 'lucide-react';
 
 const NAV_LINKS = [
@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { name: 'Events', path: '/admin/events', icon: Calendar },
   { name: 'Registrations', path: '/admin/registrations', icon: Users },
   { name: 'Payments', path: '/admin/payments', icon: CreditCard },
+  { name: 'Scanner', path: '/admin/scanner', icon: ScanLine },
   { name: 'Sponsors', path: '/admin/sponsors', icon: Star },
   { name: 'Organizers', path: '/admin/organizers', icon: UserCheck },
   { name: 'Notifications', path: '/admin/notifications', icon: Bell },
