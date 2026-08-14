@@ -8,28 +8,99 @@ import { doc, getDoc, addDoc, collection, serverTimestamp, updateDoc } from 'fir
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import PublicLayout from '@/components/layout/PublicLayout';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { CheckCircle, Upload, AlertCircle, Copy, ShieldCheck, Smartphone } from 'lucide-react';
+import {
+  CheckCircle, Upload, AlertCircle, Copy, ShieldCheck,
+  Smartphone, Monitor, QrCode, ArrowLeft, Zap,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
-const inputClass =
-  'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#00d4ff]/60 transition-all duration-200';
-const labelClass = 'block text-xs font-semibold text-white/60 uppercase tracking-wider mb-2';
+/* ─── types ─────────────────────────────────────────────── */
+declare global { interface Window { Razorpay: any; } }
 
-declare global {
-  interface Window { Razorpay: any; }
-}
-
+/* ─── helpers ───────────────────────────────────────────── */
 function loadRazorpayScript(): Promise<boolean> {
   return new Promise((resolve) => {
     if (window.Razorpay) { resolve(true); return; }
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
+    const s = document.createElement('script');
+    s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    s.onload = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.body.appendChild(s);
   });
 }
 
+const inputClass =
+  'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-violet-400/60 transition-all duration-200';
+const labelClass = 'block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2';
+
+/* ─── UPI App config ─────────────────────────────────────── */
+type UpiApp = {
+  id: string;
+  name: string;
+  short: string;
+  gradient: string;
+  ring: string;
+  buildLink: (pa: string, am: number, pn: string, tn: string) => string;
+};
+
+const UPI_APPS: UpiApp[] = [
+  {
+    id: 'phonepe',
+    name: 'PhonePe',
+    short: 'Pe',
+    gradient: 'from-[#5f259f] to-[#7b3cc3]',
+    ring: 'ring-purple-500/40',
+    buildLink: (pa, am, pn, tn) =>
+      `phonepe://pay?pa=${encodeURIComponent(pa)}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=${encodeURIComponent(tn)}`,
+  },
+  {
+    id: 'gpay',
+    name: 'Google Pay',
+    short: 'G',
+    gradient: 'from-[#1a73e8] to-[#34a853]',
+    ring: 'ring-blue-500/40',
+    buildLink: (pa, am, pn, tn) =>
+      `tez://upi/pay?pa=${encodeURIComponent(pa)}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=${encodeURIComponent(tn)}`,
+  },
+  {
+    id: 'paytm',
+    name: 'Paytm',
+    short: 'Pt',
+    gradient: 'from-[#00baf2] to-[#007ec5]',
+    ring: 'ring-sky-500/40',
+    buildLink: (pa, am, pn) =>
+      `paytmmp://pay?pa=${encodeURIComponent(pa)}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR`,
+  },
+  {
+    id: 'bhim',
+    name: 'BHIM',
+    short: 'B',
+    gradient: 'from-[#1a237e] to-[#1565c0]',
+    ring: 'ring-indigo-500/40',
+    buildLink: (pa, am, pn, tn) =>
+      `bhim://pay?pa=${encodeURIComponent(pa)}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=${encodeURIComponent(tn)}`,
+  },
+  {
+    id: 'supermoney',
+    name: 'SuperMoney',
+    short: 'SM',
+    gradient: 'from-[#e65100] to-[#ff8f00]',
+    ring: 'ring-orange-500/40',
+    buildLink: (pa, am, pn, tn) =>
+      `upi://pay?pa=${encodeURIComponent(pa)}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=${encodeURIComponent(tn)}`,
+  },
+  {
+    id: 'any',
+    name: 'Any UPI App',
+    short: '↗',
+    gradient: 'from-[#374151] to-[#1f2937]',
+    ring: 'ring-white/20',
+    buildLink: (pa, am, pn, tn) =>
+      `upi://pay?pa=${encodeURIComponent(pa)}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=${encodeURIComponent(tn)}`,
+  },
+];
+
+/* ─── Main component ─────────────────────────────────────── */
 function PaymentContent() {
   const searchParams = useSearchParams();
   const regId = searchParams.get('regId');
@@ -44,22 +115,26 @@ function PaymentContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentDone, setPaymentDone] = useState(false);
   const [isPayingWithRazorpay, setIsPayingWithRazorpay] = useState(false);
-  // Show UPI fallback if Razorpay fails or user prefers it
-  const [showUpi, setShowUpi] = useState(false);
-  // Tab: 'razorpay' | 'upi'
-  const [activeTab, setActiveTab] = useState<'razorpay' | 'upi'>('razorpay');
+  const [isMobile, setIsMobile] = useState(false);
+  const [showUtrForm, setShowUtrForm] = useState(false);
+  const [launchedApp, setLaunchedApp] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(0);
 
+  /* Device detection */
+  useEffect(() => {
+    const mobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|Windows Phone/i.test(navigator.userAgent);
+    setIsMobile(mobile || window.innerWidth < 768);
+  }, []);
+
+  /* Fetch registration + settings */
   useEffect(() => {
     const fetchData = async () => {
       if (!regId) { router.push('/register'); return; }
       try {
         if (regId === 'mock_reg_123') {
           setRegistration({
-            id: 'mock_reg_123',
-            applicantId: 'APP123456',
-            totalFee: 350,
-            events: ['demo-1', 'demo-2'],
-            eventNames: ['Code Clash', 'Web Warriors'],
+            id: 'mock_reg_123', applicantId: 'APP123456', totalFee: 350,
+            events: [], eventNames: ['Code Clash', 'Web Warriors'],
             personalInfo: { fullName: 'Test User', email: 'test@example.com', phone: '9876543210', college: 'Demo College', department: 'CSE', year: '2nd' },
           });
           setSettings({ upiId: '9342706675@okbizaxis', merchantName: 'INFOGRAM 26 SYMPOSIUM' });
@@ -80,19 +155,7 @@ function PaymentContent() {
     fetchData();
   }, [regId, router]);
 
-  const handleScreenshotChange = (file: File) => {
-    setScreenshot(file);
-    const reader = new FileReader();
-    reader.onloadend = () => setScreenshotPreview(reader.result as string);
-    reader.readAsDataURL(file);
-  };
-
-  const copyUpiId = () => {
-    const upiId = settings?.upiId || '9342706675@okbizaxis';
-    navigator.clipboard.writeText(upiId).then(() => toast.success('UPI ID copied!'));
-  };
-
-  // ── Shared finalize: write ticket + redirect ────────────────
+  /* ── Finalize payment (write ticket + redirect) ── */
   const finalizePayment = useCallback(async (paymentDetails: {
     method: 'razorpay' | 'upi';
     razorpayOrderId?: string;
@@ -110,7 +173,6 @@ function PaymentContent() {
       return;
     }
 
-    // Save payment record
     const paymentRef = await addDoc(collection(db, 'payments'), {
       registrationId: registration.id,
       amount: registration.totalFee,
@@ -124,14 +186,12 @@ function PaymentContent() {
       createdAt: serverTimestamp(),
     });
 
-    // Update registration
     await updateDoc(doc(db, 'registrations', registration.id), {
       status: 'paid',
       paymentId: paymentRef.id,
       ...(paymentDetails.utrNumber ? { utrNumber: paymentDetails.utrNumber } : {}),
     });
 
-    // Generate ticket
     const ticketNumber = `TKT-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     const qrData = JSON.stringify({
       ticketNumber,
@@ -160,7 +220,6 @@ function PaymentContent() {
       issueDate: serverTimestamp(),
     });
 
-    // Sync to Google Sheets (non-critical)
     try {
       await fetch('/api/sheets', {
         method: 'POST',
@@ -190,7 +249,7 @@ function PaymentContent() {
     setTimeout(() => router.push(`/ticket/${newTicketRef.id}`), 2000);
   }, [registration, router]);
 
-  // ── Razorpay Standard Checkout ──────────────────────────────
+  /* ── Razorpay checkout ── */
   const handleRazorpayPayment = async () => {
     if (!registration) return;
     setIsPayingWithRazorpay(true);
@@ -201,16 +260,10 @@ function PaymentContent() {
       const orderRes = await fetch('/api/payment/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: registration.totalFee,
-          receipt: `rcpt_${registration.id}`,
-          registrationId: registration.id,
-        }),
+        body: JSON.stringify({ amount: registration.totalFee, receipt: `rcpt_${registration.id}`, registrationId: registration.id }),
       });
       const orderData = await orderRes.json();
-      if (!orderRes.ok || !orderData.id) {
-        throw new Error(orderData.error || 'Could not create Razorpay order');
-      }
+      if (!orderRes.ok || !orderData.id) throw new Error(orderData.error || 'Could not create Razorpay order');
 
       const rzp = new window.Razorpay({
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -248,35 +301,52 @@ function PaymentContent() {
             });
           } catch (err) {
             console.error('Verification failed:', err);
-            toast.error('Payment verification failed. Please use UPI or contact support.');
-            setActiveTab('upi');
+            toast.error('Payment verification failed. Please enter UTR number.');
+            setShowUtrForm(true);
           } finally {
             setIsPayingWithRazorpay(false);
           }
         },
-        modal: {
-          ondismiss: () => {
-            setIsPayingWithRazorpay(false);
-          },
-        },
+        modal: { ondismiss: () => setIsPayingWithRazorpay(false) },
       });
-
       rzp.on('payment.failed', (resp: any) => {
-        toast.error(`Payment failed: ${resp.error?.description || 'Unknown error'}. Try UPI instead.`);
-        setActiveTab('upi');
+        toast.error(`Payment failed: ${resp.error?.description || 'Unknown error'}`);
         setIsPayingWithRazorpay(false);
       });
-
       rzp.open();
     } catch (err: any) {
       console.error('Razorpay error:', err);
       toast.error(err.message || 'Razorpay unavailable. Please pay via UPI.');
-      setActiveTab('upi');
       setIsPayingWithRazorpay(false);
     }
   };
 
-  // ── UPI / UTR Submit ────────────────────────────────────────
+  /* ── UPI App deep-link click ── */
+  const handleUpiAppClick = (app: UpiApp) => {
+    const upiId = settings?.upiId || '9342706675@okbizaxis';
+    const amount = registration?.totalFee || 0;
+    const pn = settings?.merchantName || 'INFOGRAM26';
+    const tn = `INFOGRAM26-${registration?.applicantId || ''}`;
+    const deepLink = app.buildLink(upiId, amount, pn, tn);
+
+    setLaunchedApp(app.name);
+    window.location.href = deepLink;
+
+    // Countdown then show UTR form
+    let c = 3;
+    setCountdown(c);
+    const t = setInterval(() => {
+      c -= 1;
+      setCountdown(c);
+      if (c <= 0) {
+        clearInterval(t);
+        setShowUtrForm(true);
+        setCountdown(0);
+      }
+    }, 1000);
+  };
+
+  /* ── UTR submit ── */
   const handleUtrSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!utrNumber.trim() || utrNumber.trim().length < 12) {
@@ -301,11 +371,26 @@ function PaymentContent() {
     }
   };
 
+  const handleScreenshotChange = (file: File) => {
+    setScreenshot(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setScreenshotPreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const copyUpiId = () => {
+    const upiId = settings?.upiId || '9342706675@okbizaxis';
+    navigator.clipboard.writeText(upiId).then(() => toast.success('UPI ID copied!'));
+  };
+
+  /* Build QR URL */
+  const upiId = settings?.upiId || '9342706675@okbizaxis';
+  const upiQrString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(settings?.merchantName || 'INFOGRAM26')}&am=${registration?.totalFee || ''}&cu=INR&tn=${encodeURIComponent(`INFOGRAM26-${registration?.applicantId || ''}`)}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(upiQrString)}&bgcolor=ffffff&color=1a0030&qzone=2`;
+
   if (loading) return (
     <PublicLayout>
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <LoadingSpinner size="lg" />
-      </div>
+      <div className="flex justify-center items-center min-h-[60vh]"><LoadingSpinner size="lg" /></div>
     </PublicLayout>
   );
 
@@ -314,17 +399,19 @@ function PaymentContent() {
       <div className="min-h-screen pt-28 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
 
-          {/* Header */}
+          {/* ── Header ── */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 bg-[#ffd700]/10 border border-[#ffd700]/25 rounded-full px-4 py-1.5 text-xs font-semibold text-[#ffd700] uppercase tracking-wider mb-4">
-              💳 Complete Your Payment
+            <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/25 rounded-full px-4 py-1.5 text-xs font-semibold text-violet-300 uppercase tracking-wider mb-4">
+              <Zap className="w-3.5 h-3.5" /> Complete Your Payment
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black uppercase" style={{ fontFamily: 'var(--font-display)', background: 'linear-gradient(135deg,#fff,#a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <h1 className="text-3xl sm:text-4xl font-black uppercase"
+              style={{ fontFamily: 'var(--font-display)', background: 'linear-gradient(135deg,#fff 30%,#a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               INFOGRAM&apos;26
             </h1>
-            <p className="text-white/50 text-sm mt-2 uppercase tracking-widest">Payment &amp; Ticket Generation</p>
+            <p className="text-white/40 text-sm mt-2 uppercase tracking-widest">Secure Payment &amp; Instant Ticket</p>
           </div>
 
+          {/* ── Payment Done ── */}
           {paymentDone ? (
             <div className="glass-card p-10 text-center rounded-2xl max-w-lg mx-auto">
               <div className="w-20 h-20 bg-green-400/15 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -342,201 +429,300 @@ function PaymentContent() {
               {/* ── Order Summary ── */}
               <div className="lg:col-span-2 space-y-4">
                 <div className="glass-card p-6 rounded-2xl">
-                  <h2 className="text-white font-bold text-lg mb-5 flex items-center gap-2">
-                    <span className="text-purple-400">📋</span> Order Summary
+                  <h2 className="text-white/60 font-bold text-xs mb-4 uppercase tracking-wider flex items-center gap-2">
+                    📋 Order Summary
                   </h2>
                   <div className="space-y-3">
-                    <div className="bg-white/4 rounded-xl p-4 border border-white/8">
-                      <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Applicant ID</p>
-                      <p className="font-mono text-white font-semibold">{registration?.applicantId}</p>
+                    <div className="bg-white/4 rounded-xl p-3.5 border border-white/8">
+                      <p className="text-white/40 text-xs uppercase tracking-wider mb-0.5">Applicant ID</p>
+                      <p className="font-mono text-white font-semibold text-sm">{registration?.applicantId}</p>
                     </div>
-                    <div className="bg-white/4 rounded-xl p-4 border border-white/8">
-                      <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Name</p>
-                      <p className="text-white font-semibold">{registration?.personalInfo?.fullName}</p>
+                    <div className="bg-white/4 rounded-xl p-3.5 border border-white/8">
+                      <p className="text-white/40 text-xs uppercase tracking-wider mb-0.5">Name</p>
+                      <p className="text-white font-semibold text-sm">{registration?.personalInfo?.fullName}</p>
                     </div>
-                    <div className="bg-white/4 rounded-xl p-4 border border-white/8">
+                    <div className="bg-white/4 rounded-xl p-3.5 border border-white/8">
                       <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Events</p>
-                      <ul className="space-y-1">
+                      <ul className="space-y-1.5">
                         {(registration?.eventNames || registration?.events || []).map((ev: string, i: number) => (
                           <li key={i} className="text-white text-sm flex items-center gap-2">
-                            <span className="text-purple-400 text-xs">✓</span> {ev}
+                            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0" />
+                            {ev}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <div className="bg-[#ffd700]/8 rounded-xl p-4 border border-[#ffd700]/20 flex justify-between items-center">
-                      <span className="text-white/70 font-medium">Total Amount</span>
+                    <div className="bg-gradient-to-r from-[#ffd700]/10 to-violet-600/10 rounded-xl p-4 border border-[#ffd700]/20 flex justify-between items-center">
+                      <span className="text-white/60 font-medium text-sm">Total Amount</span>
                       <span className="text-[#ffd700] font-black text-2xl">₹{registration?.totalFee}</span>
                     </div>
                   </div>
                 </div>
+                <div className="glass-card p-4 rounded-2xl border border-green-400/15 flex items-center gap-3">
+                  <ShieldCheck className="w-7 h-7 text-green-400 flex-shrink-0" />
+                  <div>
+                    <p className="text-green-400 font-semibold text-sm">100% Secure</p>
+                    <p className="text-white/35 text-xs">Powered by Razorpay &amp; UPI</p>
+                  </div>
+                </div>
               </div>
 
-              {/* ── Payment Methods ── */}
-              <div className="lg:col-span-3">
-                {/* Tab switcher */}
-                <div className="flex rounded-2xl overflow-hidden border border-white/10 mb-5">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('razorpay')}
-                    className={`flex-1 py-3.5 text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 ${
-                      activeTab === 'razorpay'
-                        ? 'bg-purple-600 text-white shadow-lg'
-                        : 'bg-white/5 text-white/50 hover:text-white/80 hover:bg-white/10'
-                    }`}
-                  >
-                    <ShieldCheck className="w-4 h-4" /> Razorpay
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('upi')}
-                    className={`flex-1 py-3.5 text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 ${
-                      activeTab === 'upi'
-                        ? 'bg-[#00d4ff]/20 text-[#00d4ff] border-l border-[#00d4ff]/30'
-                        : 'bg-white/5 text-white/50 hover:text-white/80 hover:bg-white/10 border-l border-white/10'
-                    }`}
-                  >
-                    <Smartphone className="w-4 h-4" /> UPI / QR
-                  </button>
+              {/* ── Right: Payment Panel ── */}
+              <div className="lg:col-span-3 space-y-4">
+
+                {/* Device chip */}
+                <div className="flex items-center gap-2 text-white/35 text-xs px-1">
+                  {isMobile
+                    ? <><Smartphone className="w-3.5 h-3.5 text-violet-400" /><span>Mobile detected — tap any UPI app to pay instantly</span></>
+                    : <><Monitor className="w-3.5 h-3.5 text-[#00d4ff]" /><span>Desktop detected — scan QR or pay via Razorpay</span></>
+                  }
                 </div>
 
-                {/* ── RAZORPAY TAB ── */}
-                {activeTab === 'razorpay' && (
-                  <div className="glass-card p-6 rounded-2xl space-y-5">
-                    <div>
-                      <h2 className="text-white font-bold text-lg flex items-center gap-2 mb-1">
-                        <ShieldCheck className="text-purple-400 w-5 h-5" /> Secure Online Payment
-                      </h2>
-                      <p className="text-white/50 text-sm">Pay instantly with Card, UPI, Net Banking or Wallets. Ticket generated immediately after payment.</p>
+                {/* ══ MOBILE: UPI App Picker ══ */}
+                {isMobile && !showUtrForm && (
+                  <div className="glass-card rounded-2xl overflow-hidden">
+                    {/* Amount banner */}
+                    <div className="bg-gradient-to-r from-violet-600/30 to-purple-900/30 border-b border-white/8 p-5 text-center">
+                      <p className="text-white/50 text-xs uppercase tracking-widest mb-1">Amount to Pay</p>
+                      <p className="text-[#ffd700] font-black text-5xl tracking-tight">₹{registration?.totalFee}</p>
+                      <p className="text-white/30 text-xs mt-2">To: <span className="text-white/60 font-mono">{upiId}</span></p>
                     </div>
 
-                    <div className="bg-white/4 rounded-xl p-4 border border-white/8 space-y-2">
-                      {['💳 Debit / Credit Cards', '📱 UPI (GPay, PhonePe, Paytm)', '🏦 Net Banking', '👛 Wallets'].map(m => (
-                        <div key={m} className="flex items-center gap-2 text-sm text-white/70">
-                          <span>{m}</span>
+                    <div className="p-5 space-y-5">
+                      <div>
+                        <p className="text-white font-bold flex items-center gap-2 mb-0.5">
+                          <Smartphone className="w-4 h-4 text-violet-400" /> Pay with UPI App
+                        </p>
+                        <p className="text-white/40 text-xs">Tap to open your preferred UPI app directly</p>
+                      </div>
+
+                      {/* App grid */}
+                      <div className="grid grid-cols-3 gap-3">
+                        {UPI_APPS.map((app) => (
+                          <button
+                            key={app.id}
+                            type="button"
+                            onClick={() => handleUpiAppClick(app)}
+                            className={`group flex flex-col items-center gap-2.5 p-4 rounded-2xl
+                              bg-gradient-to-br ${app.gradient}
+                              ring-1 ${app.ring}
+                              hover:scale-105 active:scale-95
+                              transition-all duration-200 shadow-lg`}
+                          >
+                            <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white font-black text-base">
+                              {app.short}
+                            </div>
+                            <span className="text-white text-[11px] font-semibold text-center leading-tight">{app.name}</span>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Countdown */}
+                      {countdown > 0 && (
+                        <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl px-4 py-3 text-center">
+                          <p className="text-violet-300 text-sm">Opening {launchedApp}... <span className="font-bold">{countdown}s</span></p>
+                          <p className="text-white/30 text-xs mt-1">UTR entry will appear after payment</p>
                         </div>
-                      ))}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleRazorpayPayment}
-                      disabled={isPayingWithRazorpay}
-                      className="w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed transition-all bg-gradient-to-r from-purple-600 to-violet-600 hover:brightness-110 text-white shadow-xl shadow-purple-900/40"
-                    >
-                      {isPayingWithRazorpay ? (
-                        <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Opening Razorpay...</>
-                      ) : (
-                        <><ShieldCheck className="w-5 h-5" /> Pay ₹{registration?.totalFee} with Razorpay</>
                       )}
-                    </button>
 
-                    <p className="text-center text-white/30 text-xs">
-                      Trouble with Razorpay?{' '}
-                      <button type="button" onClick={() => setActiveTab('upi')} className="text-[#00d4ff] underline underline-offset-2 hover:text-[#00d4ff]/80 transition-colors">
-                        Pay via UPI instead
+                      <button
+                        type="button"
+                        onClick={() => setShowUtrForm(true)}
+                        className="w-full py-3.5 rounded-xl border border-green-400/30 text-green-400 text-sm font-bold hover:bg-green-400/10 transition-all flex items-center justify-center gap-2"
+                      >
+                        <CheckCircle className="w-4 h-4" /> I&apos;ve Paid — Enter UTR Number
                       </button>
-                    </p>
+
+                      {/* Razorpay alt */}
+                      <div className="border-t border-white/8 pt-4 space-y-2">
+                        <p className="text-white/30 text-xs text-center">Or pay with Card / Net Banking</p>
+                        <button
+                          type="button"
+                          onClick={handleRazorpayPayment}
+                          disabled={isPayingWithRazorpay}
+                          className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-40 transition-all bg-gradient-to-r from-violet-600 to-purple-600 hover:brightness-110 text-white shadow-lg"
+                        >
+                          {isPayingWithRazorpay
+                            ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Opening Razorpay...</>
+                            : <><ShieldCheck className="w-4 h-4" /> Pay ₹{registration?.totalFee} via Razorpay</>
+                          }
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
 
-                {/* ── UPI TAB ── */}
-                {activeTab === 'upi' && (
-                  <form onSubmit={handleUtrSubmit} className="glass-card p-6 rounded-2xl space-y-5">
-                    <div>
-                      <h2 className="text-white font-bold text-lg flex items-center gap-2 mb-1">
-                        <Smartphone className="text-[#00d4ff] w-5 h-5" /> Pay via UPI
-                      </h2>
-                      <p className="text-white/50 text-sm">Scan the QR code or copy the UPI ID, pay, then enter your UTR number below.</p>
+                {/* ══ DESKTOP: QR + Razorpay ══ */}
+                {!isMobile && !showUtrForm && (
+                  <div className="glass-card rounded-2xl overflow-hidden">
+                    {/* Amount banner */}
+                    <div className="bg-gradient-to-r from-violet-600/25 to-purple-900/25 border-b border-white/8 p-5 text-center">
+                      <p className="text-white/40 text-xs uppercase tracking-widest mb-1">Amount to Pay</p>
+                      <p className="text-[#ffd700] font-black text-5xl tracking-tight">₹{registration?.totalFee}</p>
                     </div>
 
-                    {/* QR Code */}
-                    <div className="bg-white/4 rounded-2xl p-5 text-center border border-white/8">
-                      <div className="bg-white p-3 rounded-xl inline-block mb-4 shadow-lg">
-                        <img
-                          src={
-                            settings?.upiQrCodeUrl ||
-                            `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(
-                              `upi://pay?pa=${settings?.upiId || '9342706675@okbizaxis'}&pn=INFOGRAM26&am=${registration?.totalFee || 350}&cu=INR&tn=INFOGRAM26-${registration?.applicantId || ''}`
-                            )}`
-                          }
-                          alt="UPI QR Code"
-                          className="w-48 h-48 object-cover rounded-lg"
-                        />
-                      </div>
-                      <div className="bg-white/6 rounded-xl p-3 flex items-center justify-between gap-3 border border-white/10">
-                        <div className="text-left">
-                          <p className="text-white/40 text-xs">UPI ID</p>
-                          <p className="text-white font-mono font-semibold text-sm">{settings?.upiId || '9342706675@okbizaxis'}</p>
+                    <div className="p-6 space-y-6">
+                      {/* QR Section */}
+                      <div>
+                        <p className="text-white font-bold flex items-center gap-2 mb-1">
+                          <QrCode className="w-4 h-4 text-[#00d4ff]" /> Scan &amp; Pay via UPI
+                        </p>
+                        <p className="text-white/40 text-xs mb-4">Scan with PhonePe, GPay, Paytm, BHIM or any UPI app</p>
+
+                        <div className="flex flex-col sm:flex-row gap-6 items-center">
+                          {/* QR code */}
+                          <div className="flex-shrink-0">
+                            <div className="p-3 bg-white rounded-2xl shadow-2xl shadow-violet-900/50 border-4 border-violet-500/20 inline-block">
+                              <img
+                                src={settings?.upiQrCodeUrl || qrUrl}
+                                alt="UPI QR Code"
+                                className="w-52 h-52 object-cover rounded-lg"
+                              />
+                            </div>
+                            <p className="text-white/30 text-xs text-center mt-2">Scan to pay ₹{registration?.totalFee}</p>
+                          </div>
+
+                          {/* UPI details */}
+                          <div className="flex-1 space-y-3 w-full">
+                            <div className="bg-white/5 rounded-xl p-3.5 border border-white/10 flex items-center justify-between gap-3">
+                              <div>
+                                <p className="text-white/35 text-xs mb-0.5">UPI ID</p>
+                                <p className="text-white font-mono font-semibold text-sm">{upiId}</p>
+                              </div>
+                              <button type="button" onClick={copyUpiId} className="text-[#00d4ff] p-2 rounded-lg hover:bg-[#00d4ff]/10 transition-colors flex-shrink-0">
+                                <Copy className="w-4 h-4" />
+                              </button>
+                            </div>
+
+                            <div className="bg-amber-500/8 border border-amber-500/20 rounded-xl px-4 py-3 flex items-start gap-2">
+                              <AlertCircle className="text-amber-400 w-4 h-4 flex-shrink-0 mt-0.5" />
+                              <p className="text-white/60 text-xs">
+                                Pay exactly <strong className="text-[#ffd700]">₹{registration?.totalFee}</strong> — wrong amount delays your ticket
+                              </p>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              {['Open any UPI app on your phone', 'Scan the QR code or enter UPI ID', `Confirm ₹${registration?.totalFee} payment`, 'Note your UTR / transaction number'].map((step, i) => (
+                                <div key={i} className="flex items-center gap-2.5 text-xs text-white/50">
+                                  <span className="w-5 h-5 rounded-full bg-violet-600/30 text-violet-300 flex items-center justify-center text-[10px] font-bold flex-shrink-0">{i + 1}</span>
+                                  {step}
+                                </div>
+                              ))}
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => setShowUtrForm(true)}
+                              className="w-full py-3.5 rounded-xl bg-green-400/10 border border-green-400/30 text-green-400 text-sm font-bold hover:bg-green-400/20 transition-all flex items-center justify-center gap-2"
+                            >
+                              <CheckCircle className="w-4 h-4" /> I&apos;ve Paid — Enter UTR Number
+                            </button>
+                          </div>
                         </div>
-                        <button type="button" onClick={copyUpiId} className="text-[#00d4ff] p-2 rounded-lg hover:bg-[#00d4ff]/10 transition-colors flex-shrink-0">
-                          <Copy className="w-4 h-4" />
+                      </div>
+
+                      {/* Razorpay */}
+                      <div className="border-t border-white/8 pt-5">
+                        <p className="text-white/30 text-xs text-center mb-4">Or pay instantly with Card / Net Banking / Wallet</p>
+                        <button
+                          type="button"
+                          onClick={handleRazorpayPayment}
+                          disabled={isPayingWithRazorpay}
+                          className="w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed transition-all bg-gradient-to-r from-violet-600 to-purple-600 hover:brightness-110 text-white shadow-xl shadow-purple-900/40"
+                        >
+                          {isPayingWithRazorpay
+                            ? <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Opening Razorpay...</>
+                            : <><ShieldCheck className="w-5 h-5" /> Pay ₹{registration?.totalFee} — Cards / Net Banking / Wallet</>
+                          }
                         </button>
+                        <p className="text-center text-white/20 text-xs mt-3">256-bit SSL encrypted · PCI DSS compliant</p>
                       </div>
-                      <p className="text-white/40 text-xs mt-3">Merchant: <span className="text-white/60 font-medium">{settings?.merchantName || 'INFOGRAM 26 SYMPOSIUM'}</span></p>
+                    </div>
+                  </div>
+                )}
+
+                {/* ══ UTR Confirmation Form ══ */}
+                {showUtrForm && (
+                  <form onSubmit={handleUtrSubmit} className="glass-card rounded-2xl overflow-hidden">
+                    <div className="bg-gradient-to-r from-green-500/15 to-emerald-600/15 border-b border-green-500/15 p-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-400/20 rounded-full flex items-center justify-center flex-shrink-0">
+                          <CheckCircle className="w-5 h-5 text-green-400" />
+                        </div>
+                        <div>
+                          <p className="text-white font-bold">Confirm Your Payment</p>
+                          <p className="text-white/40 text-xs">
+                            {launchedApp ? `Opened ${launchedApp} — ` : ''}Enter the UTR from your UPI app to get your ticket
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Amount reminder */}
-                    <div className="flex items-center gap-3 bg-amber-500/8 border border-amber-500/20 rounded-xl px-4 py-3">
-                      <AlertCircle className="text-amber-400 w-4 h-4 flex-shrink-0" />
-                      <p className="text-white/70 text-sm">
-                        Pay exactly <strong className="text-[#ffd700]">₹{registration?.totalFee}</strong> via UPI, then fill in the UTR number below.
-                      </p>
-                    </div>
+                    <div className="p-6 space-y-5">
+                      <div>
+                        <label className={labelClass}>UTR / Transaction Reference Number *</label>
+                        <input
+                          type="text"
+                          required
+                          value={utrNumber}
+                          onChange={e => setUtrNumber(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                          className={inputClass}
+                          placeholder="Enter 12-digit UTR number"
+                          maxLength={12}
+                          autoFocus
+                        />
+                        <div className="flex items-center justify-between mt-2">
+                          <p className="text-white/30 text-xs">Found in your UPI app under transaction details</p>
+                          <p className={`text-xs font-mono ${utrNumber.length === 12 ? 'text-green-400' : 'text-white/30'}`}>
+                            {utrNumber.length}/12
+                          </p>
+                        </div>
+                      </div>
 
-                    {/* UTR Number */}
-                    <div>
-                      <label className={labelClass}>UTR / Transaction Reference Number *</label>
-                      <input
-                        type="text"
-                        required
-                        value={utrNumber}
-                        onChange={e => setUtrNumber(e.target.value.replace(/\D/g, '').slice(0, 12))}
-                        className={inputClass}
-                        placeholder="Enter 12-digit UTR number"
-                        maxLength={12}
-                      />
-                      <p className="text-white/30 text-xs mt-1.5">Found in your UPI app under transaction details</p>
-                    </div>
+                      {/* Screenshot */}
+                      <div>
+                        <label className={labelClass}>Payment Screenshot <span className="normal-case font-normal text-white/25">(optional)</span></label>
+                        <div
+                          className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${screenshot ? 'border-green-400/50 bg-green-400/5' : 'border-white/12 hover:border-violet-400/40 hover:bg-violet-400/5'}`}
+                          onClick={() => document.getElementById('screenshot-upload')?.click()}
+                        >
+                          <input type="file" id="screenshot-upload" className="hidden" accept="image/*"
+                            onChange={e => e.target.files?.[0] && handleScreenshotChange(e.target.files[0])} />
+                          {screenshotPreview ? (
+                            <div className="space-y-2">
+                              <img src={screenshotPreview} alt="Screenshot" className="max-h-36 mx-auto rounded-lg border border-white/10" />
+                              <p className="text-green-400 text-xs font-semibold">{screenshot?.name}</p>
+                              <p className="text-white/30 text-xs">Click to change</p>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-2">
+                              <Upload className="w-7 h-7 text-white/25" />
+                              <p className="text-white/40 text-sm">Upload payment screenshot</p>
+                              <p className="text-white/25 text-xs">PNG, JPG accepted</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
 
-                    {/* Screenshot (optional) */}
-                    <div>
-                      <label className={labelClass}>Payment Screenshot <span className="normal-case font-normal text-white/30">(optional)</span></label>
-                      <div
-                        className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${
-                          screenshot ? 'border-green-400/50 bg-green-400/5' : 'border-white/15 hover:border-[#00d4ff]/40 hover:bg-[#00d4ff]/5'
-                        }`}
-                        onClick={() => document.getElementById('screenshot-upload')?.click()}
+                      <button
+                        type="submit"
+                        disabled={isSubmitting || !utrNumber || utrNumber.length < 12}
+                        className="w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed transition-all bg-gradient-to-r from-green-500 to-emerald-500 hover:brightness-110 text-white shadow-xl shadow-green-900/30"
                       >
-                        <input type="file" id="screenshot-upload" className="hidden" accept="image/*"
-                          onChange={e => e.target.files?.[0] && handleScreenshotChange(e.target.files[0])} />
-                        {screenshotPreview ? (
-                          <div className="space-y-2">
-                            <img src={screenshotPreview} alt="Screenshot" className="max-h-36 mx-auto rounded-lg border border-white/10" />
-                            <p className="text-green-400 text-xs font-semibold">{screenshot?.name}</p>
-                            <p className="text-white/40 text-xs">Click to change</p>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center gap-2">
-                            <Upload className="w-7 h-7 text-white/30" />
-                            <p className="text-white/50 text-sm">Upload payment screenshot</p>
-                            <p className="text-white/30 text-xs">PNG, JPG accepted</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                        {isSubmitting
+                          ? <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Confirming Payment...</>
+                          : <><CheckCircle className="w-5 h-5" /> Confirm Payment &amp; Get Ticket</>
+                        }
+                      </button>
 
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || !utrNumber || utrNumber.length < 12}
-                      className="w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed transition-all bg-gradient-to-r from-[#00d4ff] to-[#0ea5e9] text-slate-900 shadow-xl shadow-[#00d4ff]/20"
-                    >
-                      {isSubmitting ? (
-                        <><div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" /> Confirming Payment...</>
-                      ) : (
-                        <><CheckCircle className="w-5 h-5" /> Confirm Payment &amp; Get Ticket</>
-                      )}
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => { setShowUtrForm(false); setLaunchedApp(null); }}
+                        className="w-full text-center text-white/30 text-sm hover:text-white/55 transition-colors flex items-center justify-center gap-1.5"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" /> Back to payment options
+                      </button>
+                    </div>
                   </form>
                 )}
 
@@ -553,9 +739,7 @@ export default function PaymentPage() {
   return (
     <Suspense fallback={
       <PublicLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <LoadingSpinner size="lg" />
-        </div>
+        <div className="flex items-center justify-center min-h-[60vh]"><LoadingSpinner size="lg" /></div>
       </PublicLayout>
     }>
       <PaymentContent />
