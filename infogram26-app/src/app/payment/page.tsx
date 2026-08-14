@@ -504,36 +504,9 @@ function PaymentContent() {
                       <p className="text-white/30 text-xs mt-1.5">Found in your UPI app under transaction details</p>
                     </div>
 
-                    {/* Screenshot Upload */}
-                    <div>
-                      <label className={labelClass}>Payment Screenshot *</label>
-                      <div
-                        className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 ${
-                          screenshot ? 'border-green-400/50 bg-green-400/5' : 'border-white/15 hover:border-[#00d4ff]/40 hover:bg-[#00d4ff]/5'
-                        }`}
-                        onClick={() => document.getElementById('screenshot-upload')?.click()}
-                      >
-                        <input type="file" id="screenshot-upload" className="hidden" accept="image/*"
-                          onChange={e => e.target.files?.[0] && handleScreenshotChange(e.target.files[0])} />
-                        {screenshotPreview ? (
-                          <div className="space-y-3">
-                            <img src={screenshotPreview} alt="Screenshot" className="max-h-36 mx-auto rounded-lg border border-white/10" />
-                            <p className="text-green-400 text-xs font-semibold">{screenshot?.name}</p>
-                            <p className="text-white/40 text-xs">Click to change</p>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center gap-2">
-                            <Upload className="w-8 h-8 text-white/30" />
-                            <p className="text-white/60 text-sm font-medium">Upload payment screenshot</p>
-                            <p className="text-white/30 text-xs">Click to browse • PNG, JPG accepted</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || !utrNumber || utrNumber.length < 12 || !screenshot}
+                     <button
+                       type="submit"
+                       disabled={isSubmitting || !utrNumber || utrNumber.length < 12}
                       className="w-full btn-primary py-4 rounded-xl font-bold text-base flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (
