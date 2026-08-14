@@ -34,24 +34,6 @@ const socialLinks = [
       </svg>
     ),
   },
-  {
-    label: 'LinkedIn',
-    href: 'https://linkedin.com',
-    icon: (
-      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-      </svg>
-    ),
-  },
-  {
-    label: 'YouTube',
-    href: 'https://youtube.com',
-    icon: (
-      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-        <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
-      </svg>
-    ),
-  },
 ];
 
 export default function Footer() {
@@ -60,36 +42,34 @@ export default function Footer() {
   const isDark = theme === 'dark';
 
   return (
-    <footer className={`pt-16 pb-12 border-t transition-colors duration-300 relative z-10 ${
-      isDark ? 'bg-[#04060e] border-purple-500/20 text-white' : 'bg-white border-slate-200 text-slate-950'
-    }`}>
+    <footer className={`pt-16 pb-12 border-t transition-colors duration-300 relative z-10 ${isDark ? 'bg-[#04060e] border-purple-500/20 text-white' : 'bg-white border-slate-200 text-slate-950'
+      }`}>
       <div className="container-xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12">
 
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="flex items-center gap-2.5 group w-fit"
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full border shadow-sm flex items-center justify-center overflow-hidden shrink-0 bg-black transition-all duration-200 ${
-                isDark ? 'border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.3)]' : 'border-[#7c3aed]/40'
-              }`}>
-                <img 
-                  src="/logo.png" 
-                  alt="INFOGRAM'26 Logo" 
+              <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full border shadow-sm flex items-center justify-center overflow-hidden shrink-0 bg-black transition-all duration-200 ${isDark ? 'border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.3)]' : 'border-[#7c3aed]/40'
+                }`}>
+                <img
+                  src="/logo.png"
+                  alt="INFOGRAM'26 Logo"
                   width={48}
                   height={48}
                   decoding="async"
-                  className="w-full h-full object-cover rounded-full transform scale-105" 
+                  className="w-full h-full object-cover rounded-full transform scale-105"
                 />
               </div>
               <span className={`text-xl font-black tracking-wider ${isDark ? 'text-white' : 'text-slate-950'}`} style={{ fontFamily: 'var(--font-display)' }}>
                 INFOGRAM<span className={isDark ? 'text-amber-300' : 'text-[#7c3aed]'}>&apos;26</span>
               </span>
             </Link>
-            
+
             <p className={`text-sm leading-relaxed font-bold max-w-xs ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
               National Level Technical Symposium organized by the Department of Information Technology at C. Abdul Hakeem College of Engineering &amp; Technology.
             </p>
@@ -102,11 +82,10 @@ export default function Footer() {
                   target={s.href.startsWith('http') ? '_blank' : undefined}
                   rel={s.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   aria-label={s.label}
-                  className={`w-[44px] h-[44px] flex items-center justify-center rounded-full border transition-all duration-200 ${
-                    isDark 
-                      ? 'bg-slate-900 border-slate-700 text-slate-200 hover:bg-purple-500/20 hover:text-amber-300 hover:border-amber-300/40' 
+                  className={`w-[44px] h-[44px] flex items-center justify-center rounded-full border transition-all duration-200 ${isDark
+                      ? 'bg-slate-900 border-slate-700 text-slate-200 hover:bg-purple-500/20 hover:text-amber-300 hover:border-amber-300/40'
                       : 'bg-slate-100 border-slate-300 text-slate-900 hover:bg-[#7c3aed]/10 hover:text-[#7c3aed] hover:border-[#7c3aed]/40'
-                  }`}
+                    }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   {s.icon}
@@ -125,9 +104,8 @@ export default function Footer() {
                 <li key={link.name}>
                   <Link
                     href={link.path}
-                    className={`min-h-[40px] flex items-center text-sm font-black transition-colors ${
-                      isDark ? 'text-slate-300 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
-                    }`}
+                    className={`min-h-[40px] flex items-center text-sm font-black transition-colors ${isDark ? 'text-slate-300 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
+                      }`}
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
                     {link.name}
@@ -151,9 +129,8 @@ export default function Footer() {
                     <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>·</span>
                     <a
                       href={`tel:+91${person.phone}`}
-                      className={`text-sm font-black transition-colors ${
-                        isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
-                      }`}
+                      className={`text-sm font-black transition-colors ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
+                        }`}
                       style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                       {person.phone}
@@ -167,9 +144,8 @@ export default function Footer() {
                 <Link
                   key={link.name}
                   href={link.path}
-                  className={`block text-xs font-black uppercase tracking-wider transition-colors ${
-                    isDark ? 'text-slate-300 hover:text-amber-300' : 'text-slate-800 hover:text-[#7c3aed]'
-                  }`}
+                  className={`block text-xs font-black uppercase tracking-wider transition-colors ${isDark ? 'text-slate-300 hover:text-amber-300' : 'text-slate-800 hover:text-[#7c3aed]'
+                    }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   {link.name}
@@ -223,9 +199,8 @@ export default function Footer() {
                 <Phone className={`w-4 h-4 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                 <a
                   href="tel:+918248963928"
-                  className={`text-sm font-black transition-colors ${
-                    isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
-                  }`}
+                  className={`text-sm font-black transition-colors ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
+                    }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   HOD: Dr. S. Umamaheswari (8248963928)
@@ -235,9 +210,8 @@ export default function Footer() {
                 <Mail className={`w-4 h-4 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                 <a
                   href="mailto:info@cahcet.edu.in"
-                  className={`text-sm font-black transition-colors ${
-                    isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
-                  }`}
+                  className={`text-sm font-black transition-colors ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
+                    }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   info@cahcet.edu.in
@@ -249,11 +223,10 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className={`pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-black ${
-          isDark ? 'border-slate-800 text-slate-300' : 'border-slate-300 text-slate-800'
-        }`}>
+        <div className={`pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-black ${isDark ? 'border-slate-800 text-slate-300' : 'border-slate-300 text-slate-800'
+          }`}>
           <p>© {currentYear} INFogram&apos;26 · Department of Information Technology, CAHCET. All rights reserved.</p>
-          
+
           <p className="flex items-center gap-2 text-xs font-black">
             <span>Designed &amp; Developed by</span>
             <a
@@ -262,11 +235,10 @@ export default function Footer() {
               rel="noopener noreferrer"
               title="appziio — Web & App Development Studio"
               aria-label="Developed by appziio"
-              className={`font-black text-xs uppercase tracking-widest transition-all px-3 py-1 rounded-full border ${
-                isDark 
-                  ? 'bg-purple-500/20 text-amber-300 border-purple-500/40 hover:bg-purple-500/30 shadow-[0_0_12px_rgba(252,211,77,0.4)]' 
+              className={`font-black text-xs uppercase tracking-widest transition-all px-3 py-1 rounded-full border ${isDark
+                  ? 'bg-purple-500/20 text-amber-300 border-purple-500/40 hover:bg-purple-500/30 shadow-[0_0_12px_rgba(252,211,77,0.4)]'
                   : 'bg-[#7c3aed]/10 text-[#7c3aed] border-[#7c3aed]/30 hover:bg-[#7c3aed]/20 shadow-xs'
-              }`}
+                }`}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               appziio

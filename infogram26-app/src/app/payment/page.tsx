@@ -49,8 +49,10 @@ function PaymentContent() {
   // Razorpay is the primary payment method. If it fails to load, errors
   // creating the order, or the user backs out of checkout, we fall back
   // to the UPI QR + UTR verification flow instead of leaving them stuck.
-  const [razorpayAvailable, setRazorpayAvailable] = useState(true);
-  const [showQrFallback, setShowQrFallback] = useState(false);
+  // Razorpay temporarily disabled — UPI QR + UTR is the active payment method.
+  // Flip razorpayAvailable back to true once Razorpay keys are configured.
+  const [razorpayAvailable, setRazorpayAvailable] = useState(false);
+  const [showQrFallback, setShowQrFallback] = useState(true);
   const [isPayingWithRazorpay, setIsPayingWithRazorpay] = useState(false);
 
   useEffect(() => {
@@ -291,21 +293,11 @@ function PaymentContent() {
       toast.error('Please enter a valid 12-digit UTR number');
       return;
     }
-    if (!screenshot) {
-      toast.error('Please upload a payment screenshot');
-      return;
-    }
     if (!registration) return;
 
     setIsSubmitting(true);
     try {
-      let proofUrl = '';
-      if (registration.id !== 'mock_reg_123' && db && storage) {
-        const storageRef = ref(storage, `payment-proofs/${registration.id}-${Date.now()}`);
-        await uploadBytes(storageRef, screenshot);
-        proofUrl = await getDownloadURL(storageRef);
-      }
-      await finalizePayment({ method: 'upi', utrNumber: utrNumber.trim(), proofUrl });
+      await finalizePayment({ method: 'upi', utrNumber: utrNumber.trim() });
     } catch (err) {
       console.error('Payment submission failed:', err);
       toast.error('Something went wrong. Please try again.');
