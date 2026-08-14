@@ -162,13 +162,18 @@ function PaymentContent() {
     setTimeout(() => router.push(`/ticket/${newTicketRef.id}`), 2500);
   }, [registration, router]);
 
+  /* Preload Razorpay script on page mount for instant mobile response */
+  useEffect(() => {
+    loadRazorpayScript().catch((err) => console.warn('Razorpay script preload warning:', err));
+  }, []);
+
   /* ── Razorpay checkout ── */
   const handleRazorpayPayment = async () => {
     if (!registration) return;
     setIsPayingWithRazorpay(true);
     try {
       const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) throw new Error('Razorpay script failed to load');
+      if (!scriptLoaded) throw new Error('Razorpay script failed to load. Please check your internet connection.');
 
       const orderRes = await fetch('/api/payment/create-order', {
         method: 'POST',
@@ -178,8 +183,10 @@ function PaymentContent() {
       const orderData = await orderRes.json();
       if (!orderRes.ok || !orderData.id) throw new Error(orderData.error || 'Could not create Razorpay order');
 
-      const rzp = new window.Razorpay({
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      const razorpayKey = orderData.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_TPacWV4BbmByiW';
+
+      const options: any = {
+        key: razorpayKey,
         amount: orderData.amount,
         currency: orderData.currency,
         order_id: orderData.id,
@@ -187,11 +194,16 @@ function PaymentContent() {
         description: `Registration — ${registration.applicantId}`,
         image: '/logo.png',
         prefill: {
-          name: registration.personalInfo?.fullName,
-          email: registration.personalInfo?.email,
-          contact: registration.personalInfo?.phone,
+          name: registration.personalInfo?.fullName || '',
+          email: registration.personalInfo?.email || '',
+          contact: registration.personalInfo?.phone ? String(registration.personalInfo.phone).replace(/\D/g, '').slice(-10) : '',
         },
         theme: { color: '#7c3aed' },
+        modal: {
+          ondismiss: () => setIsPayingWithRazorpay(false),
+          backdropclose: false,
+          escape: true,
+        },
         handler: async (response: any) => {
           try {
             const verifyRes = await fetch('/api/payment/verify', {
@@ -218,10 +230,11 @@ function PaymentContent() {
             setIsPayingWithRazorpay(false);
           }
         },
-        modal: { ondismiss: () => setIsPayingWithRazorpay(false) },
-      });
+      };
+
+      const rzp = new window.Razorpay(options);
       rzp.on('payment.failed', (resp: any) => {
-        toast.error(`Payment failed: ${resp.error?.description || 'Unknown error'}`);
+        toast.error(`Payment failed: ${resp.error?.description || 'Transaction cancelled or failed'}`);
         setIsPayingWithRazorpay(false);
       });
       rzp.open();
@@ -348,6 +361,8 @@ function PaymentContent() {
                 className="group relative w-full overflow-hidden rounded-2xl text-white font-black text-base py-4 px-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_12px_40px_rgba(124,58,237,0.4)] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                 style={{
                   background: 'linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #8b5cf6 100%)',
+                  WebkitTapHighlightColor: 'transparent',
+                  touchAction: 'manipulation',
                 }}
               >
                 {/* Shimmer effect */}
@@ -369,6 +384,21 @@ function PaymentContent() {
                   )}
                 </div>
               </button>
+
+              {/* ── Mobile Fallback Direct Link ── */}
+              <div className="text-center pt-1">
+                <a
+                  href="https://razorpay.me/@infogram26"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-1.5 text-xs font-bold transition-all hover:underline ${
+                    isDark ? 'text-violet-300 hover:text-violet-200' : 'text-[#7c3aed] hover:text-purple-800'
+                  }`}
+                >
+                  <span>Having trouble on mobile? Pay directly via Razorpay Page</span>
+                  <span className="text-xs">↗</span>
+                </a>
+              </div>
 
               {/* ── Trust Badges ── */}
               <div className={`${glassCard} rounded-2xl p-4`}>

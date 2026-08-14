@@ -32,7 +32,10 @@ export async function POST(req: Request) {
       throw new Error(data.error?.description || 'Failed to create Razorpay order');
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json({
+      ...data,
+      keyId,
+    });
   } catch (error: any) {
     console.error('Razorpay Order Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
