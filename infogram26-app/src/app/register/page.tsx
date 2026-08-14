@@ -18,10 +18,18 @@ const personalInfoSchema = z.object({
   college: z.string().min(1, 'College is required'),
   department: z.string().min(1, 'Department is required'),
   year: z.enum(['1st', '2nd', '3rd', '4th']),
-  registerNumber: z.string().min(1, 'Register Number is required'),
+  registerNumber: z.string().optional(),
   email: z.string().email('Invalid email address'),
   phone: z.string().regex(/^\d{10}$/, 'Phone number must be 10 digits'),
   gender: z.enum(['Male', 'Female', 'Other']),
+}).superRefine((data, ctx) => {
+  if (data.year !== '1st' && !data.registerNumber?.trim()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Register Number is required for 2nd year and above',
+      path: ['registerNumber'],
+    });
+  }
 });
 
 type PersonalInfoForm = z.infer<typeof personalInfoSchema>;
@@ -292,8 +300,14 @@ export default function RegisterPage() {
                       {errors.department && <p className={errorStyle}>{errors.department.message}</p>}
                     </div>
                     <div>
-                      <label className={labelStyle}>Register Number *</label>
-                      <input {...register('registerNumber')} className={inputStyle} placeholder="College register number" />
+                      <label className={labelStyle}>
+                        Register Number
+                        {formData.year === '1st'
+                          ? <span className="ml-2 text-[10px] normal-case font-bold text-amber-400/80">(Optional for 1st year)</span>
+                          : <span className="ml-1">*</span>
+                        }
+                      </label>
+                      <input {...register('registerNumber')} className={inputStyle} placeholder={formData.year === '1st' ? 'Leave blank if not yet assigned' : 'College register number'} />
                       {errors.registerNumber && <p className={errorStyle}>{errors.registerNumber.message}</p>}
                     </div>
                     <div>
@@ -477,7 +491,7 @@ export default function RegisterPage() {
                     type="button"
                     onClick={handleNext}
                     disabled={
-                      (step === 1 && (!formData.fullName || !formData.email || !formData.phone || !formData.college || !formData.department || !formData.registerNumber || !formData.year || !formData.gender)) ||
+                      (step === 1 && (!formData.fullName || !formData.email || !formData.phone || !formData.college || !formData.department || !formData.year || !formData.gender || (formData.year !== '1st' && !formData.registerNumber))) ||
                       (step === 2 && selectedEvents.length === 0)
                     }
                     className="px-8 py-3.5 rounded-full text-sm font-black flex items-center gap-2 bg-gradient-to-r from-[#7c3aed] to-[#6366f1] text-white shadow-xl hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
