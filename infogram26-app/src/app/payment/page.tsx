@@ -47,30 +47,62 @@ function PaymentContent() {
   useEffect(() => {
     const fetchData = async () => {
       if (!regId) { router.push('/register'); return; }
+
+      const urlFee = Number(searchParams.get('fee')) || 0;
+      const urlEvents = searchParams.get('events') ? searchParams.get('events')!.split(',') : [];
+      const urlName = searchParams.get('name') || 'Symposium Participant';
+      const urlEmail = searchParams.get('email') || '';
+      const urlPhone = searchParams.get('phone') || '';
+
       try {
-        if (regId === 'mock_reg_123') {
+        if (regId === 'mock_reg_123' || !db) {
           setRegistration({
-            id: 'mock_reg_123', applicantId: 'APP123456', totalFee: 350,
-            events: [], eventNames: ['Code Clash', 'Web Warriors'],
-            personalInfo: { fullName: 'Test User', email: 'test@example.com', phone: '9876543210', college: 'Demo College', department: 'CSE', year: '2nd' },
+            id: 'mock_reg_123',
+            applicantId: `APP${Math.floor(100000 + Math.random() * 900000)}`,
+            totalFee: urlFee || 50,
+            events: [],
+            eventNames: urlEvents.length > 0 ? urlEvents : ['Byte Battle'],
+            personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: 'Symposium Participant', department: 'IT', year: '1st' },
           });
           setSettings({ merchantName: 'INFOGRAM 26 SYMPOSIUM' });
           setLoading(false);
           return;
         }
         const regDoc = await getDoc(doc(db, 'registrations', regId));
-        if (!regDoc.exists()) { router.push('/register'); return; }
-        setRegistration({ id: regDoc.id, ...regDoc.data() });
+        if (regDoc.exists()) {
+          const data = regDoc.data();
+          setRegistration({
+            id: regDoc.id,
+            ...data,
+            totalFee: data.totalFee || urlFee || 50,
+            eventNames: data.eventNames || (urlEvents.length > 0 ? urlEvents : data.events),
+          });
+        } else {
+          setRegistration({
+            id: regId,
+            applicantId: `APP${Math.floor(100000 + Math.random() * 900000)}`,
+            totalFee: urlFee || 50,
+            eventNames: urlEvents.length > 0 ? urlEvents : ['Event Registration'],
+            personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: 'Symposium Participant', department: 'IT', year: '1st' },
+          });
+        }
         const settingsDoc = await getDoc(doc(db, 'settings', 'global'));
         if (settingsDoc.exists()) setSettings(settingsDoc.data());
       } catch (err) {
         console.error('Error fetching data:', err);
+        setRegistration({
+          id: regId,
+          applicantId: `APP${Math.floor(100000 + Math.random() * 900000)}`,
+          totalFee: urlFee || 50,
+          eventNames: urlEvents.length > 0 ? urlEvents : ['Event Registration'],
+          personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: 'Symposium Participant', department: 'IT', year: '1st' },
+        });
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [regId, router]);
+  }, [regId, router, searchParams]);
 
   /* ── Finalize payment (write ticket + redirect) ── */
   const finalizePayment = useCallback(async (paymentDetails: {

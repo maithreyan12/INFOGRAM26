@@ -161,11 +161,13 @@ export default function RegisterPage() {
     if (selectedEvents.length === 0) return;
     setIsSubmitting(true);
     let targetRegId = 'mock_reg_123';
+    const totalFee = getTotalFee();
+    const eventNamesList = selectedEvents.map(id => events.find(e => e.id === id)?.name).filter(Boolean);
+
     try {
       if (db) {
         try {
           const applicantId = generateApplicantId();
-          // Sanitize formData to replace undefined with null for Firestore compatibility
           const cleanPersonalInfo = JSON.parse(
             JSON.stringify(formData, (key, value) => (value === undefined ? null : value))
           );
@@ -173,8 +175,8 @@ export default function RegisterPage() {
             applicantId,
             personalInfo: cleanPersonalInfo,
             events: selectedEvents,
-            eventNames: selectedEvents.map(id => events.find(e => e.id === id)?.name).filter(Boolean),
-            totalFee: getTotalFee(),
+            eventNames: eventNamesList,
+            totalFee,
             status: 'pending_payment',
             createdAt: serverTimestamp(),
           });
@@ -184,10 +186,28 @@ export default function RegisterPage() {
         }
       }
       toast.success('Registration saved! Opening payment...');
-      router.push(`/payment?regId=${targetRegId}&auto=true`);
+      const params = new URLSearchParams({
+        regId: targetRegId,
+        fee: String(totalFee),
+        events: eventNamesList.join(','),
+        name: formData.fullName || '',
+        email: formData.email || '',
+        phone: formData.phone || '',
+        auto: 'true',
+      });
+      router.push(`/payment?${params.toString()}`);
     } catch (err: any) {
       console.error('Registration error, redirecting to payment:', err);
-      router.push(`/payment?regId=mock_reg_123&auto=true`);
+      const params = new URLSearchParams({
+        regId: 'mock_reg_123',
+        fee: String(totalFee),
+        events: eventNamesList.join(','),
+        name: formData.fullName || '',
+        email: formData.email || '',
+        phone: formData.phone || '',
+        auto: 'true',
+      });
+      router.push(`/payment?${params.toString()}`);
     }
   };
 
