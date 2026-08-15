@@ -21,8 +21,8 @@ export default function SettingsPage() {
 
   // Razorpay Settings State
   const [enableRazorpay, setEnableRazorpay] = useState(true);
-  const [razorpayKeyId, setRazorpayKeyId] = useState('rzp_test_9028173491');
-  const [razorpayKeySecret, setRazorpayKeySecret] = useState('secret_key_infogram26');
+  const [razorpayKeyId, setRazorpayKeyId] = useState(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_TPacWV4BbmByiW');
+  const [razorpayKeySecret, setRazorpayKeySecret] = useState('');
   const [savingRazorpay, setSavingRazorpay] = useState(false);
 
   // UPI Settings State
@@ -282,9 +282,10 @@ export default function SettingsPage() {
 
             <div className="space-y-5">
               <div>
-                <label className="block text-xs font-black uppercase text-gray-400 mb-2">Razorpay Key ID</label>
+                <label className="block text-xs font-black uppercase text-gray-400 mb-2">Razorpay Key ID (Live / Test)</label>
                 <input
                   type="text"
+                  placeholder="e.g. rzp_live_TPacWV4BbmByiW"
                   value={razorpayKeyId}
                   onChange={(e) => setRazorpayKeyId(e.target.value)}
                   className="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 text-xs font-mono font-bold text-[#00d4ff] focus:outline-none focus:border-[#00d4ff]"
@@ -296,6 +297,7 @@ export default function SettingsPage() {
                 <div className="relative">
                   <input
                     type={showSecret ? 'text' : 'password'}
+                    placeholder="Enter Razorpay Secret Key"
                     value={razorpayKeySecret}
                     onChange={(e) => setRazorpayKeySecret(e.target.value)}
                     className="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 pr-12 text-xs font-mono font-bold text-white focus:outline-none focus:border-[#00d4ff]"
