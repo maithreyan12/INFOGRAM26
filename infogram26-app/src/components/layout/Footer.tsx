@@ -170,7 +170,7 @@ export default function Footer() {
                   </span>
                   <div className="flex items-center gap-2 mt-2">
                     <a
-                      href="https://www.google.com/maps/place/C.+Abdul+Hakeem+College+of+Engineering+%26+Technology,+Melvisharam,+Ranipet,+Tamil+Nadu+632509/data=!4m2!3m1!1s0x3bad35d34059d16f:0xb443fab6e00b313f"
+                      href="https://maps.google.com/?q=C.+Abdul+Hakeem+College+of+Engineering+%26+Technology,+Melvisharam,+Ranipet,+Tamil+Nadu+632509"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-white text-slate-900 border border-slate-300 hover:bg-slate-100 transition-colors shadow-xs"
@@ -182,7 +182,7 @@ export default function Footer() {
                       <span>Google Maps</span>
                     </a>
                     <a
-                      href="https://maps.apple.com/p/~nwAp4fu74pyaQ"
+                      href="https://maps.apple.com/?q=C.+Abdul+Hakeem+College+of+Engineering+%26+Technology&ll=12.9365538,79.2319153"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-slate-950 text-white hover:bg-slate-800 border border-slate-700 transition-colors shadow-xs"

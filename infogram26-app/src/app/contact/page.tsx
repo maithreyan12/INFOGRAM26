@@ -239,7 +239,7 @@ export default function ContactPage() {
                 {/* Equal Aligned Maps Action Buttons */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <a
-                    href="https://www.google.com/maps/place/C.+Abdul+Hakeem+College+of+Engineering+%26+Technology,+Melvisharam,+Ranipet,+Tamil+Nadu+632509/data=!4m2!3m1!1s0x3bad35d34059d16f:0xb443fab6e00b313f"
+                    href="https://maps.google.com/?q=C.+Abdul+Hakeem+College+of+Engineering+%26+Technology,+Melvisharam,+Ranipet,+Tamil+Nadu+632509"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-2xl font-black text-xs uppercase tracking-wider bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/20 transition-all active:scale-95 group"
@@ -252,7 +252,7 @@ export default function ContactPage() {
                     <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
                   </a>
                   <a
-                    href="https://maps.apple.com/p/~nwAp4fu74pyaQ"
+                    href="https://maps.apple.com/?q=C.+Abdul+Hakeem+College+of+Engineering+%26+Technology&ll=12.9365538,79.2319153"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2.5 px-4 py-3 rounded-2xl font-black text-xs uppercase tracking-wider bg-slate-950 hover:bg-slate-900 text-white border border-slate-700 shadow-lg transition-all active:scale-95 group"
