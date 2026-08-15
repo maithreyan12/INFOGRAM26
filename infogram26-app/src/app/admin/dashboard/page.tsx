@@ -1,16 +1,67 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Users, IndianRupee, Calendar as CalendarIcon, Clock, Plus, Bell, UserCheck, ShieldCheck, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEventStore } from '@/store/eventStore';
+import { db } from '@/lib/firebase/config';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 export default function AdminDashboard() {
-  const { events, organizers, registrations } = useEventStore();
+  const { events, organizers, registrations: storeRegistrations } = useEventStore();
+  const [liveRegistrations, setLiveRegistrations] = useState<any[]>([]);
 
-  const totalRegistrations = registrations.length;
-  const totalRevenue = registrations.reduce((sum, r) => sum + r.totalFee, 0);
+  useEffect(() => {
+    if (!db) {
+      setLiveRegistrations(storeRegistrations || []);
+      return;
+    }
+
+    let rawRegs: any[] = [];
+    let ticketMap: Record<string, any> = {};
+
+    const updateMetrics = () => {
+      const combined = [...rawRegs];
+      Object.values(ticketMap).forEach((t: any) => {
+        const exists = combined.some(
+          (r) => r.applicantId === t.applicantId || (r.personalInfo?.email && r.personalInfo?.email === t.email)
+        );
+        if (!exists && (t.studentName || t.email || t.applicantId)) {
+          combined.push({
+            id: t.id,
+            totalFee: t.totalAmount || 50,
+          });
+        }
+      });
+      setLiveRegistrations(combined.length > 0 ? combined : storeRegistrations || []);
+    };
+
+    const unsubRegs = onSnapshot(collection(db, 'registrations'), (snap) => {
+      rawRegs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      updateMetrics();
+    });
+
+    const unsubTickets = onSnapshot(collection(db, 'tickets'), (snap) => {
+      const map: Record<string, any> = {};
+      snap.docs.forEach((d) => {
+        const data = d.data();
+        if (data.applicantId) map[data.applicantId] = data;
+      });
+      ticketMap = map;
+      updateMetrics();
+    });
+
+    return () => {
+      unsubRegs();
+      unsubTickets();
+    };
+  }, [storeRegistrations]);
+
+  const activeRegistrations = liveRegistrations.length > 0 ? liveRegistrations : storeRegistrations;
+  const totalRegistrations = activeRegistrations.length;
+  const totalRevenue = activeRegistrations.reduce((sum, r) => sum + (r.totalFee || 50), 0);
   const activeEventsCount = events.length;
   const organizersCount = organizers.length;
 
@@ -196,18 +247,22 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/80">
-                {registrations.map((reg) => (
-                  <tr key={reg.id} className="transition-colors hover:bg-gray-800/50">
-                    <td className="px-4 py-3.5 font-mono text-[#00d4ff] font-bold">{reg.applicantId}</td>
-                    <td className="px-4 py-3.5 font-black text-white">{reg.fullName}</td>
-                    <td className="px-4 py-3.5 text-gray-300">{reg.college}</td>
-                    <td className="px-4 py-3.5 text-right">
-                      <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase">
-                        {reg.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {activeRegistrations.slice(0, 5).map((reg: any) => {
+                  const name = reg.personalInfo?.fullName || reg.fullName || 'Participant';
+                  const college = reg.personalInfo?.college || reg.college || 'CAHCET';
+                  return (
+                    <tr key={reg.id} className="transition-colors hover:bg-gray-800/50">
+                      <td className="px-4 py-3.5 font-mono text-[#00d4ff] font-bold">{reg.applicantId}</td>
+                      <td className="px-4 py-3.5 font-black text-white">{name}</td>
+                      <td className="px-4 py-3.5 text-gray-300">{college}</td>
+                      <td className="px-4 py-3.5 text-right">
+                        <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase">
+                          {reg.status === 'paid' ? 'PAID' : reg.status?.toUpperCase() || 'VERIFIED'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

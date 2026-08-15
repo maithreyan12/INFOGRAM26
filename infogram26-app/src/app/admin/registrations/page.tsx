@@ -26,25 +26,62 @@ export default function RegistrationsPage() {
       return;
     }
 
+    let rawRegs: any[] = [];
+    let ticketItems: Record<string, any> = {};
+
+    const updateCombinedList = () => {
+      const combined = [...rawRegs];
+
+      // Add any tickets that are not in rawRegs
+      Object.values(ticketItems).forEach((t: any) => {
+        const exists = combined.some(
+          (r) => r.applicantId === t.applicantId || (r.personalInfo?.email && r.personalInfo?.email === t.email)
+        );
+        if (!exists && (t.studentName || t.email || t.applicantId)) {
+          combined.push({
+            id: t.registrationId || t.id,
+            applicantId: t.applicantId || `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
+            personalInfo: {
+              fullName: t.studentName || t.fullName || 'Registered Participant',
+              email: t.email || '',
+              phone: t.phone || '',
+              college: t.college || 'CAHCET Participant',
+              department: t.department || 'Information Technology',
+              year: t.year || '1st',
+            },
+            eventNames: Array.isArray(t.events) ? t.events : [t.events || 'Symposium Event'],
+            events: Array.isArray(t.events) ? t.events : [t.events || 'Symposium Event'],
+            totalFee: t.totalAmount || 50,
+            status: 'paid',
+            checkedIn: t.status === 'used' || t.checkedIn,
+            attendanceStatus: t.status === 'used' || t.checkedIn ? 'checked_in' : 'pending',
+            razorpayPaymentId: t.razorpayPaymentId,
+          });
+        }
+      });
+
+      // Fallback to storeRegistrations if empty
+      setRegistrations(combined.length > 0 ? combined : storeRegistrations || []);
+      setLoading(false);
+    };
+
     // Realtime listener for registrations
     const unsubRegs = onSnapshot(
       collection(db, 'registrations'),
       (snap) => {
-        const list = snap.docs.map((d) => ({
+        rawRegs = snap.docs.map((d) => ({
           id: d.id,
           ...d.data(),
         }));
-        setRegistrations(list.length > 0 ? list : storeRegistrations || []);
-        setLoading(false);
+        updateCombinedList();
       },
       (err) => {
         console.warn('Registrations live sync error:', err);
-        setRegistrations(storeRegistrations || []);
-        setLoading(false);
+        updateCombinedList();
       }
     );
 
-    // Realtime listener for tickets (to track QR check-in status)
+    // Realtime listener for tickets (to track QR check-in status and unlinked tickets)
     const unsubTickets = onSnapshot(
       collection(db, 'tickets'),
       (snap) => {
@@ -53,7 +90,9 @@ export default function RegistrationsPage() {
           const data = d.data();
           if (data.applicantId) map[data.applicantId] = { id: d.id, ...data };
         });
+        ticketItems = map;
         setTicketsMap(map);
+        updateCombinedList();
       },
       (err) => console.warn('Tickets live sync error:', err)
     );
