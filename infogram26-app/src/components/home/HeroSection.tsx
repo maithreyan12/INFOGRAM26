@@ -266,8 +266,8 @@ export default function HeroSection() {
         >
           <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
           <div className="leading-tight">
-            <div className={`text-[9px] font-black uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Prize Pool</div>
-            <div className={`font-black text-sm ${isDark ? 'text-amber-300' : 'text-amber-600'}`}>₹50,000+</div>
+            <div className={`text-[9px] font-black uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Official Event</div>
+            <div className={`font-black text-sm ${isDark ? 'text-amber-300' : 'text-amber-600'}`}>Trophies &amp; Awards</div>
           </div>
         </motion.div>
       </motion.div>

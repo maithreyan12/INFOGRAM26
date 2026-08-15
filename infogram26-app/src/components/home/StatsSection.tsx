@@ -9,7 +9,7 @@ const stats = [
   { id: 1, label: 'Events', value: 15, suffix: '+', icon: Calendar, color: 'text-[#7c3aed]', bg: 'bg-[#7c3aed]/10', border: 'border-[#7c3aed]/20' },
   { id: 2, label: 'Participants', value: 500, suffix: '+', icon: Users, color: 'text-[#059669]', bg: 'bg-[#059669]/10', border: 'border-[#059669]/20' },
   { id: 3, label: 'Sponsors', value: 10, suffix: '+', icon: Building, color: 'text-[#d97706]', bg: 'bg-[#d97706]/10', border: 'border-[#d97706]/20' },
-  { id: 4, label: 'Prize Pool', value: 50000, prefix: '₹', suffix: '+', icon: Trophy, color: 'text-[#d97706]', bg: 'bg-[#d97706]/10', border: 'border-[#d97706]/20' },
+  { id: 4, label: 'Trophies & Awards', value: 15, suffix: '+', icon: Trophy, color: 'text-[#d97706]', bg: 'bg-[#d97706]/10', border: 'border-[#d97706]/20' },
 ];
 
 function AnimatedCounter({ value, prefix = '', suffix = '' }: { value: number; prefix?: string; suffix?: string }) {
@@ -76,7 +76,7 @@ export default function StatsSection() {
                 <div className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-1 ${
                   isDark && stat.color === 'text-[#7c3aed]' ? 'text-purple-400' : stat.color
                 }`} style={{ fontFamily: 'var(--font-display)' }}>
-                  <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
+                  <AnimatedCounter value={stat.value} prefix={(stat as any).prefix || ''} suffix={stat.suffix} />
                 </div>
                 <div className={`text-xs sm:text-sm font-black uppercase tracking-wider ${isDark ? 'text-slate-200' : 'text-slate-950'}`} style={{ fontFamily: 'var(--font-heading)' }}>
                   {stat.label}

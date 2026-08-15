@@ -140,7 +140,7 @@ export default function PromoStudioPage() {
                   <div className="pt-2 flex justify-center gap-2 text-[9px] font-bold text-gray-300">
                     <span className="bg-black/60 border border-gray-800 px-2.5 py-1 rounded-lg">🗓️ MARCH 2026</span>
                     <span className="bg-black/60 border border-gray-800 px-2.5 py-1 rounded-lg">📍 IT BLOCK</span>
-                    <span className="bg-black/60 border border-gray-800 px-2.5 py-1 rounded-lg">🏆 ₹50,000+ CASH</span>
+                    <span className="bg-black/60 border border-gray-800 px-2.5 py-1 rounded-lg">🏆 TROPHIES &amp; AWARDS</span>
                   </div>
                 </div>
 
