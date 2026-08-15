@@ -225,12 +225,12 @@ export default function MyTicketPage() {
                     We couldn&apos;t find an entry pass for <span className="font-mono font-bold text-amber-400">{searchValue}</span>. If you completed payment via UPI or Razorpay, send your transaction screenshot on WhatsApp to instantly generate your ticket.
                   </p>
                   <a
-                    href={`https://wa.me/919043293530?text=Hi! I paid for INFOGRAM'26 but can't find my ticket. My contact number is ${encodeURIComponent(searchValue)}`}
+                    href={`https://wa.me/919342706675?text=Hi! I paid for INFOGRAM'26 but can't find my ticket. My contact number is ${encodeURIComponent(searchValue)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-slate-950 shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
                   >
-                    📱 Contact WhatsApp Support (+91 90432 93530)
+                    📱 Contact WhatsApp Support (+91 93427 06675)
                   </a>
                 </div>
               ) : (
@@ -286,7 +286,7 @@ export default function MyTicketPage() {
           {/* Direct link for contact */}
           <div className={`mt-8 rounded-2xl border p-5 text-center ${isDark ? 'border-white/[0.06] bg-white/[0.02]' : 'border-slate-200 bg-white/50'}`}>
             <p className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              For quick support, WhatsApp us directly at <span className="font-bold text-amber-400">+91 90432 93530</span>
+              For quick support, WhatsApp us directly at <a href="https://wa.me/919342706675" target="_blank" rel="noopener noreferrer" className="font-bold text-emerald-400 hover:underline">+91 93427 06675</a>
             </p>
           </div>
 
