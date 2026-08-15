@@ -76,6 +76,18 @@ export async function POST(req: Request) {
 
     let deletedTicketsCount = 0;
 
+    // Delete test registrations (arunkumar and verification.test)
+    const testEmails = ['arunkumar.cahcet@gmail.com', 'verification.test@example.com', 'test@example.com'];
+    for (const testE of testEmails) {
+      try {
+        const qE = query(collection(db, 'tickets'), where('email', '==', testE));
+        const snapE = await getDocs(qE);
+        for (const d of snapE.docs) {
+          try { await deleteDoc(doc(db, 'tickets', d.id)); } catch {}
+        }
+      } catch {}
+    }
+
     // Delete old tickets matching each phone / email
     for (const m of teamMembers) {
       const phoneVars = [m.phone, `+91${m.phone}`, `+91 ${m.phone}`];

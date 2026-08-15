@@ -30,10 +30,22 @@ export default function RegistrationsPage() {
     let ticketItems: Record<string, any> = {};
 
     const updateCombinedList = () => {
-      const combined = [...rawRegs];
+      // Filter rawRegs to ONLY include paid registrations or those with a valid ticket
+      const paidRegs = rawRegs.filter((r) => {
+        const isPaidStatus = r.status === 'paid' || r.ticketId || ticketItems[r.applicantId];
+        const email = (r.personalInfo?.email || r.email || '').toLowerCase();
+        const isTestEmail = email.includes('verification.test') || email.includes('arunkumar.cahcet') || email === 'test@example.com';
+        return isPaidStatus && !isTestEmail;
+      });
+
+      const combined = [...paidRegs];
 
       // Add any tickets that are not in rawRegs
       Object.values(ticketItems).forEach((t: any) => {
+        const email = (t.email || '').toLowerCase();
+        const isTestEmail = email.includes('verification.test') || email.includes('arunkumar.cahcet') || email === 'test@example.com';
+        if (isTestEmail) return;
+
         const exists = combined.some(
           (r) => r.applicantId === t.applicantId || (r.personalInfo?.email && r.personalInfo?.email === t.email)
         );
@@ -61,7 +73,7 @@ export default function RegistrationsPage() {
       });
 
       // Fallback to storeRegistrations if empty
-      setRegistrations(combined.length > 0 ? combined : storeRegistrations || []);
+      setRegistrations(combined.length > 0 ? combined : (storeRegistrations || []).filter(r => (r.status as string) === 'paid' || r.status === 'confirmed'));
       setLoading(false);
     };
 
