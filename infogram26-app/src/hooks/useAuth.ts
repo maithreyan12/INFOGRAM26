@@ -91,12 +91,19 @@ export function useAuth() {
             emailLower.includes('admin') || 
             emailLower.includes('appziio');
 
-          // ── Core admins: instant access, no Firestore check needed ──
-          if (emailLower === 'maithreyan2006@gmail.com' || emailLower === 'farnavith@gmail.com') {
+          // ── Main Admin & 2 Co-Admins: Instant Core Access ──
+          if (emailLower === 'maithreyan2006@gmail.com' || emailLower === 'farnavith@gmail.com' || emailLower === 'infoappziio@gmail.com') {
+            const isMainAdmin = emailLower === 'maithreyan2006@gmail.com';
+            const adminTitle = isMainAdmin
+              ? 'Maithreyan D (Main Admin)'
+              : emailLower.includes('farnavith')
+              ? 'Farnavith (Co-Admin)'
+              : 'Appziio (Co-Admin)';
+
             setAdminUser({
               uid: firebaseUser.uid,
               email: firebaseUser.email || '',
-              displayName: firebaseUser.displayName || (emailLower.includes('farnavith') ? 'Farnavith (Core Admin)' : 'Maithreyan D'),
+              displayName: firebaseUser.displayName || adminTitle,
               role: 'super_admin',
               createdAt: new Date(),
               isActive: true,
