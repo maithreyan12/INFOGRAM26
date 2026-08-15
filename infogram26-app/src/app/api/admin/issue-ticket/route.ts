@@ -19,33 +19,36 @@ function getDB() {
 export async function POST(req: Request) {
   try {
     const { name, email, phone, college, department, year, events, amount, applicantId } = await req.json();
-
     const db = getDB();
 
     const appCode = applicantId || `INFO26-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
     const eventsList = Array.isArray(events) ? events : [events || 'HackForge'];
     const ticketNumber = `TKT-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
 
-    // 1. Create Registration Document (allow create: if true)
-    const regRef = await addDoc(collection(db, 'registrations'), {
-      applicantId: appCode,
-      personalInfo: {
-        fullName: name || 'Participant',
-        email: email || '',
-        phone: phone || '',
-        college: college || 'Vellore Institute of Technology',
-        department: department || 'Software Engineering',
-        year: year || '2nd Year',
-      },
-      eventNames: eventsList,
-      events: eventsList,
-      totalFee: amount || 100,
-      status: 'paid',
-      source: 'admin_issue_ticket',
-      createdAt: new Date().toISOString(),
-    });
+    let regId = `reg_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+    try {
+      const regRef = await addDoc(collection(db, 'registrations'), {
+        applicantId: appCode,
+        personalInfo: {
+          fullName: name || 'Participant',
+          email: email || '',
+          phone: phone || '',
+          college: college || 'Vellore Institute of Technology',
+          department: department || 'Software Engineering',
+          year: year || '2nd Year',
+        },
+        eventNames: eventsList,
+        events: eventsList,
+        totalFee: amount || 100,
+        status: 'paid',
+        source: 'admin_issue_ticket',
+        createdAt: new Date().toISOString(),
+      });
+      regId = regRef.id;
+    } catch (regErr: any) {
+      console.error('Registration addDoc error:', regErr);
+    }
 
-    // 2. Create Ticket Document (allow create: if true via addDoc)
     const qrData = JSON.stringify({
       ticketNumber,
       applicantId: appCode,
@@ -54,25 +57,30 @@ export async function POST(req: Request) {
       verified: true,
     });
 
-    const ticketRef = await addDoc(collection(db, 'tickets'), {
-      ticketNumber,
-      applicantId: appCode,
-      registrationId: regRef.id,
-      studentName: name,
-      email: email || '',
-      phone: phone || '',
-      college: college || 'Vellore Institute of Technology',
-      department: department || 'Software Engineering',
-      year: year || '2nd Year',
-      events: eventsList,
-      totalAmount: amount || 100,
-      paymentMethod: 'razorpay',
-      qrData,
-      status: 'valid',
-      issueDate: new Date(),
-    });
-
-    const ticketId = ticketRef.id;
+    let ticketId = `tkt_${Date.now()}`;
+    try {
+      const ticketRef = await addDoc(collection(db, 'tickets'), {
+        ticketNumber,
+        applicantId: appCode,
+        registrationId: regId,
+        studentName: name,
+        email: email || '',
+        phone: phone || '',
+        college: college || 'Vellore Institute of Technology',
+        department: department || 'Software Engineering',
+        year: year || '2nd Year',
+        events: eventsList,
+        totalAmount: amount || 100,
+        paymentMethod: 'razorpay',
+        qrData,
+        status: 'valid',
+        issueDate: new Date().toISOString(),
+      });
+      ticketId = ticketRef.id;
+    } catch (tktErr: any) {
+      console.error('Ticket addDoc error:', tktErr);
+      return NextResponse.json({ error: `Ticket write error: ${tktErr.message}` }, { status: 500 });
+    }
 
     // Sync to Google Sheets
     try {
@@ -100,7 +108,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       ticketId,
-      registrationId: regRef.id,
+      registrationId: regId,
       applicantId: appCode,
       ticketUrl,
     });
