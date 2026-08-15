@@ -182,7 +182,7 @@ export default function AboutPage() {
                   </a>
                   <a href="tel:+919043293530" className={`flex items-center gap-2 font-bold text-xs sm:text-sm whitespace-nowrap transition-all hover:underline ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-800 hover:text-[#7c3aed]'}`}>
                     <Phone className="w-4 h-4 text-[#7c3aed] shrink-0" />
-                    <span>Staff: Mr. M. Mohamed Rafe (9043293530)</span>
+                    <span>Assistant Professor: Mr. M. Mohamed Rafe (9043293530)</span>
                   </a>
                   <div className={`flex items-center gap-2.5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                     <Mail className="w-4 h-4 text-[#7c3aed] shrink-0" />

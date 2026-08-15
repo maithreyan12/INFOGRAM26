@@ -289,7 +289,7 @@ export default function ContactPage() {
                     <Phone className="w-5 h-5 text-[#7c3aed]" />
                   </div>
                   <div>
-                    <h3 className={`font-black text-xs uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Staff Coordinator</h3>
+                    <h3 className={`font-black text-xs uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Assistant Professor</h3>
                     <a href="tel:+919043293530" className={`font-black text-sm transition-colors ${isDark ? 'text-slate-100 hover:text-amber-300' : 'text-slate-950 hover:text-[#7c3aed]'}`}>
                       Mr. M. Mohamed Rafe (9043293530)
                     </a>
