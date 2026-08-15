@@ -26,6 +26,7 @@ export async function POST(req: Request) {
     const ticketNumber = `TKT-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
 
     let regId = `reg_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+    let regError = null;
     try {
       const regRef = await addDoc(collection(db, 'registrations'), {
         applicantId: appCode,
@@ -45,8 +46,9 @@ export async function POST(req: Request) {
         createdAt: new Date().toISOString(),
       });
       regId = regRef.id;
-    } catch (regErr: any) {
-      console.error('Registration addDoc error:', regErr);
+    } catch (err: any) {
+      regError = err.message;
+      console.error('REG ERROR:', err);
     }
 
     const qrData = JSON.stringify({
@@ -57,7 +59,8 @@ export async function POST(req: Request) {
       verified: true,
     });
 
-    let ticketId = `tkt_${Date.now()}`;
+    let ticketId = `tkt_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+    let tktError = null;
     try {
       const ticketRef = await addDoc(collection(db, 'tickets'), {
         ticketNumber,
@@ -77,9 +80,17 @@ export async function POST(req: Request) {
         issueDate: new Date().toISOString(),
       });
       ticketId = ticketRef.id;
-    } catch (tktErr: any) {
-      console.error('Ticket addDoc error:', tktErr);
-      return NextResponse.json({ error: `Ticket write error: ${tktErr.message}` }, { status: 500 });
+    } catch (err: any) {
+      tktError = err.message;
+      console.error('TKT ERROR:', err);
+    }
+
+    if (regError || tktError) {
+      return NextResponse.json({
+        error: 'Firestore write issue',
+        regError,
+        tktError,
+      }, { status: 500 });
     }
 
     // Sync to Google Sheets
