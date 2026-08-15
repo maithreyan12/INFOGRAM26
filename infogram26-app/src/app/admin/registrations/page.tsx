@@ -3,9 +3,9 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Search, Filter, Download, CheckCircle2, UserCheck, Clock, RefreshCw } from 'lucide-react';
+import { Search, Filter, Download, CheckCircle2, UserCheck, Clock, RefreshCw, Ticket, ExternalLink, Copy } from 'lucide-react';
 import { db } from '@/lib/firebase/config';
-import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, addDoc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { useEventStore } from '@/store/eventStore';
 import { toast } from 'sonner';
 
@@ -160,7 +160,80 @@ export default function RegistrationsPage() {
     }
   };
 
-  /* ── 3. CSV / Excel Export ── */
+  /* ── 3. Generate / Regenerate Ticket ── */
+  const handleGenerateTicket = async (reg: any) => {
+    try {
+      if (!db) { toast.error('Database not connected'); return; }
+      toast.info('Generating ticket...');
+
+      const ticketId = `tkt_${reg.id}`;
+      const applicantId = reg.applicantId || `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`;
+      const name = reg.personalInfo?.fullName || reg.fullName || 'Participant';
+      const email = reg.personalInfo?.email || reg.email || '';
+      const phone = reg.personalInfo?.phone || reg.phone || '';
+      const college = reg.personalInfo?.college || reg.college || 'Participant College';
+      const dept = reg.personalInfo?.department || reg.department || 'Information Technology';
+      const year = reg.personalInfo?.year || reg.year || '1st';
+      const eventsList = reg.eventNames || reg.events || ['Symposium Event'];
+      const amount = reg.totalFee || 50;
+
+      const ticketNumber = `TKT-${Date.now()}-${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
+      const qrData = JSON.stringify({
+        ticketNumber,
+        applicantId,
+        name,
+        events: eventsList,
+        verified: true,
+      });
+
+      await setDoc(doc(db, 'tickets', ticketId), {
+        ticketNumber,
+        applicantId,
+        registrationId: reg.id,
+        studentName: name,
+        email,
+        phone,
+        college,
+        department: dept,
+        year,
+        events: eventsList,
+        totalAmount: amount,
+        paymentMethod: reg.razorpayPaymentId ? 'razorpay' : 'manual',
+        razorpayPaymentId: reg.razorpayPaymentId || '',
+        qrData,
+        status: 'valid',
+        issueDate: serverTimestamp(),
+      }, { merge: true });
+
+      // Mark registration as paid too
+      await updateDoc(doc(db, 'registrations', reg.id), {
+        status: 'paid',
+        ticketId,
+      });
+
+      const ticketUrl = `https://infogram26.in/ticket/${ticketId}`;
+      await navigator.clipboard.writeText(ticketUrl).catch(() => {});
+      toast.success(`✅ Ticket created! Link copied: ${ticketUrl}`, { duration: 8000 });
+
+      // Sync to Sheets
+      fetch('/api/sheets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicantId, ticketNumber, name, email, phone, college,
+          department: dept, year,
+          events: Array.isArray(eventsList) ? eventsList.join(', ') : eventsList,
+          amount, status: 'paid',
+          razorpayPaymentId: reg.razorpayPaymentId || 'manual',
+        }),
+      }).catch(() => {});
+    } catch (err) {
+      console.error('Generate ticket error:', err);
+      toast.error('Failed to generate ticket. Please try again.');
+    }
+  };
+
+
   const handleExportCSV = () => {
     if (registrations.length === 0) {
       toast.error('No registrations available to export.');
@@ -429,18 +502,39 @@ export default function RegistrationsPage() {
 
                       {/* Quick Action */}
                       <td className="px-6 py-4 text-right">
-                        {!isCheckedIn ? (
-                          <button
-                            onClick={() => handleManualCheckIn(reg)}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-slate-950 shadow-md transition-all active:scale-95"
-                          >
-                            <UserCheck className="w-3.5 h-3.5" /> Check In
-                          </button>
-                        ) : (
-                          <span className="text-[11px] font-bold text-emerald-400 flex items-center justify-end gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Verified
-                          </span>
-                        )}
+                        <div className="flex flex-col items-end gap-1.5">
+                          {/* Generate / View Ticket */}
+                          {ticketInfo?.id ? (
+                            <a
+                              href={`https://infogram26.in/ticket/${ticketInfo.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 transition-all active:scale-95"
+                            >
+                              <ExternalLink className="w-3 h-3" /> View Ticket
+                            </a>
+                          ) : (
+                            <button
+                              onClick={() => handleGenerateTicket(reg)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 transition-all active:scale-95"
+                            >
+                              <Ticket className="w-3 h-3" /> Gen Ticket
+                            </button>
+                          )}
+                          {/* Check In */}
+                          {!isCheckedIn ? (
+                            <button
+                              onClick={() => handleManualCheckIn(reg)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-slate-950 shadow-md transition-all active:scale-95"
+                            >
+                              <UserCheck className="w-3.5 h-3.5" /> Check In
+                            </button>
+                          ) : (
+                            <span className="text-[11px] font-bold text-emerald-400 flex items-center justify-end gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Verified
+                            </span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
