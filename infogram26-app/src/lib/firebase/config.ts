@@ -11,8 +11,8 @@ const firebaseConfig = {
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "infogram26.firebaseapp.com",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "infogram26",
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "infogram26.firebasestorage.app",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "207965452211",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:207965452211:web:aec06e1299bf5a27233dc6",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "1083758362629",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:1083758362629:web:38b344efbc36746efbdba4",
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-11PB2J23P7",
 };
 
@@ -20,26 +20,16 @@ export const isFirebaseConfigured = true;
 
 // ─── Singleton Firebase App ───────────────────────────────────
 function getFirebaseApp() {
-  try {
-    return getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-  } catch (e) {
-    console.warn("Firebase initialization notice:", e);
-    return null;
+  if (getApps().length > 0) {
+    return getApp();
   }
+  return initializeApp(firebaseConfig);
 }
 
 const app = getFirebaseApp();
 
-export const auth = (() => {
-  try { return app ? getAuth(app) : null; } catch { return null; }
-})() as any;
-
-export const db = (() => {
-  try { return app ? getFirestore(app) : null; } catch { return null; }
-})() as any;
-
-export const storage = (() => {
-  try { return app ? getStorage(app) : null; } catch { return null; }
-})() as any;
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 export default app;
