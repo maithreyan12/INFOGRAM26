@@ -83,14 +83,20 @@ export function useAuth() {
         if (firebaseUser) {
           setUser(firebaseUser);
           const emailLower = firebaseUser.email?.toLowerCase() || '';
-          const isSuperAdminEmail = emailLower === 'maithreyan2006@gmail.com' || emailLower === 'infoappziio@gmail.com' || emailLower.includes('admin') || emailLower.includes('appziio');
+          const isSuperAdminEmail = 
+            emailLower === 'maithreyan2006@gmail.com' || 
+            emailLower === 'farnavith@gmail.com' || 
+            emailLower === 'infoappziio@gmail.com' || 
+            emailLower.includes('farnavith') || 
+            emailLower.includes('admin') || 
+            emailLower.includes('appziio');
 
-          // ── Core admin: instant access, no Firestore check needed ──
-          if (emailLower === 'maithreyan2006@gmail.com') {
+          // ── Core admins: instant access, no Firestore check needed ──
+          if (emailLower === 'maithreyan2006@gmail.com' || emailLower === 'farnavith@gmail.com') {
             setAdminUser({
               uid: firebaseUser.uid,
               email: firebaseUser.email || '',
-              displayName: firebaseUser.displayName || 'Maithreyan D',
+              displayName: firebaseUser.displayName || (emailLower.includes('farnavith') ? 'Farnavith (Core Admin)' : 'Maithreyan D'),
               role: 'super_admin',
               createdAt: new Date(),
               isActive: true,
