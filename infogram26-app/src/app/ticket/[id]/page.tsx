@@ -43,6 +43,7 @@ export default function TicketPage() {
   const id = params.id as string;
   const [ticket, setTicket] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
   const ticketRef = useRef<HTMLDivElement>(null);
   const exportTicketRef = useRef<HTMLDivElement>(null);
@@ -50,29 +51,37 @@ export default function TicketPage() {
   useEffect(() => {
     const fetchTicket = async () => {
       try {
-        if (id === 'mock_ticket_123') {
-          setTicket({
-            id: 'mock_ticket_123',
-            ticketNumber: 'TKT-DEMO-2026',
-            applicantId: 'INFO26-TECH-10294',
-            studentName: 'Symposium Participant',
-            email: 'participant@example.com',
-            phone: '9876543210',
-            college: 'C. Abdul Hakeem College of Engineering',
-            department: 'B.E Information Technology',
-            year: '2nd Year',
-            events: ['Tech Talks', 'Byte Battle'],
-            totalAmount: 50,
-            qrData: JSON.stringify({ ticketNumber: 'TKT-DEMO-2026', applicantId: 'INFO26-TECH-10294', verified: true }),
-            status: 'valid',
-            issueDate: { seconds: Date.now() / 1000 },
-          });
+        if (!db) {
+          setError('Database connection unavailable');
           setLoading(false);
           return;
         }
         const ticketDoc = await getDoc(doc(db, 'tickets', id));
         if (ticketDoc.exists()) {
           setTicket({ id: ticketDoc.id, ...ticketDoc.data() });
+        } else {
+          // Fallback check in registrations collection
+          const regDoc = await getDoc(doc(db, 'registrations', id));
+          if (regDoc.exists()) {
+            const data = regDoc.data();
+            setTicket({
+              id: regDoc.id,
+              ticketNumber: `TKT-${regDoc.id.slice(-6).toUpperCase()}`,
+              applicantId: data.applicantId,
+              studentName: data.personalInfo?.fullName || data.studentName || 'Participant',
+              email: data.personalInfo?.email || data.email || '',
+              phone: data.personalInfo?.phone || data.phone || '',
+              college: data.personalInfo?.college || data.college || '',
+              department: data.personalInfo?.department || data.department || '',
+              year: data.personalInfo?.year || data.year || '',
+              events: data.eventNames || data.events || [],
+              totalAmount: data.totalFee || 100,
+              qrData: JSON.stringify({ applicantId: data.applicantId, verified: true }),
+              status: data.status === 'paid' ? 'valid' : 'pending',
+            });
+          } else {
+            setError('Ticket pass not found in database');
+          }
         }
       } catch (error) {
         console.error('Error fetching ticket:', error);

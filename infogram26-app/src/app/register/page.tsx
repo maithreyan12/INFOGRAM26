@@ -158,7 +158,7 @@ export default function RegisterPage() {
   const onSubmit = async () => {
     if (selectedEvents.length === 0) return;
     setIsSubmitting(true);
-    let targetRegId = 'mock_reg_123';
+    let targetRegId = `reg_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     const totalFee = getTotalFee();
     const eventNamesList = selectedEvents.map(id => events.find(e => e.id === id)?.name).filter(Boolean);
 

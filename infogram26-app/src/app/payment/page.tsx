@@ -58,9 +58,9 @@ function PaymentContent() {
       const urlYear = searchParams.get('year') || '';
 
       try {
-        if (regId === 'mock_reg_123' || !db) {
+        if (!db) {
           setRegistration({
-            id: 'mock_reg_123',
+            id: regId,
             applicantId: `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
             totalFee: urlFee || 50,
             events: [],
@@ -115,11 +115,10 @@ function PaymentContent() {
   }) => {
     if (!registration) return;
 
-    if (registration.id === 'mock_reg_123' || !db) {
+    if (!db) {
       setPaymentDone(true);
-      toast.success('Payment confirmed! Generating your ticket...');
-      setTicketId('mock_ticket_123');
-      setTimeout(() => router.push('/ticket/mock_ticket_123'), 2500);
+      toast.success('Payment confirmed! Redirecting to ticket lookup...');
+      setTimeout(() => router.push('/my-ticket'), 2000);
       return;
     }
 
