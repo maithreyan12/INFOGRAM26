@@ -23,18 +23,37 @@ export default function AdminDashboard() {
     let ticketMap: Record<string, any> = {};
 
     const updateMetrics = () => {
+      // Start from real registrations only
       const combined = [...rawRegs];
+
+      // Add ticket-only entries (HackForge team passes, manually issued passes)
+      // that don't already exist in registrations
       Object.values(ticketMap).forEach((t: any) => {
         const exists = combined.some(
-          (r) => r.applicantId === t.applicantId || (r.personalInfo?.email && r.personalInfo?.email === t.email)
+          (r) =>
+            r.applicantId === t.applicantId ||
+            (r.personalInfo?.email && t.email && r.personalInfo?.email === t.email)
         );
-        if (!exists && (t.studentName || t.email || t.applicantId)) {
+        if (!exists && (t.studentName || t.applicantId)) {
           combined.push({
-            id: t.id,
-            totalFee: t.totalAmount || 50,
+            id: t.ticketId || t.id,
+            applicantId: t.applicantId,
+            totalFee: t.totalAmount || 100,
+            status: 'paid',
+            personalInfo: {
+              fullName: t.studentName || t.name || 'Participant',
+              email: t.email || '',
+              phone: t.phone || '',
+              college: t.college || 'Vellore Institute of Technology',
+              department: t.department || t.branch || 'Information Technology',
+              year: t.year || '',
+            },
+            events: t.eventNames || t.events || [],
+            eventNames: t.eventNames || t.events || [],
           });
         }
       });
+
       setLiveRegistrations(combined.length > 0 ? combined : storeRegistrations || []);
     };
 

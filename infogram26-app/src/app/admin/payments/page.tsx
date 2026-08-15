@@ -34,15 +34,46 @@ export default function PaymentsPage() {
       return;
     }
 
+    let rawRegs: any[] = [];
+    let rawTickets: any[] = [];
+
+    const mergeAndSet = () => {
+      const combined = [...rawRegs];
+      rawTickets.forEach((t: any) => {
+        const exists = combined.some(
+          (r) =>
+            r.applicantId === t.applicantId ||
+            (r.personalInfo?.email && t.email && r.personalInfo?.email === t.email)
+        );
+        if (!exists && (t.studentName || t.applicantId)) {
+          combined.push({
+            id: t.ticketId || t.id,
+            applicantId: t.applicantId,
+            razorpayPaymentId: t.razorpayPaymentId || t.paymentId || 'pass_issued',
+            totalFee: t.totalAmount || t.totalFee || 100,
+            status: 'paid',
+            personalInfo: {
+              fullName: t.studentName || t.name || 'Participant',
+              email: t.email || '',
+              phone: t.phone || '',
+              college: t.college || 'Vellore Institute of Technology',
+              department: t.department || t.branch || 'Information Technology',
+              year: t.year || '',
+            },
+            events: t.eventNames || t.events || [],
+            eventNames: t.eventNames || t.events || [],
+          });
+        }
+      });
+      setRegistrations(combined.length > 0 ? combined : storeRegistrations || []);
+      setLoading(false);
+    };
+
     const unsubRegs = onSnapshot(
       collection(db, 'registrations'),
       (snap) => {
-        const list = snap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        }));
-        setRegistrations(list.length > 0 ? list : storeRegistrations || []);
-        setLoading(false);
+        rawRegs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        mergeAndSet();
       },
       (err) => {
         console.warn('Registrations payment live sync error:', err);
@@ -54,12 +85,11 @@ export default function PaymentsPage() {
     const unsubTickets = onSnapshot(
       collection(db, 'tickets'),
       (snap) => {
+        rawTickets = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         const map: Record<string, any> = {};
-        snap.docs.forEach((d) => {
-          const data = d.data();
-          if (data.applicantId) map[data.applicantId] = data;
-        });
+        rawTickets.forEach((t) => { if (t.applicantId) map[t.applicantId] = t; });
         setTicketsMap(map);
+        mergeAndSet();
       },
       (err) => console.warn('Tickets payment live sync error:', err)
     );
@@ -69,6 +99,7 @@ export default function PaymentsPage() {
       unsubTickets();
     };
   }, [storeRegistrations]);
+
 
   /* ── 2. Manual Reconcile Payment Handler ── */
   const handleReconcilePayment = async (e: React.FormEvent) => {
@@ -156,8 +187,10 @@ export default function PaymentsPage() {
   };
 
   /* ── 3. Metrics calculation ── */
-  const totalRevenue = registrations.reduce((sum, r) => sum + (r.totalFee || 50), 0);
-  const paidCount = registrations.filter((r) => r.status === 'paid' || r.razorpayPaymentId).length;
+  const paidRegs = registrations.filter((r) => r.status === 'paid' || r.razorpayPaymentId);
+  const totalRevenue = paidRegs.reduce((sum, r) => sum + (r.totalFee || r.totalAmount || 100), 0);
+  const paidCount = paidRegs.length;
+  const razorpayVerified = registrations.filter((r) => r.razorpayPaymentId && !r.razorpayPaymentId.startsWith('pass_')).length;
 
   const filteredRegistrations = registrations.filter((reg) => {
     const q = searchQuery.toLowerCase();
@@ -210,7 +243,7 @@ export default function PaymentsPage() {
             </div>
             <div>
               <p className="text-xs font-black uppercase text-gray-400">Razorpay Verified</p>
-              <h3 className="text-2xl font-black text-white">₹{totalRevenue.toLocaleString('en-IN')}</h3>
+              <h3 className="text-2xl font-black text-white">{razorpayVerified}</h3>
             </div>
           </div>
         </div>
