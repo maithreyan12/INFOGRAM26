@@ -55,7 +55,11 @@ export default function MyTicketPage() {
           try {
             const q1 = query(collection(db, 'tickets'), where('phone', '==', pVar), limit(5));
             const snap1 = await getDocs(q1);
-            snap1.docs.forEach(d => matchedMap.set(d.id, { id: d.id, ...d.data() }));
+            snap1.docs.forEach(d => {
+              const data = d.data();
+              const dedupKey = (data.studentName || data.email || d.id).toLowerCase();
+              matchedMap.set(dedupKey, { id: d.id, ...data });
+            });
           } catch {}
         }
 
@@ -91,7 +95,11 @@ export default function MyTicketPage() {
         try {
           const q1 = query(collection(db, 'tickets'), where('email', '==', searchEmail), limit(5));
           const snap1 = await getDocs(q1);
-          snap1.docs.forEach(d => matchedMap.set(d.id, { id: d.id, ...d.data() }));
+          snap1.docs.forEach(d => {
+            const data = d.data();
+            const dedupKey = (data.studentName || data.email || d.id).toLowerCase();
+            matchedMap.set(dedupKey, { id: d.id, ...data });
+          });
         } catch {}
 
         if (matchedMap.size === 0) {
