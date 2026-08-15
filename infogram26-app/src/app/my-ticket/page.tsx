@@ -23,13 +23,7 @@ export default function MyTicketPage() {
 
   const handleSearch = async () => {
     const val = searchValue.trim();
-    if (!val) { toast.error('Please enter your mobile number or email'); return; }
-    if (searchType === 'phone' && val.replace(/\D/g, '').length < 10) {
-      toast.error('Enter a valid 10-digit mobile number'); return;
-    }
-    if (searchType === 'email' && !val.includes('@')) {
-      toast.error('Enter a valid email address'); return;
-    }
+    if (!val) { toast.error('Please enter your mobile number, email, or Applicant ID'); return; }
 
     setLoading(true);
     setSearched(false);
@@ -39,11 +33,61 @@ export default function MyTicketPage() {
       if (!db) { toast.error('Database connection unavailable'); setLoading(false); return; }
 
       const rawDigits = val.replace(/\D/g, '').slice(-10);
-      const searchEmail = val.toLowerCase();
+      const searchLower = val.toLowerCase();
       const matchedMap = new Map<string, any>();
 
-      if (searchType === 'phone') {
-        // Query variations of phone numbers in Firestore
+      // ── 1. Search by Applicant ID (exact & formatted) ──
+      const appCodeVariations = [
+        val,
+        val.toUpperCase(),
+        val.toLowerCase(),
+        val.replace(/INFO26EVT/i, 'INFO26-EVT-'),
+        val.replace(/INFO26HACK/i, 'INFO26-HACK-'),
+        val.replace(/INFO26BYTE/i, 'INFO26-BYTE-'),
+        val.replace(/INFO26TECH/i, 'INFO26-TECH-'),
+        val.replace(/INFO26CODE/i, 'INFO26-CODE-'),
+      ];
+
+      for (const appVar of appCodeVariations) {
+        if (!appVar) continue;
+        try {
+          const qApp = query(collection(db, 'tickets'), where('applicantId', '==', appVar), limit(5));
+          const snapApp = await getDocs(qApp);
+          snapApp.docs.forEach((d) => {
+            const data = d.data();
+            const dedupKey = (data.applicantId || data.phone || data.email || d.id).toLowerCase();
+            matchedMap.set(dedupKey, { id: d.id, ...data });
+          });
+        } catch {}
+
+        if (matchedMap.size === 0) {
+          try {
+            const qRegApp = query(collection(db, 'registrations'), where('applicantId', '==', appVar), limit(5));
+            const snapRegApp = await getDocs(qRegApp);
+            snapRegApp.docs.forEach((d) => {
+              const data = d.data();
+              const fakeId = data.ticketId || `tkt_${d.id}`;
+              matchedMap.set(fakeId, {
+                id: fakeId,
+                registrationId: d.id,
+                studentName: data.personalInfo?.fullName || data.studentName || 'Participant',
+                email: data.personalInfo?.email || data.email || '',
+                phone: data.personalInfo?.phone || data.phone || '',
+                college: data.personalInfo?.college || data.college || '',
+                department: data.personalInfo?.department || data.department || '',
+                year: data.personalInfo?.year || data.year || '',
+                events: data.eventNames || data.events || [],
+                totalAmount: data.totalFee || 50,
+                status: data.status === 'paid' ? 'valid' : 'pending',
+                applicantId: data.applicantId,
+              });
+            });
+          } catch {}
+        }
+      }
+
+      // ── 2. Search by Phone Number (if digits >= 10) ──
+      if (rawDigits.length >= 10) {
         const phoneVariations = [
           rawDigits,
           `+91${rawDigits}`,
@@ -55,7 +99,7 @@ export default function MyTicketPage() {
           try {
             const q1 = query(collection(db, 'tickets'), where('phone', '==', pVar), limit(5));
             const snap1 = await getDocs(q1);
-            snap1.docs.forEach(d => {
+            snap1.docs.forEach((d) => {
               const data = d.data();
               const dedupKey = (data.applicantId || data.phone || data.email || d.id).toLowerCase();
               matchedMap.set(dedupKey, { id: d.id, ...data });
@@ -63,24 +107,23 @@ export default function MyTicketPage() {
           } catch {}
         }
 
-        // Also query registrations if no tickets found
         if (matchedMap.size === 0) {
           for (const pVar of phoneVariations) {
             try {
               const q2 = query(collection(db, 'registrations'), where('personalInfo.phone', '==', pVar), limit(5));
               const snap2 = await getDocs(q2);
-              snap2.docs.forEach(d => {
+              snap2.docs.forEach((d) => {
                 const data = d.data();
                 const fakeId = data.ticketId || `tkt_${d.id}`;
                 matchedMap.set(fakeId, {
                   id: fakeId,
                   registrationId: d.id,
-                  studentName: data.personalInfo?.fullName || 'Participant',
-                  email: data.personalInfo?.email || '',
-                  phone: data.personalInfo?.phone || '',
-                  college: data.personalInfo?.college || '',
-                  department: data.personalInfo?.department || '',
-                  year: data.personalInfo?.year || '',
+                  studentName: data.personalInfo?.fullName || data.studentName || 'Participant',
+                  email: data.personalInfo?.email || data.email || '',
+                  phone: data.personalInfo?.phone || data.phone || '',
+                  college: data.personalInfo?.college || data.college || '',
+                  department: data.personalInfo?.department || data.department || '',
+                  year: data.personalInfo?.year || data.year || '',
                   events: data.eventNames || data.events || [],
                   totalAmount: data.totalFee || 50,
                   status: data.status === 'paid' ? 'valid' : 'pending',
@@ -90,12 +133,14 @@ export default function MyTicketPage() {
             } catch {}
           }
         }
-      } else {
-        // Search by email
+      }
+
+      // ── 3. Search by Email (if contains '@') ──
+      if (searchLower.includes('@')) {
         try {
-          const q1 = query(collection(db, 'tickets'), where('email', '==', searchEmail), limit(5));
+          const q1 = query(collection(db, 'tickets'), where('email', '==', searchLower), limit(5));
           const snap1 = await getDocs(q1);
-          snap1.docs.forEach(d => {
+          snap1.docs.forEach((d) => {
             const data = d.data();
             const dedupKey = (data.applicantId || data.phone || data.email || d.id).toLowerCase();
             matchedMap.set(dedupKey, { id: d.id, ...data });
@@ -104,20 +149,20 @@ export default function MyTicketPage() {
 
         if (matchedMap.size === 0) {
           try {
-            const q2 = query(collection(db, 'registrations'), where('personalInfo.email', '==', searchEmail), limit(5));
+            const q2 = query(collection(db, 'registrations'), where('personalInfo.email', '==', searchLower), limit(5));
             const snap2 = await getDocs(q2);
-            snap2.docs.forEach(d => {
+            snap2.docs.forEach((d) => {
               const data = d.data();
               const fakeId = data.ticketId || `tkt_${d.id}`;
               matchedMap.set(fakeId, {
                 id: fakeId,
                 registrationId: d.id,
-                studentName: data.personalInfo?.fullName || 'Participant',
-                email: data.personalInfo?.email || '',
-                phone: data.personalInfo?.phone || '',
-                college: data.personalInfo?.college || '',
-                department: data.personalInfo?.department || '',
-                year: data.personalInfo?.year || '',
+                studentName: data.personalInfo?.fullName || data.studentName || 'Participant',
+                email: data.personalInfo?.email || data.email || '',
+                phone: data.personalInfo?.phone || data.phone || '',
+                college: data.personalInfo?.college || data.college || '',
+                department: data.personalInfo?.department || data.department || '',
+                year: data.personalInfo?.year || data.year || '',
                 events: data.eventNames || data.events || [],
                 totalAmount: data.totalFee || 50,
                 status: data.status === 'paid' ? 'valid' : 'pending',
