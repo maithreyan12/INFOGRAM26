@@ -221,7 +221,19 @@ function PaymentContent() {
       const orderRes = await fetch('/api/payment/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: registration.totalFee, receipt: `rcpt_${registration.id}`, registrationId: registration.id }),
+        body: JSON.stringify({
+            amount: registration.totalFee,
+            receipt: `rcpt_${registration.id}`,
+            registrationId: registration.id,
+            applicantId: registration.applicantId,
+            name: registration.personalInfo?.fullName,
+            email: registration.personalInfo?.email,
+            phone: registration.personalInfo?.phone,
+            college: registration.personalInfo?.college,
+            department: registration.personalInfo?.department,
+            year: registration.personalInfo?.year,
+            events: registration.eventNames || registration.events,
+          }),
       });
       const orderData = await orderRes.json();
       if (!orderRes.ok || !orderData.id) throw new Error(orderData.error || 'Could not create Razorpay order');
