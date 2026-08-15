@@ -251,7 +251,7 @@ export default function TicketPage() {
                       {ticket.studentName}
                     </div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>
-                      {ticket.department} {ticket.year ? `• ${ticket.year}` : ''}
+                      {ticket.department} {ticket.year ? `• ${ticket.year.includes('Year') ? ticket.year : ticket.year + ' Year'}` : ''}
                     </div>
                     <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
                       {ticket.college}
@@ -300,10 +300,16 @@ export default function TicketPage() {
                               <Clock className="w-3.5 h-3.5 shrink-0" />
                               <span>{ev.time}</span>
                             </div>
-                            <div className="flex items-center gap-1 text-sky-300">
-                              <MapPin className="w-3.5 h-3.5 shrink-0" />
-                              <span>{ev.venue}</span>
-                            </div>
+                            <a
+                              href="https://maps.google.com/?q=C.+Abdul+Hakeem+College+of+Engineering+and+Technology,+Melvisharam"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-sky-300 hover:text-sky-200 hover:underline cursor-pointer transition-colors"
+                              title="Click to open Google Maps venue location"
+                            >
+                              <MapPin className="w-3.5 h-3.5 shrink-0 text-sky-400" />
+                              <span>📍 {ev.venue}</span>
+                            </a>
                           </div>
                         </div>
                       ))}
@@ -369,8 +375,15 @@ export default function TicketPage() {
                   <span style={{ fontWeight: 800, color: '#ffd700' }}>SATURDAY, 22 AUGUST 2026</span>
                 </div>
                 <div>
-                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>ISSUED ON: </span>
-                  <span style={{ fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>{issueDateStr}</span>
+                  <a
+                    href="https://infogram26.in"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontWeight: 800, color: '#00d4ff', textDecoration: 'none' }}
+                    className="hover:underline"
+                  >
+                    🌐 www.infogram26.in
+                  </a>
                 </div>
                 <div>
                   <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>FEE PAID: </span>
@@ -588,8 +601,8 @@ export default function TicketPage() {
                 <span style={{ fontWeight: 800, color: '#ffd700' }}>SATURDAY, 22 AUGUST 2026</span>
               </div>
               <div>
-                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>ISSUED ON: </span>
-                <span style={{ fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>{issueDateStr}</span>
+                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>OFFICIAL PORTAL: </span>
+                <span style={{ fontWeight: 800, color: '#00d4ff' }}>www.infogram26.in</span>
               </div>
               <div>
                 <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>FEE PAID: </span>
