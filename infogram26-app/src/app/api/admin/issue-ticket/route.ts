@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc, deleteDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDGPuGlZhb_lFur3YPAegpdr8aM4BUd-zY",
@@ -18,7 +18,23 @@ function getDB() {
 
 export async function POST(req: Request) {
   try {
-    const { name, email, phone, college, department, year, events, amount, applicantId } = await req.json();
+    const body = await req.json();
+
+    // Handle delete action if requested
+    if (body.action === 'delete') {
+      const db = getDB();
+      const { ticketId } = body;
+      if (ticketId) {
+        try {
+          await deleteDoc(doc(db, 'tickets', ticketId));
+        } catch (e: any) {
+          console.warn('Delete ticket notice:', e.message);
+        }
+      }
+      return NextResponse.json({ success: true, deleted: ticketId });
+    }
+
+    const { name, email, phone, college, department, year, events, amount, applicantId } = body;
     const db = getDB();
 
     const appCode = applicantId || `INFO26-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
