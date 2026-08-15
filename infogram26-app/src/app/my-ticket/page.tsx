@@ -202,7 +202,7 @@ export default function MyTicketPage() {
               ) : (
                 <Search className="w-5 h-5" />
               )}
-              {loading ? 'Searching Passes...' : 'Search & Download Pass'}
+              {loading ? 'Searching Passes...' : 'Download Ticket'}
             </button>
           </div>
 

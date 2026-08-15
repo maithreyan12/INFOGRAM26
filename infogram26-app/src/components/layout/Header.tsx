@@ -138,7 +138,7 @@ export default function Header() {
               }`}
               style={{ fontFamily: 'var(--font-heading)' }}
             >
-              <Ticket className="w-3.5 h-3.5" /> Download Ticket
+              <Ticket className="w-3.5 h-3.5" /> My Ticket
             </Link>
 
             <ThemeToggle />
