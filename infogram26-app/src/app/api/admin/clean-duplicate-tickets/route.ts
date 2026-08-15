@@ -68,84 +68,60 @@ export async function POST(req: Request) {
     ];
 
     let deletedTicketsCount = 0;
-    let deletedRegsCount = 0;
 
-    // 1. Delete ALL old tickets matching any of these 4 emails or phones
-    const allPhones = teamMembers.map(m => m.phone);
-    const allEmails = teamMembers.map(m => m.email);
-
-    // Query tickets
-    const tktSnap = await getDocs(collection(db, 'tickets'));
-    for (const d of tktSnap.docs) {
-      const data = d.data();
-      const p = (data.phone || '').replace(/\D/g, '').slice(-10);
-      const e = (data.email || '').toLowerCase();
-      const name = (data.studentName || data.name || '').toLowerCase();
-
-      if (
-        allPhones.includes(p) ||
-        allEmails.includes(e) ||
-        name.includes('thamarai') ||
-        name.includes('lakshaya') ||
-        name.includes('mithra') ||
-        name.includes('rithika')
-      ) {
+    // Delete old tickets matching each phone / email
+    for (const m of teamMembers) {
+      const phoneVars = [m.phone, `+91${m.phone}`, `+91 ${m.phone}`];
+      for (const pVar of phoneVars) {
         try {
-          await deleteDoc(doc(db, 'tickets', d.id));
-          deletedTicketsCount++;
-        } catch (err: any) {
-          console.warn('Err deleting ticket:', d.id, err.message);
-        }
+          const q = query(collection(db, 'tickets'), where('phone', '==', pVar));
+          const snap = await getDocs(q);
+          for (const d of snap.docs) {
+            try {
+              await deleteDoc(doc(db, 'tickets', d.id));
+              deletedTicketsCount++;
+            } catch {}
+          }
+        } catch {}
       }
+      try {
+        const qE = query(collection(db, 'tickets'), where('email', '==', m.email));
+        const snapE = await getDocs(qE);
+        for (const d of snapE.docs) {
+          try {
+            await deleteDoc(doc(db, 'tickets', d.id));
+            deletedTicketsCount++;
+          } catch {}
+        }
+      } catch {}
     }
 
-    // Query registrations
-    const regSnap = await getDocs(collection(db, 'registrations'));
-    for (const d of regSnap.docs) {
-      const data = d.data();
-      const p = (data.personalInfo?.phone || data.phone || '').replace(/\D/g, '').slice(-10);
-      const e = (data.personalInfo?.email || data.email || '').toLowerCase();
-      const name = (data.personalInfo?.fullName || data.fullName || '').toLowerCase();
-
-      if (
-        allPhones.includes(p) ||
-        allEmails.includes(e) ||
-        name.includes('thamarai') ||
-        name.includes('lakshaya') ||
-        name.includes('mithra') ||
-        name.includes('rithika')
-      ) {
-        try {
-          await deleteDoc(doc(db, 'registrations', d.id));
-          deletedRegsCount++;
-        } catch (err: any) {
-          console.warn('Err deleting registration:', d.id, err.message);
-        }
-      }
-    }
-
-    // 2. Re-create EXACTLY 1 ticket per member
+    // Now create EXACTLY 1 ticket per member
     const createdResults: any[] = [];
     for (const m of teamMembers) {
       const ticketNumber = `TKT-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
 
-      const regRef = await addDoc(collection(db, 'registrations'), {
-        applicantId: m.applicantId,
-        personalInfo: {
-          fullName: m.name,
-          email: m.email,
-          phone: m.phone,
-          college: m.college,
-          department: m.department,
-          year: m.year,
-        },
-        eventNames: m.events,
-        events: m.events,
-        totalFee: m.amount,
-        status: 'paid',
-        source: 'clean_dedup_system',
-        createdAt: new Date().toISOString(),
-      });
+      let regId = `reg_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+      try {
+        const regRef = await addDoc(collection(db, 'registrations'), {
+          applicantId: m.applicantId,
+          personalInfo: {
+            fullName: m.name,
+            email: m.email,
+            phone: m.phone,
+            college: m.college,
+            department: m.department,
+            year: m.year,
+          },
+          eventNames: m.events,
+          events: m.events,
+          totalFee: m.amount,
+          status: 'paid',
+          source: 'clean_dedup_system',
+          createdAt: new Date().toISOString(),
+        });
+        regId = regRef.id;
+      } catch {}
 
       const qrData = JSON.stringify({
         ticketNumber,
@@ -158,7 +134,7 @@ export async function POST(req: Request) {
       const tktRef = await addDoc(collection(db, 'tickets'), {
         ticketNumber,
         applicantId: m.applicantId,
-        registrationId: regRef.id,
+        registrationId: regId,
         studentName: m.name,
         email: m.email,
         phone: m.phone,
@@ -175,6 +151,7 @@ export async function POST(req: Request) {
 
       createdResults.push({
         name: m.name,
+        phone: m.phone,
         ticketId: tktRef.id,
         url: `https://infogram26.in/ticket/${tktRef.id}`,
       });
@@ -183,7 +160,6 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       deletedTicketsCount,
-      deletedRegsCount,
       createdCount: createdResults.length,
       passes: createdResults,
     });
