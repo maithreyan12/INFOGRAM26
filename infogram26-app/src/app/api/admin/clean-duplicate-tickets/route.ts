@@ -76,17 +76,48 @@ export async function POST(req: Request) {
 
     let deletedTicketsCount = 0;
 
-    // Delete test registrations (arunkumar and verification.test)
-    const testEmails = ['arunkumar.cahcet@gmail.com', 'verification.test@example.com', 'test@example.com'];
-    for (const testE of testEmails) {
-      try {
-        const qE = query(collection(db, 'tickets'), where('email', '==', testE));
-        const snapE = await getDocs(qE);
-        for (const d of snapE.docs) {
+    // Delete test registrations and tickets (arunkumar, verification.test, INFO26-CODE-9999)
+    try {
+      const snapRegs = await getDocs(collection(db, 'registrations'));
+      for (const d of snapRegs.docs) {
+        const data = d.data();
+        const email = (data.personalInfo?.email || data.email || '').toLowerCase();
+        const name = (data.personalInfo?.fullName || data.studentName || '').toLowerCase();
+        const appId = (data.applicantId || '').toLowerCase();
+        if (
+          email.includes('test') ||
+          email.includes('verification') ||
+          email.includes('arunkumar') ||
+          name.includes('test') ||
+          name.includes('verification') ||
+          appId.includes('9999') ||
+          appId.includes('test')
+        ) {
+          try { await deleteDoc(doc(db, 'registrations', d.id)); } catch {}
+        }
+      }
+    } catch {}
+
+    try {
+      const snapTkts = await getDocs(collection(db, 'tickets'));
+      for (const d of snapTkts.docs) {
+        const data = d.data();
+        const email = (data.email || '').toLowerCase();
+        const name = (data.studentName || data.name || '').toLowerCase();
+        const appId = (data.applicantId || '').toLowerCase();
+        if (
+          email.includes('test') ||
+          email.includes('verification') ||
+          email.includes('arunkumar') ||
+          name.includes('test') ||
+          name.includes('verification') ||
+          appId.includes('9999') ||
+          appId.includes('test')
+        ) {
           try { await deleteDoc(doc(db, 'tickets', d.id)); } catch {}
         }
-      } catch {}
-    }
+      }
+    } catch {}
 
     // Delete old tickets matching each phone / email
     for (const m of teamMembers) {

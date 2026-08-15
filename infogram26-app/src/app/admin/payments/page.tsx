@@ -37,9 +37,26 @@ export default function PaymentsPage() {
     let rawRegs: any[] = [];
     let rawTickets: any[] = [];
 
+    const isTestEntry = (item: any) => {
+      const email = (item.personalInfo?.email || item.email || '').toLowerCase();
+      const name = (item.personalInfo?.fullName || item.studentName || item.name || '').toLowerCase();
+      const appId = (item.applicantId || '').toLowerCase();
+      return (
+        email.includes('test') ||
+        email.includes('verification') ||
+        email.includes('arunkumar') ||
+        name.includes('test') ||
+        name.includes('verification') ||
+        appId.includes('9999') ||
+        appId.includes('test')
+      );
+    };
+
     const mergeAndSet = () => {
-      const combined = [...rawRegs];
+      const combined = rawRegs.filter((r) => !isTestEntry(r));
       rawTickets.forEach((t: any) => {
+        if (isTestEntry(t)) return;
+
         const exists = combined.some(
           (r) =>
             r.applicantId === t.applicantId ||
@@ -65,7 +82,8 @@ export default function PaymentsPage() {
           });
         }
       });
-      setRegistrations(combined.length > 0 ? combined : storeRegistrations || []);
+      const filteredStoreRegs = (storeRegistrations || []).filter((r) => !isTestEntry(r));
+      setRegistrations(combined.length > 0 ? combined : filteredStoreRegs);
       setLoading(false);
     };
 
