@@ -363,7 +363,7 @@ export default function ContactPage() {
                             ? 'bg-slate-950 border-purple-500/30 text-white placeholder-slate-500 focus:border-amber-300' 
                             : 'bg-slate-50 border-slate-300 text-slate-950 placeholder-slate-400 focus:border-[#7c3aed]'
                         }`}
-                        placeholder="John Doe"
+                        placeholder="Enter your full name..."
                         {...register("name")}
                       />
                       {errors.name && <p className="text-xs font-bold text-red-500 mt-1">{errors.name.message}</p>}
@@ -379,7 +379,7 @@ export default function ContactPage() {
                               ? 'bg-slate-950 border-purple-500/30 text-white placeholder-slate-500 focus:border-amber-300' 
                               : 'bg-slate-50 border-slate-300 text-slate-950 placeholder-slate-400 focus:border-[#7c3aed]'
                           }`}
-                          placeholder="john@example.com"
+                          placeholder="Enter your email address..."
                           {...register("email")}
                         />
                         {errors.email && <p className="text-xs font-bold text-red-500 mt-1">{errors.email.message}</p>}
@@ -393,7 +393,7 @@ export default function ContactPage() {
                               ? 'bg-slate-950 border-purple-500/30 text-white placeholder-slate-500 focus:border-amber-300' 
                               : 'bg-slate-50 border-slate-300 text-slate-950 placeholder-slate-400 focus:border-[#7c3aed]'
                           }`}
-                          placeholder="+91..."
+                          placeholder="10-digit mobile number"
                           {...register("phone")}
                         />
                       </div>
