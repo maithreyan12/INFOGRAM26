@@ -90,7 +90,7 @@ export async function POST(req: Request) {
         ticketNumber,
         applicantId: appCode,
         registrationId: regId,
-        studentName: name,
+        studentName: name || 'Participant',
         email: email || '',
         phone: phone || '',
         college: college || 'Vellore Institute of Technology',

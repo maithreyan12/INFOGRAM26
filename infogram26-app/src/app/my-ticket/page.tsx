@@ -243,7 +243,7 @@ export default function MyTicketPage() {
                           {ticket.studentName || ticket.name}
                         </div>
                         <div className={`text-xs font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                          {ticket.department} • {ticket.year} Year
+                          {ticket.department} {ticket.year ? `• ${ticket.year.includes('Year') ? ticket.year : `${ticket.year} Year`}` : ''}
                         </div>
                         <div className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{ticket.college}</div>
                       </div>

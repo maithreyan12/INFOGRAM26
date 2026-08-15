@@ -467,7 +467,7 @@ export default function RegistrationsPage() {
                       <td className="px-6 py-4">
                         <div className="font-black text-white text-sm">{name}</div>
                         <div className="text-[11px] text-gray-300 font-semibold mt-0.5">
-                          {dept} • {year} Year
+                          {dept} {year ? `• ${year.includes('Year') ? year : `${year} Year`}` : ''}
                         </div>
                         <div className="text-[10px] text-gray-400 font-medium">{college}</div>
                         <div className="text-[10px] text-gray-500 font-mono mt-0.5">
