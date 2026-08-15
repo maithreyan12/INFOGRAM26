@@ -1,27 +1,38 @@
 import { NextResponse } from 'next/server';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getFirestore, collection, addDoc, doc, setDoc } from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDGPuGlZhb_lFur3YPAegpdr8aM4BUd-zY",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "infogram26.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "infogram26",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "infogram26.firebasestorage.app",
+  messagingSenderId: "1083758362629",
+  appId: "1:1083758362629:web:38b344efbc36746efbdba4",
+};
+
+function getDB() {
+  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  return getFirestore(app);
+}
 
 export async function POST(req: Request) {
   try {
     const { name, email, phone, college, department, year, events, amount, applicantId } = await req.json();
 
-    const { db } = await import('@/lib/firebase/config');
-    const { collection, addDoc, doc, setDoc, serverTimestamp } = await import('firebase/firestore');
-
-    if (!db) {
-      return NextResponse.json({ error: 'Database not initialized' }, { status: 500 });
-    }
+    const db = getDB();
 
     const appCode = applicantId || `INFO26-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
     const eventsList = Array.isArray(events) ? events : [events || 'HackForge'];
     const ticketNumber = `TKT-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
 
-    // 1. Create Registration Document (allow create: if true)
+    // 1. Create Registration Document
     const regRef = await addDoc(collection(db, 'registrations'), {
       applicantId: appCode,
       personalInfo: {
-        fullName: name || 'Thamaraiselvi',
-        email: email || 'thamaraisanthi1459@gmail.com',
-        phone: phone || '9626918439',
+        fullName: name || 'Participant',
+        email: email || '',
+        phone: phone || '',
         college: college || 'Vellore Institute of Technology',
         department: department || 'Software Engineering',
         year: year || '2nd Year',
@@ -30,16 +41,16 @@ export async function POST(req: Request) {
       events: eventsList,
       totalFee: amount || 100,
       status: 'paid',
-      source: 'manual_reconciliation',
+      source: 'admin_issue_ticket',
       createdAt: new Date().toISOString(),
     });
 
-    // 2. Create Ticket Document (allow create: if true)
+    // 2. Create Ticket Document
     const ticketId = `tkt_${regRef.id}`;
     const qrData = JSON.stringify({
       ticketNumber,
       applicantId: appCode,
-      name: name || 'Thamaraiselvi',
+      name,
       events: eventsList,
       verified: true,
     });
@@ -48,9 +59,9 @@ export async function POST(req: Request) {
       ticketNumber,
       applicantId: appCode,
       registrationId: regRef.id,
-      studentName: name || 'Thamaraiselvi',
-      email: email || 'thamaraisanthi1459@gmail.com',
-      phone: phone || '9626918439',
+      studentName: name,
+      email: email || '',
+      phone: phone || '',
       college: college || 'Vellore Institute of Technology',
       department: department || 'Software Engineering',
       year: year || '2nd Year',
@@ -62,17 +73,17 @@ export async function POST(req: Request) {
       issueDate: new Date(),
     });
 
-    // Also sync to Google Sheets
+    // Sync to Google Sheets
     try {
-      fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://infogram26.in'}/api/sheets`, {
+      fetch('https://www.infogram26.in/api/sheets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           applicantId: appCode,
           ticketNumber,
-          name: name || 'Thamaraiselvi',
-          email: email || 'thamaraisanthi1459@gmail.com',
-          phone: phone || '9626918439',
+          name,
+          email: email || '',
+          phone: phone || '',
           college: college || 'Vellore Institute of Technology',
           department: department || 'Software Engineering',
           year: year || '2nd Year',
