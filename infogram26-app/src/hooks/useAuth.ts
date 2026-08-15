@@ -113,6 +113,24 @@ export function useAuth() {
             return;
           }
 
+          // ── Pre-authorized Organizers: Instant Event Admin Access ──
+          const ORGANIZER_EMAILS = ['maithreyangopika@gmail.com'];
+          if (ORGANIZER_EMAILS.includes(emailLower)) {
+            const matchedOrg = organizers.find((o) => o.email.toLowerCase() === emailLower);
+            setAdminUser(matchedOrg || {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              displayName: firebaseUser.displayName || 'Gopika (Quest X Organizer)',
+              role: 'organizer',
+              assignedEventId: 'nontech-2',
+              createdAt: new Date(),
+              isActive: true,
+            });
+            setRole('organizer');
+            setLoading(false);
+            return;
+          }
+
           try {
             if (db) {
               const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
