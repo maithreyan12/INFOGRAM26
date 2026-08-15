@@ -57,7 +57,7 @@ export default function MyTicketPage() {
             const snap1 = await getDocs(q1);
             snap1.docs.forEach(d => {
               const data = d.data();
-              const dedupKey = (data.studentName || data.email || d.id).toLowerCase();
+              const dedupKey = (data.applicantId || data.phone || data.email || d.id).toLowerCase();
               matchedMap.set(dedupKey, { id: d.id, ...data });
             });
           } catch {}
@@ -97,7 +97,7 @@ export default function MyTicketPage() {
           const snap1 = await getDocs(q1);
           snap1.docs.forEach(d => {
             const data = d.data();
-            const dedupKey = (data.studentName || data.email || d.id).toLowerCase();
+            const dedupKey = (data.applicantId || data.phone || data.email || d.id).toLowerCase();
             matchedMap.set(dedupKey, { id: d.id, ...data });
           });
         } catch {}
