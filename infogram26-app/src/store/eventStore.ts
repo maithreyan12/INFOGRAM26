@@ -31,18 +31,7 @@ interface EventState {
 
 import { OFFICIAL_EVENTS } from '@/lib/eventsData';
 
-const INITIAL_ORGANIZERS: OrganizerData[] = [
-  {
-    uid: 'gopika-organizer-questx',
-    email: 'maithreyangopika@gmail.com',
-    displayName: 'Gopika (Quest X Organizer)',
-    role: 'organizer',
-    assignedEventId: 'nontech-2',
-    assignedEventName: 'Quest X',
-    createdAt: new Date(),
-    isActive: true,
-  },
-];
+const INITIAL_ORGANIZERS: OrganizerData[] = [];
 
 const INITIAL_EVENTS: Event[] = OFFICIAL_EVENTS;
 
