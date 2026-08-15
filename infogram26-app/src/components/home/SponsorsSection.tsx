@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 // @ts-ignore
 import { db, isFirebaseConfigured } from '@/lib/firebase/config';
 import { useTheme } from '@/context/ThemeContext';
@@ -30,20 +30,27 @@ export default function SponsorsSection() {
   const isDark = theme === 'dark';
 
   useEffect(() => {
-    async function fetchSponsors() {
-      try {
-        if (!isFirebaseConfigured || !db) { setSponsors(DEMO_SPONSORS); return; }
-        const snapshot = await getDocs(collection(db, 'sponsors'));
+    if (!isFirebaseConfigured || !db) {
+      setSponsors(DEMO_SPONSORS);
+      return;
+    }
+
+    const unsub = onSnapshot(
+      collection(db, 'sponsors'),
+      (snapshot) => {
         if (snapshot.empty) {
           setSponsors(DEMO_SPONSORS);
         } else {
-          setSponsors(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Sponsor)));
+          setSponsors(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Sponsor)));
         }
-      } catch (error) {
+      },
+      (err) => {
+        console.warn('Live sponsors sync notice:', err);
         setSponsors(DEMO_SPONSORS);
       }
-    }
-    fetchSponsors();
+    );
+
+    return () => unsub();
   }, []);
 
   const getInitials = (name: string) => {
