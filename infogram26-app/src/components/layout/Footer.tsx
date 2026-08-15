@@ -195,13 +195,14 @@ export default function Footer() {
                   </div>
                 </div>
               </li>
-              <li className="flex items-center gap-3">
+              <li className="flex items-center gap-2 min-w-0">
                 <Phone className={`w-4 h-4 shrink-0 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                 <a
                   href="tel:+919043293530"
-                  className={`text-sm font-black transition-colors ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
+                  className={`text-[11px] sm:text-xs font-black whitespace-nowrap transition-colors ${isDark ? 'text-slate-200 hover:text-amber-300' : 'text-slate-900 hover:text-[#7c3aed]'
                     }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
+                  title="Staff: Mr. M. Mohamed Rafe (9043293530)"
                 >
                   Staff: Mr. M. Mohamed Rafe (9043293530)
                 </a>
