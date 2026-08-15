@@ -50,19 +50,22 @@ function PaymentContent() {
 
       const urlFee = Number(searchParams.get('fee')) || 0;
       const urlEvents = searchParams.get('events') ? searchParams.get('events')!.split(',') : [];
-      const urlName = searchParams.get('name') || 'Symposium Participant';
+      const urlName = searchParams.get('name') || '';
       const urlEmail = searchParams.get('email') || '';
       const urlPhone = searchParams.get('phone') || '';
+      const urlCollege = searchParams.get('college') || '';
+      const urlDept = searchParams.get('department') || '';
+      const urlYear = searchParams.get('year') || '';
 
       try {
         if (regId === 'mock_reg_123' || !db) {
           setRegistration({
             id: 'mock_reg_123',
-            applicantId: `INFO26-BYTE-${Math.floor(10000 + Math.random() * 90000)}`,
+            applicantId: `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
             totalFee: urlFee || 50,
             events: [],
-            eventNames: urlEvents.length > 0 ? urlEvents : ['Byte Battle'],
-            personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: 'Symposium Participant', department: 'IT', year: '1st' },
+            eventNames: urlEvents.length > 0 ? urlEvents : ['Symposium Event'],
+            personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: urlCollege, department: urlDept, year: urlYear },
           });
           setSettings({ merchantName: 'INFOGRAM 26 SYMPOSIUM' });
           setLoading(false);
@@ -83,7 +86,7 @@ function PaymentContent() {
             applicantId: `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
             totalFee: urlFee || 50,
             eventNames: urlEvents.length > 0 ? urlEvents : ['Event Registration'],
-            personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: 'Symposium Participant', department: 'IT', year: '1st' },
+            personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: urlCollege, department: urlDept, year: urlYear },
           });
         }
         const settingsDoc = await getDoc(doc(db, 'settings', 'global'));
@@ -95,7 +98,7 @@ function PaymentContent() {
           applicantId: `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
           totalFee: urlFee || 50,
           eventNames: urlEvents.length > 0 ? urlEvents : ['Event Registration'],
-          personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: 'Symposium Participant', department: 'IT', year: '1st' },
+          personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: urlCollege, department: urlDept, year: urlYear },
         });
       } finally {
         setLoading(false);

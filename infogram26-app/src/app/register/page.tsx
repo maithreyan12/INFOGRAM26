@@ -214,6 +214,9 @@ export default function RegisterPage() {
         name: formData.fullName || '',
         email: formData.email || '',
         phone: formData.phone || '',
+        college: formData.college || '',
+        department: formData.department || '',
+        year: formData.year || '',
         auto: 'true',
       });
       router.push(`/payment?${params.toString()}`);
@@ -226,6 +229,9 @@ export default function RegisterPage() {
         name: formData.fullName || '',
         email: formData.email || '',
         phone: formData.phone || '',
+        college: formData.college || '',
+        department: formData.department || '',
+        year: formData.year || '',
         auto: 'true',
       });
       router.push(`/payment?${params.toString()}`);
