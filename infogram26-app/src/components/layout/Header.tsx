@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Ticket } from 'lucide-react';
 
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { useTheme } from '@/context/ThemeContext';
@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { name: 'About', path: '/about' },
   { name: 'Events', path: '/events' },
   { name: 'Register', path: '/register' },
+  { name: 'My Ticket', path: '/my-ticket' },
   { name: 'Contact', path: '/contact' },
 ];
 
@@ -126,8 +127,20 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Right Area: Theme Toggle & Mobile Menu */}
+          {/* Right Area: Download Ticket, Theme Toggle & Mobile Menu */}
           <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              href="/my-ticket"
+              className={`hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 ${
+                isDark
+                  ? 'bg-amber-400/15 text-amber-300 border border-amber-400/40 hover:bg-amber-400/25 shadow-md shadow-amber-400/10'
+                  : 'bg-amber-500 text-slate-950 font-black hover:bg-amber-400 shadow-md'
+              }`}
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              <Ticket className="w-3.5 h-3.5" /> Download Ticket
+            </Link>
+
             <ThemeToggle />
 
             {/* Mobile Menu Button */}
