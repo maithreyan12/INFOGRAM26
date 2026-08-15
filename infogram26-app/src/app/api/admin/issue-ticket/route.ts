@@ -18,6 +18,14 @@ function getDB() {
 
 export async function POST(req: Request) {
   try {
+    const adminKey = req.headers.get('x-admin-key');
+    const secretKey = process.env.ADMIN_SECRET_KEY || 'infogram26_admin_secret_key_2026';
+
+    // Verify secret key if configured or header provided
+    if (process.env.ADMIN_SECRET_KEY && adminKey !== secretKey) {
+      return NextResponse.json({ error: 'Unauthorized: Invalid admin key' }, { status: 401 });
+    }
+
     const body = await req.json();
 
     // Handle delete action if requested
