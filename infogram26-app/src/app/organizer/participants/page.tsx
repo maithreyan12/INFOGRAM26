@@ -17,14 +17,57 @@ export default function ParticipantsPage() {
   const [allRegs, setAllRegs] = useState<any[]>([]);
   const [search, setSearch] = useState('');
 
-  // Real-time Firestore listener - filter to this event only
+  // Real-time Firestore listener — listens to both registrations and tickets
   useEffect(() => {
     if (!db) return;
-    const unsub = onSnapshot(collection(db, 'registrations'), (snap) => {
-      const regs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setAllRegs(regs);
+
+    let rawRegs: any[] = [];
+    let rawTickets: any[] = [];
+
+    const mergeLists = () => {
+      const combined = [...rawRegs];
+      rawTickets.forEach((t: any) => {
+        const exists = combined.some(
+          (r) =>
+            r.applicantId === t.applicantId ||
+            (r.personalInfo?.email && t.email && r.personalInfo?.email === t.email)
+        );
+        if (!exists && (t.studentName || t.applicantId)) {
+          combined.push({
+            id: t.ticketId || t.id,
+            applicantId: t.applicantId,
+            status: 'paid',
+            totalFee: t.totalAmount || 100,
+            personalInfo: {
+              fullName: t.studentName || t.name || 'Participant',
+              email: t.email || '',
+              phone: t.phone || '',
+              college: t.college || 'CAHCET',
+              department: t.department || 'Information Technology',
+              year: t.year || '1st',
+            },
+            eventNames: Array.isArray(t.events) ? t.events : [t.events],
+            events: Array.isArray(t.events) ? t.events : [t.events],
+          });
+        }
+      });
+      setAllRegs(combined);
+    };
+
+    const unsubRegs = onSnapshot(collection(db, 'registrations'), (snap) => {
+      rawRegs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      mergeLists();
     });
-    return () => unsub();
+
+    const unsubTickets = onSnapshot(collection(db, 'tickets'), (snap) => {
+      rawTickets = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      mergeLists();
+    });
+
+    return () => {
+      unsubRegs();
+      unsubTickets();
+    };
   }, []);
 
   // Filter participants for this coordinator's event only, paid status only
