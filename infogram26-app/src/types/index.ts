@@ -19,7 +19,7 @@ export interface AdminUser {
 
 // ─── Event ──────────────────────────────────────────────────
 export type EventCategory = 'technical' | 'non-technical';
-export type EventStatus = 'upcoming' | 'live' | 'completed' | 'cancelled';
+export type EventStatus = 'upcoming' | 'live' | 'completed' | 'cancelled' | 'paused';
 
 export interface Event {
   id: string;

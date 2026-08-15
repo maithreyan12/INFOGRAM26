@@ -144,6 +144,7 @@ export default function EventsPage() {
                 <th className="px-6 py-4">Date &amp; Venue</th>
                 <th className="px-6 py-4">Assigned Event Admin</th>
                 <th className="px-6 py-4">Fee</th>
+                <th className="px-6 py-4 text-center font-black">Live Status &amp; Controls</th>
                 <th className="px-6 py-4 text-center">Registrations</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
@@ -193,6 +194,26 @@ export default function EventsPage() {
                     </td>
                     <td className="px-6 py-4 font-black text-white">
                       {evt.registrationFee > 0 ? `₹${evt.registrationFee}` : 'Free'}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <select
+                        value={evt.status || 'upcoming'}
+                        onChange={(e) => updateEvent(evt.id, { status: e.target.value as any })}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider border focus:outline-none cursor-pointer ${
+                          evt.status === 'live'
+                            ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse'
+                            : evt.status === 'paused'
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50'
+                            : evt.status === 'completed'
+                            ? 'bg-slate-800 text-slate-400 border-slate-700'
+                            : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                        }`}
+                      >
+                        <option value="upcoming" className="bg-gray-900 text-emerald-400">⚡ Upcoming (Open)</option>
+                        <option value="live" className="bg-gray-900 text-red-400">🟢 Live Now</option>
+                        <option value="paused" className="bg-gray-900 text-amber-400">⏸️ Paused</option>
+                        <option value="completed" className="bg-gray-900 text-gray-400">🏁 Completed</option>
+                      </select>
                     </td>
                     <td className="px-6 py-4 text-center font-black">
                       <span className="bg-black/60 px-3 py-1 rounded-full border border-gray-800 text-xs text-amber-400">

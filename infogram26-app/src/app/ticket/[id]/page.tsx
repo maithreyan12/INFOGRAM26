@@ -1,14 +1,41 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-
 import { useParams, useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import QRCode from 'react-qr-code';
 import { toast } from 'sonner';
 import PublicLayout from '@/components/layout/PublicLayout';
-import { Download, Home, CheckCircle } from 'lucide-react';
+import { Download, Home, CheckCircle, Calendar, MapPin, Clock, ShieldCheck, Tag } from 'lucide-react';
+import { OFFICIAL_EVENTS, formatTimeRange } from '@/lib/eventsData';
+
+/* Helper to resolve event details */
+function getEventInfo(evNameOrId: string) {
+  const norm = evNameOrId.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const match = OFFICIAL_EVENTS.find(
+    (e) =>
+      e.name.toLowerCase().replace(/[^a-z0-9]/g, '') === norm ||
+      e.id === evNameOrId ||
+      e.slug === evNameOrId
+  );
+  if (match) {
+    return {
+      name: match.name,
+      category: match.category === 'technical' ? 'Technical' : 'Non-Technical',
+      venue: match.venue,
+      time: formatTimeRange(match.startTime, match.endTime),
+      date: match.date || '22 Aug 2026',
+    };
+  }
+  return {
+    name: evNameOrId,
+    category: 'Symposium Event',
+    venue: 'Main Campus, CAHCET',
+    time: 'Full Day',
+    date: '22 Aug 2026',
+  };
+}
 
 export default function TicketPage() {
   const params = useParams();
@@ -18,6 +45,7 @@ export default function TicketPage() {
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const ticketRef = useRef<HTMLDivElement>(null);
+  const exportTicketRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchTicket = async () => {
@@ -26,17 +54,16 @@ export default function TicketPage() {
           setTicket({
             id: 'mock_ticket_123',
             ticketNumber: 'TKT-DEMO-2026',
-            applicantId: 'APP123456',
-            studentName: 'Test Participant',
-            email: 'test@example.com',
+            applicantId: 'INFO26-TECH-10294',
+            studentName: 'Symposium Participant',
+            email: 'participant@example.com',
             phone: '9876543210',
-            college: 'Demo College of Engineering',
+            college: 'C. Abdul Hakeem College of Engineering',
             department: 'B.E Information Technology',
-            year: '2nd',
-            events: ['Code Clash', 'Web Warriors'],
-            totalAmount: 350,
-            utrNumber: '123456789012',
-            qrData: JSON.stringify({ ticketNumber: 'TKT-DEMO-2026', applicantId: 'APP123456', verified: true }),
+            year: '2nd Year',
+            events: ['Tech Talks', 'Byte Battle'],
+            totalAmount: 50,
+            qrData: JSON.stringify({ ticketNumber: 'TKT-DEMO-2026', applicantId: 'INFO26-TECH-10294', verified: true }),
             status: 'valid',
             issueDate: { seconds: Date.now() / 1000 },
           });
@@ -57,17 +84,18 @@ export default function TicketPage() {
   }, [id]);
 
   const handleDownloadPDF = async () => {
-    if (!ticketRef.current) return;
+    const targetEl = exportTicketRef.current || ticketRef.current;
+    if (!targetEl) return;
     setDownloading(true);
     try {
-      toast.info('Generating premium PDF ticket...');
+      toast.info('Generating official PDF pass...');
       const html2canvas = (await import('html2canvas')).default;
       const jsPDF = (await import('jspdf')).default;
 
-      const canvas = await html2canvas(ticketRef.current, {
+      const canvas = await html2canvas(targetEl, {
         scale: 3,
         useCORS: true,
-        backgroundColor: '#040d1a',
+        backgroundColor: '#030a16',
         logging: false,
       });
 
@@ -95,8 +123,8 @@ export default function TicketPage() {
       const y = (pdfHeight - drawH) / 2;
 
       pdf.addImage(imgData, 'PNG', x, y, drawW, drawH);
-      pdf.save(`INFOGRAM26_Ticket_${ticket.ticketNumber}.pdf`);
-      toast.success('Ticket downloaded! See your Downloads folder.');
+      pdf.save(`INFOGRAM26_Ticket_${ticket?.applicantId || ticket?.ticketNumber}.pdf`);
+      toast.success('Official Entry Ticket downloaded!');
     } catch (err) {
       console.error('PDF generation error', err);
       toast.error('Failed to generate PDF. Please try again.');
@@ -116,8 +144,8 @@ export default function TicketPage() {
   if (!ticket) return (
     <PublicLayout>
       <div className="flex flex-col justify-center items-center min-h-screen text-center px-4">
-        <h1 className="text-4xl font-bold mb-4 text-slate-900">Ticket Not Found</h1>
-        <p className="text-slate-600 mb-8 font-medium">This ticket does not exist or has been removed.</p>
+        <h1 className="text-3xl font-bold mb-4 text-slate-900">Ticket Not Found</h1>
+        <p className="text-slate-600 mb-8 font-medium">This ticket pass does not exist or has expired.</p>
         <button onClick={() => router.push('/')} className="btn-primary px-8 py-3 rounded-full font-bold">
           Return to Home
         </button>
@@ -125,213 +153,453 @@ export default function TicketPage() {
     </PublicLayout>
   );
 
-  const issueDate = ticket.issueDate?.seconds
-    ? new Date(ticket.issueDate.seconds * 1000).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })
-    : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+  const issueDateStr = ticket.issueDate?.seconds
+    ? new Date(ticket.issueDate.seconds * 1000).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  const rawEventsList: string[] = Array.isArray(ticket.events)
+    ? ticket.events
+    : typeof ticket.events === 'string'
+    ? ticket.events.split(',')
+    : [];
+
+  const structuredEvents = rawEventsList.map((ev) => getEventInfo(ev.trim()));
 
   return (
     <PublicLayout>
       <div className="min-h-screen pt-28 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Success Header */}
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 rounded-full px-5 py-2 text-sm font-semibold text-emerald-600 mb-4">
-              <CheckCircle className="w-4 h-4" /> Registration Successful
+          {/* Header Banner */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-5 py-2 text-xs font-black uppercase tracking-wider text-emerald-600 mb-3">
+              <CheckCircle className="w-4 h-4" /> Registration &amp; Payment Confirmed
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Your Entry Pass is Ready!</h1>
-            <p className="text-slate-600 text-sm font-medium">Download and present this ticket at the registration desk on event day.</p>
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+              OFFICIAL ENTRY PASS
+            </h1>
+            <p className="text-slate-600 text-xs sm:text-sm font-semibold mt-1">
+              Present this pass or scannable QR code at the registration desk on event day
+            </p>
           </div>
 
-          {/* ══════════ PREMIUM TICKET ══════════ */}
-          <div ref={ticketRef} className="relative w-full max-w-3xl mx-auto mb-8 overflow-hidden"
+          {/* ══════════ FORMAL PREMIUM TICKET PASS ══════════ */}
+          <div
+            ref={ticketRef}
+            className="relative w-full max-w-3xl mx-auto mb-8 overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, #040d1a 0%, #071422 50%, #040d1a 100%)',
+              background: 'linear-gradient(135deg, #030a16 0%, #07162c 50%, #030a16 100%)',
               borderRadius: '24px',
-              border: '1px solid rgba(0, 212, 255, 0.3)',
-              boxShadow: '0 0 60px rgba(0, 212, 255, 0.15), 0 0 120px rgba(0, 212, 255, 0.05)',
+              border: '1.5px solid rgba(0, 212, 255, 0.4)',
+              boxShadow: '0 16px 48px rgba(0, 212, 255, 0.15), 0 0 100px rgba(124, 58, 237, 0.1)',
             }}
           >
-            {/* Top decorative bar */}
-            <div style={{
-              height: '5px',
-              background: 'linear-gradient(90deg, #00d4ff, #ffd700, #00d4ff)',
-              width: '100%',
-            }} />
+            {/* Top Metallic Trim */}
+            <div style={{ height: '6px', background: 'linear-gradient(90deg, #7c3aed, #00d4ff, #ffd700, #00d4ff, #7c3aed)' }} />
 
-            {/* Holographic shimmer overlay */}
-            <div className="absolute inset-0 pointer-events-none" style={{
-              background: 'linear-gradient(135deg, rgba(0,212,255,0.03) 0%, transparent 50%, rgba(255,215,0,0.03) 100%)',
-            }} />
+            {/* Corner Decorative Frames */}
+            <div className="absolute top-4 left-4" style={{ width: 16, height: 16, borderTop: '2px solid #00d4ff', borderLeft: '2px solid #00d4ff' }} />
+            <div className="absolute top-4 right-4" style={{ width: 16, height: 16, borderTop: '2px solid #00d4ff', borderRight: '2px solid #00d4ff' }} />
+            <div className="absolute bottom-4 left-4" style={{ width: 16, height: 16, borderBottom: '2px solid #ffd700', borderLeft: '2px solid #ffd700' }} />
+            <div className="absolute bottom-4 right-4" style={{ width: 16, height: 16, borderBottom: '2px solid #ffd700', borderRight: '2px solid #ffd700' }} />
 
-            {/* Corner accents */}
-            <div className="absolute top-3 left-3" style={{ width: 20, height: 20, borderTop: '2px solid #00d4ff', borderLeft: '2px solid #00d4ff' }} />
-            <div className="absolute top-3 right-3" style={{ width: 20, height: 20, borderTop: '2px solid #00d4ff', borderRight: '2px solid #00d4ff' }} />
-            <div className="absolute bottom-3 left-3" style={{ width: 20, height: 20, borderBottom: '2px solid #ffd700', borderLeft: '2px solid #ffd700' }} />
-            <div className="absolute bottom-3 right-3" style={{ width: 20, height: 20, borderBottom: '2px solid #ffd700', borderRight: '2px solid #ffd700' }} />
-
-            <div className="flex flex-col md:flex-row p-6 sm:p-8 gap-6" style={{ minHeight: 320 }}>
-              {/* LEFT: Ticket Info */}
-              <div className="flex-1 flex flex-col gap-5">
-                {/* Logo + Title */}
-                <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div style={{
-                      width: 42, height: 42,
-                      background: 'rgba(0,212,255,0.1)',
-                      border: '1px solid rgba(0,212,255,0.3)',
-                      borderRadius: '10px',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: 1, lineHeight: 1 }}>
-                        INFOGRAM<span style={{ color: '#00d4ff' }}>&apos;26</span>
-                      </div>
-                      <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: 3, textTransform: 'uppercase', fontFamily: 'var(--font-heading)' }}>
-                        National Level Tech Symposium
-                      </div>
-                    </div>
-                  </div>
+            <div className="p-6 sm:p-8">
+              {/* Institution Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-5 mb-6 gap-4">
+                <div className="flex items-center gap-3">
                   <div style={{
-                    height: 1,
-                    background: 'linear-gradient(90deg, rgba(0,212,255,0.5), rgba(255,255,255,0.05))',
-                    marginBottom: 16,
-                  }} />
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase' }}>
-                    Department of Information Technology
+                    width: 46, height: 46,
+                    background: 'rgba(0,212,255,0.1)',
+                    border: '1.5px solid rgba(0,212,255,0.4)',
+                    borderRadius: '14px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <ShieldCheck className="w-6 h-6 text-[#00d4ff]" />
                   </div>
-                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: 1 }}>
-                    C. Abdul Hakeem College of Engineering & Technology
-                  </div>
-                </div>
-
-                {/* Participant */}
-                <div>
-                  <div style={{ fontSize: 10, color: '#00d4ff', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4, fontWeight: 700 }}>Participant</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>{ticket.studentName}</div>
-                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>
-                    {ticket.department} • {ticket.year} Year
-                  </div>
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{ticket.college}</div>
-                </div>
-
-                {/* Events */}
-                <div>
-                  <div style={{ fontSize: 10, color: '#ffd700', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6, fontWeight: 700 }}>Registered Events</div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {(ticket.events || []).map((ev: string, i: number) => (
-                      <span key={i} style={{
-                        background: 'rgba(0,212,255,0.12)',
-                        border: '1px solid rgba(0,212,255,0.25)',
-                        color: '#00d4ff',
-                        padding: '3px 10px',
-                        borderRadius: 100,
-                        fontSize: 11,
-                        fontWeight: 600,
-                      }}>
-                        {ev}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Bottom meta */}
-                <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                   <div>
-                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', letterSpacing: 2, textTransform: 'uppercase' }}>Applicant ID</div>
-                    <div style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: '#00d4ff' }}>{ticket.applicantId}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: 1, lineHeight: 1 }}>
+                      INFOGRAM<span style={{ color: '#00d4ff' }}>&apos;26</span>
+                    </div>
+                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: 2, textTransform: 'uppercase', marginTop: 3, fontWeight: 700 }}>
+                      Department of Information Technology • CAHCET
+                    </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', letterSpacing: 2, textTransform: 'uppercase' }}>Event Date</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#ffd700' }}>22 Aug 2026</div>
+                </div>
+
+                {/* Applicant ID Pill */}
+                <div className="flex flex-col sm:items-end">
+                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase', fontWeight: 800 }}>
+                    APPLICANT ID
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', letterSpacing: 2, textTransform: 'uppercase' }}>Amount Paid</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#4ade80' }}>₹{ticket.totalAmount}</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: 18, fontWeight: 900, color: '#00d4ff', letterSpacing: 1 }}>
+                    {ticket.applicantId}
                   </div>
                 </div>
               </div>
 
-              {/* Divider (tear line) */}
-              <div className="hidden md:flex flex-col items-center" style={{ minWidth: 24 }}>
-                <div style={{ flex: 1, width: 1, background: 'repeating-linear-gradient(to bottom, rgba(0,212,255,0.3) 0px, rgba(0,212,255,0.3) 6px, transparent 6px, transparent 12px)' }} />
-                <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#040d1a', border: '1px solid rgba(0,212,255,0.2)', margin: '8px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(0,212,255,0.4)' }} />
-                </div>
-                <div style={{ flex: 1, width: 1, background: 'repeating-linear-gradient(to bottom, rgba(0,212,255,0.3) 0px, rgba(0,212,255,0.3) 6px, transparent 6px, transparent 12px)' }} />
-              </div>
+              {/* Main Section Grid: Participant Details + QR */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                
+                {/* Left 2 Cols: Participant Credentials & Formal Event Schedule */}
+                <div className="md:col-span-2 space-y-5">
+                  
+                  {/* Participant Credentials */}
+                  <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                    <div style={{ fontSize: 9, color: '#00d4ff', letterSpacing: 2, textTransform: 'uppercase', fontWeight: 800, marginBottom: 4 }}>
+                      PASS HOLDER CREDENTIALS
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 900, color: '#ffffff', lineHeight: 1.2 }}>
+                      {ticket.studentName}
+                    </div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>
+                      {ticket.department} {ticket.year ? `• ${ticket.year}` : ''}
+                    </div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                      {ticket.college}
+                    </div>
+                  </div>
 
-              {/* RIGHT: QR + Ticket Number */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, minWidth: 160 }}>
-                <div style={{ background: '#fff', padding: 12, borderRadius: 12, boxShadow: '0 0 20px rgba(0,212,255,0.2)' }}>
-                  <QRCode
-                    value={typeof window !== 'undefined' ? `${window.location.origin}/ticket/${id}` : `https://www.infogram26.in/ticket/${id}`}
-                    size={128}
-                    level="H"
-                    bgColor="#ffffff"
-                    fgColor="#040d1a"
-                  />
+                  {/* Formal Structured Events Section */}
+                  <div>
+                    <div style={{ fontSize: 10, color: '#ffd700', letterSpacing: 2, textTransform: 'uppercase', fontWeight: 800, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Tag className="w-3.5 h-3.5 text-amber-400" /> REGISTERED EVENT SCHEDULE
+                    </div>
+                    <div className="space-y-2.5">
+                      {structuredEvents.map((ev, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            background: 'rgba(0, 212, 255, 0.05)',
+                            border: '1px solid rgba(0, 212, 255, 0.2)',
+                            borderRadius: '14px',
+                            padding: '12px 14px',
+                          }}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span style={{
+                                background: ev.category === 'Technical' ? 'rgba(0, 212, 255, 0.2)' : 'rgba(192, 132, 252, 0.2)',
+                                color: ev.category === 'Technical' ? '#00d4ff' : '#c084fc',
+                                border: `1px solid ${ev.category === 'Technical' ? 'rgba(0,212,255,0.4)' : 'rgba(192,132,252,0.4)'}`,
+                                fontSize: 9,
+                                fontWeight: 800,
+                                padding: '1px 7px',
+                                borderRadius: 100,
+                                textTransform: 'uppercase',
+                              }}>
+                                {ev.category}
+                              </span>
+                              <span style={{ fontSize: 14, fontWeight: 800, color: '#ffffff' }}>
+                                {ev.name}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 text-xs font-semibold text-white/70 shrink-0">
+                            <div className="flex items-center gap-1 text-amber-300">
+                              <Clock className="w-3.5 h-3.5 shrink-0" />
+                              <span>{ev.time}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-sky-300">
+                              <MapPin className="w-3.5 h-3.5 shrink-0" />
+                              <span>{ev.venue}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>Ticket No.</div>
-                  <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#fff', fontWeight: 600, wordBreak: 'break-all' }}>{ticket.ticketNumber}</div>
-                </div>
+
+                {/* Right 1 Col: Scannable QR & Serial */}
                 <div style={{
-                  background: ticket.status === 'valid' ? 'rgba(74,222,128,0.15)' : 'rgba(239,68,68,0.15)',
-                  border: `1px solid ${ticket.status === 'valid' ? 'rgba(74,222,128,0.3)' : 'rgba(239,68,68,0.3)'}`,
-                  color: ticket.status === 'valid' ? '#4ade80' : '#f87171',
-                  padding: '3px 12px',
-                  borderRadius: 100,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: 2,
-                  textTransform: 'uppercase' as const,
+                  background: 'rgba(0,0,0,0.4)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '18px',
+                  padding: '20px 16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 12,
                 }}>
-                  {ticket.status === 'valid' ? '✓ VALID' : ticket.status?.toUpperCase()}
+                  {/* QR Code Container */}
+                  <div style={{ background: '#ffffff', padding: 10, borderRadius: 14, boxShadow: '0 0 24px rgba(0, 212, 255, 0.25)' }}>
+                    <QRCode
+                      value={typeof window !== 'undefined' ? `${window.location.origin}/ticket/${id}` : `https://www.infogram26.in/ticket/${id}`}
+                      size={132}
+                      level="H"
+                      bgColor="#ffffff"
+                      fgColor="#040d1a"
+                    />
+                  </div>
+
+                  <div className="text-center">
+                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 2, fontWeight: 800 }}>
+                      TICKET NUMBER
+                    </div>
+                    <div style={{ fontFamily: 'monospace', fontSize: 12, color: '#ffffff', fontWeight: 800, wordBreak: 'break-all' }}>
+                      {ticket.ticketNumber}
+                    </div>
+                  </div>
+
+                  {/* Status Pill */}
+                  <div style={{
+                    background: ticket.status === 'valid' ? 'rgba(74, 222, 128, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                    border: `1px solid ${ticket.status === 'valid' ? 'rgba(74, 222, 128, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
+                    color: ticket.status === 'valid' ? '#4ade80' : '#f87171',
+                    padding: '4px 14px',
+                    borderRadius: 100,
+                    fontSize: 10,
+                    fontWeight: 900,
+                    letterSpacing: 2,
+                    textTransform: 'uppercase',
+                  }}>
+                    {ticket.status === 'valid' ? '✓ VALID ENTRY PASS' : ticket.status?.toUpperCase()}
+                  </div>
                 </div>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', letterSpacing: 1, textTransform: 'uppercase' }}>Issued</div>
-                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>{issueDate}</div>
+
+              </div>
+
+              {/* Ticket Footer Meta Info */}
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 14 }} className="flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div>
+                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>EVENT DATE: </span>
+                  <span style={{ fontWeight: 800, color: '#ffd700' }}>SATURDAY, 22 AUGUST 2026</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>ISSUED ON: </span>
+                  <span style={{ fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>{issueDateStr}</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>FEE PAID: </span>
+                  <span style={{ fontWeight: 900, color: '#4ade80' }}>₹{ticket.totalAmount || 50}</span>
                 </div>
               </div>
             </div>
 
-            {/* Bottom decorative bar */}
-            <div style={{
-              height: '4px',
-              background: 'linear-gradient(90deg, #ffd700, #00d4ff, #ffd700)',
-              width: '100%',
-            }} />
+            {/* Bottom Metallic Trim */}
+            <div style={{ height: '5px', background: 'linear-gradient(90deg, #ffd700, #00d4ff, #7c3aed)' }} />
           </div>
-          {/* ══════════ END TICKET ══════════ */}
+          {/* ══════════ END FORMAL TICKET PASS ══════════ */}
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={handleDownloadPDF}
               disabled={downloading}
-              className="btn-primary flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base disabled:opacity-60"
+              className="btn-primary flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-bold text-base shadow-xl disabled:opacity-60"
             >
               {downloading ? (
-                <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Generating PDF...</>
+                <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Generating PDF Pass...</>
               ) : (
-                <><Download className="w-5 h-5" /> Download PDF Ticket</>
+                <><Download className="w-5 h-5" /> Download Official PDF Ticket</>
               )}
             </button>
             <button
               onClick={() => router.push('/')}
-              className="btn-glass flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base"
+              className="btn-glass flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-bold text-base"
             >
               <Home className="w-5 h-5" /> Back to Home
             </button>
           </div>
 
-          <p className="text-center text-white/30 text-xs mt-6">
-            Keep this ticket safe. Present it at the registration desk on 22 Aug 2026.
+          <p className="text-center text-slate-500 text-xs font-semibold mt-6">
+            Keep this official ticket safe. Present the printed PDF or digital QR code at the registration counter on 22 Aug 2026.
           </p>
+        </div>
+      </div>
+
+      {/* ══════════ OFF-SCREEN HIGH-DEF PDF TEMPLATE (780px FIXED) ══════════ */}
+      <div style={{ position: 'fixed', left: '-9999px', top: '0', width: '780px', pointerEvents: 'none', zIndex: -100 }}>
+        <div
+          ref={exportTicketRef}
+          style={{
+            width: '780px',
+            background: 'linear-gradient(135deg, #030a16 0%, #07162c 50%, #030a16 100%)',
+            borderRadius: '24px',
+            border: '1.5px solid rgba(0, 212, 255, 0.4)',
+            overflow: 'hidden',
+            boxSizing: 'border-box',
+          }}
+        >
+          {/* Top Metallic Trim */}
+          <div style={{ height: '6px', background: 'linear-gradient(90deg, #7c3aed, #00d4ff, #ffd700, #00d4ff, #7c3aed)' }} />
+
+          <div style={{ padding: '32px' }}>
+            {/* Institution Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '20px', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{
+                  width: 48, height: 48,
+                  background: 'rgba(0,212,255,0.1)',
+                  border: '1.5px solid rgba(0,212,255,0.4)',
+                  borderRadius: '14px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <ShieldCheck className="w-7 h-7 text-[#00d4ff]" />
+                </div>
+                <div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 900, color: '#ffffff', letterSpacing: 1, lineHeight: 1 }}>
+                    INFOGRAM<span style={{ color: '#00d4ff' }}>&apos;26</span>
+                  </div>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', letterSpacing: 2, textTransform: 'uppercase', marginTop: 4, fontWeight: 700 }}>
+                    Department of Information Technology • CAHCET
+                  </div>
+                </div>
+              </div>
+
+              {/* Applicant ID Pill */}
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase', fontWeight: 800 }}>
+                  APPLICANT ID
+                </div>
+                <div style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 900, color: '#00d4ff', letterSpacing: 1 }}>
+                  {ticket.applicantId}
+                </div>
+              </div>
+            </div>
+
+            {/* Main Content Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 240px', gap: '24px', marginBottom: '24px' }}>
+              {/* Left Column: Participant & Events */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                
+                {/* Credentials Box */}
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                  <div style={{ fontSize: 9, color: '#00d4ff', letterSpacing: 2, textTransform: 'uppercase', fontWeight: 800, marginBottom: 4 }}>
+                    PASS HOLDER CREDENTIALS
+                  </div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: '#ffffff', lineHeight: 1.2 }}>
+                    {ticket.studentName}
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>
+                    {ticket.department} {ticket.year ? `• ${ticket.year}` : ''}
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                    {ticket.college}
+                  </div>
+                </div>
+
+                {/* Event Schedule */}
+                <div>
+                  <div style={{ fontSize: 10, color: '#ffd700', letterSpacing: 2, textTransform: 'uppercase', fontWeight: 800, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Tag className="w-3.5 h-3.5 text-amber-400" /> REGISTERED EVENT SCHEDULE
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {structuredEvents.map((ev, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          background: 'rgba(0, 212, 255, 0.05)',
+                          border: '1px solid rgba(0, 212, 255, 0.2)',
+                          borderRadius: '14px',
+                          padding: '12px 16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span style={{
+                            background: ev.category === 'Technical' ? 'rgba(0, 212, 255, 0.2)' : 'rgba(192, 132, 252, 0.2)',
+                            color: ev.category === 'Technical' ? '#00d4ff' : '#c084fc',
+                            border: `1px solid ${ev.category === 'Technical' ? 'rgba(0,212,255,0.4)' : 'rgba(192,132,252,0.4)'}`,
+                            fontSize: 9,
+                            fontWeight: 800,
+                            padding: '2px 8px',
+                            borderRadius: 100,
+                            textTransform: 'uppercase',
+                          }}>
+                            {ev.category}
+                          </span>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: '#ffffff' }}>
+                            {ev.name}
+                          </span>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>
+                          <div style={{ color: '#fde047' }}>
+                            ⏰ {ev.time}
+                          </div>
+                          <div style={{ color: '#7dd3fc' }}>
+                            📍 {ev.venue}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: QR Code & Verification */}
+              <div style={{
+                background: 'rgba(0,0,0,0.5)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '18px',
+                padding: '20px 16px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+              }}>
+                <div style={{ background: '#ffffff', padding: 12, borderRadius: 14, boxShadow: '0 0 24px rgba(0, 212, 255, 0.25)' }}>
+                  <QRCode
+                    value={typeof window !== 'undefined' ? `${window.location.origin}/ticket/${id}` : `https://www.infogram26.in/ticket/${id}`}
+                    size={140}
+                    level="H"
+                    bgColor="#ffffff"
+                    fgColor="#040d1a"
+                  />
+                </div>
+
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 2, fontWeight: 800 }}>
+                    TICKET NUMBER
+                  </div>
+                  <div style={{ fontFamily: 'monospace', fontSize: 12, color: '#ffffff', fontWeight: 800, wordBreak: 'break-all' }}>
+                    {ticket.ticketNumber}
+                  </div>
+                </div>
+
+                <div style={{
+                  background: ticket.status === 'valid' ? 'rgba(74, 222, 128, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                  border: `1px solid ${ticket.status === 'valid' ? 'rgba(74, 222, 128, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
+                  color: ticket.status === 'valid' ? '#4ade80' : '#f87171',
+                  padding: '4px 14px',
+                  borderRadius: 100,
+                  fontSize: 10,
+                  fontWeight: 900,
+                  letterSpacing: 2,
+                  textTransform: 'uppercase',
+                }}>
+                  {ticket.status === 'valid' ? '✓ VALID ENTRY PASS' : ticket.status?.toUpperCase()}
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Meta */}
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
+              <div>
+                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>EVENT DATE: </span>
+                <span style={{ fontWeight: 800, color: '#ffd700' }}>SATURDAY, 22 AUGUST 2026</span>
+              </div>
+              <div>
+                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>ISSUED ON: </span>
+                <span style={{ fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>{issueDateStr}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>FEE PAID: </span>
+                <span style={{ fontWeight: 900, color: '#4ade80' }}>₹{ticket.totalAmount || 50}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Metallic Trim */}
+          <div style={{ height: '5px', background: 'linear-gradient(90deg, #ffd700, #00d4ff, #7c3aed)' }} />
         </div>
       </div>
     </PublicLayout>

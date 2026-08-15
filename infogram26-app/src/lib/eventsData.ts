@@ -503,3 +503,55 @@ export const OFFICIAL_EVENTS: Event[] = [
     updatedAt: new Date(),
   },
 ];
+
+/* ─── Standardized 4-Letter Event Prefix Map for Perfectly Aligned Applicant IDs ─── */
+export const EVENT_PREFIX_MAP: Record<string, string> = {
+  'tech-talks': 'TALK',
+  'tech talks': 'TALK',
+  'codestorm': 'CODE',
+  'pixel-craft': 'PIXL',
+  'pixel craft': 'PIXL',
+  'open-source': 'OPEN',
+  'open source': 'OPEN',
+  'byte-battle': 'BYTE',
+  'byte battle': 'BYTE',
+  'hack-forge': 'HACK',
+  'hack forge': 'HACK',
+  'clash-of-minds': 'MIND',
+  'clash of minds': 'MIND',
+  'mind-matrix': 'MATX',
+  'mind matrix': 'MATX',
+  'quest-x': 'QSTX',
+  'quest x': 'QSTX',
+  'frame-craft': 'FRAM',
+  'frame craft': 'FRAM',
+  'fun-fiesta': 'FEST',
+  'fun fiesta': 'FEST',
+  'artistry': 'ARTS',
+  'flavour-fusion': 'FOOD',
+  'flavour fusion': 'FOOD',
+  'battle-verse': 'BGMI',
+  'battle verse': 'BGMI',
+  'mic-drop': 'MICS',
+  'mic drop': 'MICS',
+  'reel-it-feel-it': 'REEL',
+  'reel it feel it': 'REEL',
+};
+
+export function getEventPrefix(eventNameOrSlug?: string): string {
+  if (!eventNameOrSlug) return 'GENR';
+  const norm = eventNameOrSlug.toLowerCase().trim();
+  if (EVENT_PREFIX_MAP[norm]) return EVENT_PREFIX_MAP[norm];
+  
+  const cleaned = eventNameOrSlug.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (cleaned.length >= 4) return cleaned.slice(0, 4);
+  return cleaned.padEnd(4, 'X');
+}
+
+export function generateApplicantId(eventList?: string[]): string {
+  const num = Math.floor(10000 + Math.random() * 90000);
+  const firstEv = eventList && eventList.length > 0 ? eventList[0] : '';
+  const prefix = getEventPrefix(firstEv);
+  return `INFO26-${prefix}-${num}`;
+}
+

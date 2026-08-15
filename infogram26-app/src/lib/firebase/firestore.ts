@@ -122,10 +122,8 @@ export function listenToCollection<T>(
 export { where, orderBy, limit, Timestamp, serverTimestamp };
 
 // ─── ID Generators ───────────────────────────────────────────
-export function generateApplicantId(): string {
-  const num = Math.floor(10000 + Math.random() * 90000);
-  return `IGR26-${num}`;
-}
+import { generateApplicantId } from '@/lib/eventsData';
+export { generateApplicantId };
 
 export function generateTicketNumber(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

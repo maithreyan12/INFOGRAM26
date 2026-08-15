@@ -182,16 +182,58 @@ export default function ScannerPage() {
     if (!ticket || !db) return;
     setMarkingUsed(true);
     try {
+      // 1. Update ticket doc
       await updateDoc(doc(db, 'tickets', ticket.id), {
         status: 'used',
+        checkedIn: true,
         checkedInAt: new Date(),
       });
+
+      // 2. Update corresponding registration doc if exists
+      try {
+        const regQuery = query(collection(db, 'registrations'), where('applicantId', '==', ticket.applicantId));
+        const regSnap = await getDocs(regQuery);
+        if (!regSnap.empty) {
+          await updateDoc(doc(db, 'registrations', regSnap.docs[0].id), {
+            checkedIn: true,
+            attendanceStatus: 'checked_in',
+            checkedInAt: new Date(),
+          });
+        }
+      } catch (regErr) {
+        console.warn('Registration check-in sync warning:', regErr);
+      }
+
+      // 3. Trigger Google Sheets webhook sync
+      try {
+        fetch('/api/sheets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            applicantId: ticket.applicantId,
+            ticketNumber: ticket.ticketNumber,
+            name: ticket.studentName,
+            email: ticket.email,
+            phone: ticket.phone,
+            college: ticket.college,
+            department: ticket.department,
+            year: ticket.year,
+            events: Array.isArray(ticket.events) ? ticket.events.join(', ') : ticket.events,
+            amount: ticket.totalAmount,
+            status: 'CHECKED IN (PRESENT)',
+            checkedInAt: new Date().toISOString(),
+          }),
+        }).catch((e) => console.warn('Sheets check-in sync error:', e));
+      } catch (sheetsErr) {
+        console.warn('Sheets sync error:', sheetsErr);
+      }
+
       setTicket({ ...ticket, status: 'used' });
       setScanResult('used');
-      toast.success('✅ Attendee checked in successfully!');
+      toast.success('✅ Attendee checked in! Status updated to Checked In (Green).');
     } catch (err) {
       console.error('Check-in error:', err);
-      toast.error('Failed to check in');
+      toast.error('Failed to check in attendee');
     } finally {
       setMarkingUsed(false);
     }

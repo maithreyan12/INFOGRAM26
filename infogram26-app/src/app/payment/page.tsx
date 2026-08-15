@@ -58,7 +58,7 @@ function PaymentContent() {
         if (regId === 'mock_reg_123' || !db) {
           setRegistration({
             id: 'mock_reg_123',
-            applicantId: `APP${Math.floor(100000 + Math.random() * 900000)}`,
+            applicantId: `INFO26-BYTE-${Math.floor(10000 + Math.random() * 90000)}`,
             totalFee: urlFee || 50,
             events: [],
             eventNames: urlEvents.length > 0 ? urlEvents : ['Byte Battle'],
@@ -80,7 +80,7 @@ function PaymentContent() {
         } else {
           setRegistration({
             id: regId,
-            applicantId: `APP${Math.floor(100000 + Math.random() * 900000)}`,
+            applicantId: `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
             totalFee: urlFee || 50,
             eventNames: urlEvents.length > 0 ? urlEvents : ['Event Registration'],
             personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: 'Symposium Participant', department: 'IT', year: '1st' },
@@ -92,7 +92,7 @@ function PaymentContent() {
         console.error('Error fetching data:', err);
         setRegistration({
           id: regId,
-          applicantId: `APP${Math.floor(100000 + Math.random() * 900000)}`,
+          applicantId: `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
           totalFee: urlFee || 50,
           eventNames: urlEvents.length > 0 ? urlEvents : ['Event Registration'],
           personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: 'Symposium Participant', department: 'IT', year: '1st' },

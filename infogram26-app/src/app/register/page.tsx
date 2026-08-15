@@ -35,7 +35,7 @@ const personalInfoSchema = z.object({
 
 type PersonalInfoForm = z.infer<typeof personalInfoSchema>;
 
-import { OFFICIAL_EVENTS, formatTimeRange } from '@/lib/eventsData';
+import { OFFICIAL_EVENTS, formatTimeRange, generateApplicantId } from '@/lib/eventsData';
 
 const demoEvents = OFFICIAL_EVENTS.map(e => ({
   id: e.id,
@@ -155,8 +155,6 @@ export default function RegisterPage() {
   const getTotalFee = () =>
     selectedEvents.reduce((sum, id) => sum + (events.find(e => e.id === id)?.fee || 0), 0);
 
-  const generateApplicantId = () => `APP${Math.floor(100000 + Math.random() * 900000)}`;
-
   const onSubmit = async () => {
     if (selectedEvents.length === 0) return;
     setIsSubmitting(true);
@@ -167,7 +165,7 @@ export default function RegisterPage() {
     try {
       if (db) {
         try {
-          const applicantId = generateApplicantId();
+          const applicantId = generateApplicantId(eventNamesList as string[]);
           const cleanPersonalInfo = JSON.parse(
             JSON.stringify(formData, (key, value) => (value === undefined ? null : value))
           );
@@ -181,6 +179,29 @@ export default function RegisterPage() {
             createdAt: serverTimestamp(),
           });
           targetRegId = docRef.id;
+
+          // Non-blocking sync to Google Sheets upon registration completion
+          try {
+            fetch('/api/sheets', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                applicantId,
+                name: formData.fullName,
+                email: formData.email,
+                phone: formData.phone,
+                college: formData.college,
+                department: formData.department,
+                year: formData.year,
+                events: eventNamesList.join(', '),
+                amount: totalFee,
+                paymentMethod: 'pending',
+                status: 'pending_payment',
+              }),
+            }).catch((err) => console.warn('Google Sheets sync warning:', err));
+          } catch (sheetsErr) {
+            console.warn('Google Sheets sync skipped:', sheetsErr);
+          }
         } catch (dbErr) {
           console.warn('Firestore write warning, proceeding to payment:', dbErr);
         }

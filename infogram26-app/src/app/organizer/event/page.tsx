@@ -4,8 +4,9 @@ export const dynamic = 'force-dynamic';
 import OrganizerLayout from '@/components/admin/OrganizerLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useEventStore } from '@/store/eventStore';
-import { Save, Image as ImageIcon, Check } from 'lucide-react';
+import { Save, Image as ImageIcon, Check, Play, Pause, CheckCircle2, Radio, Lock } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 export default function EventEditorPage() {
   const { adminUser } = useAuth();
@@ -35,6 +36,18 @@ export default function EventEditorPage() {
     }
   }, [event]);
 
+  const handleStatusChange = (newStatus: 'live' | 'upcoming' | 'paused' | 'completed') => {
+    if (!event) return;
+    updateEvent(event.id, { status: newStatus as any });
+    const labels = {
+      live: '🟢 Event is now LIVE on stage!',
+      upcoming: '⚡ Registration is OPEN!',
+      paused: '⏸️ Registration is PAUSED.',
+      completed: '🏁 Event is marked COMPLETED.',
+    };
+    toast.success(labels[newStatus]);
+  };
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!event) return;
@@ -57,7 +70,7 @@ export default function EventEditorPage() {
     return (
       <OrganizerLayout>
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center text-gray-400">
-          <p className="text-white font-semibold">No assigned event found.</p>
+          <p className="text-white font-semibold">No assigned event found for your account.</p>
         </div>
       </OrganizerLayout>
     );
@@ -67,9 +80,9 @@ export default function EventEditorPage() {
     <OrganizerLayout>
       <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Edit Event Details</h1>
+          <h1 className="text-3xl font-bold text-white">Event Admin Control &amp; Editor</h1>
           <p className="text-gray-400 mt-1 text-sm">
-            Updating public information for <span className="text-blue-400 font-semibold">{event.name}</span>
+            Authorized management panel for <span className="text-blue-400 font-bold">{event.name}</span>
           </p>
         </div>
         {savedSuccess && (
@@ -77,6 +90,82 @@ export default function EventEditorPage() {
             <Check className="w-4 h-4 text-green-400" /> Event Details Saved!
           </div>
         )}
+      </div>
+
+      {/* ── Start / Stop Live Event Control Panel ── */}
+      <div className="bg-slate-900 border border-blue-500/30 rounded-2xl p-6 mb-8 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 className="text-lg font-black text-white flex items-center gap-2">
+              <Radio className="w-5 h-5 text-red-500 animate-pulse" /> Live Event &amp; Registration Control Panel
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">Control live status &amp; registration availability for {event.name}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-400 font-bold uppercase">Current Status:</span>
+            <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border ${
+              event.status === 'live'
+                ? 'bg-red-500/20 text-red-400 border-red-500/40 animate-pulse'
+                : event.status === 'completed'
+                ? 'bg-slate-800 text-slate-400 border-slate-700'
+                : event.status === 'paused'
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+            }`}>
+              {event.status === 'live' ? '🟢 LIVE NOW' : event.status?.toUpperCase()}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <button
+            type="button"
+            onClick={() => handleStatusChange('live')}
+            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
+              event.status === 'live'
+                ? 'bg-red-600 text-white border-red-500 shadow-lg shadow-red-600/30 ring-2 ring-red-500/50'
+                : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30'
+            }`}
+          >
+            <Play className="w-4 h-4 fill-current" /> Start Event (Go Live)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleStatusChange('upcoming')}
+            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
+              event.status === 'upcoming'
+                ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-600/30'
+                : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+            }`}
+          >
+            <CheckCircle2 className="w-4 h-4" /> Open Registration
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleStatusChange('paused')}
+            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
+              event.status === 'paused'
+                ? 'bg-amber-600 text-white border-amber-500 shadow-lg shadow-amber-600/30'
+                : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30'
+            }`}
+          >
+            <Pause className="w-4 h-4" /> Pause Registration
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleStatusChange('completed')}
+            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
+              event.status === 'completed'
+                ? 'bg-slate-700 text-white border-slate-600 shadow-lg'
+                : 'bg-slate-800/80 hover:bg-slate-800 text-slate-400 border-slate-700'
+            }`}
+          >
+            <Lock className="w-4 h-4" /> Mark Completed
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-8">

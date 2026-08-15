@@ -1,0 +1,5 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "cd infogram26-app && npm run build",
+  "outputDirectory": "infogram26-app/.next"
+}

@@ -120,17 +120,40 @@ export default function EventCard({ event }: EventCardProps) {
           </div>
 
           {/* CTA */}
-          <Link
-            href={`/events/${event.slug}`}
-            className={`mt-3 w-full py-3 px-4 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 shadow-md ${
-              isDark 
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:brightness-110' 
-                : 'bg-gradient-to-r from-[#7c3aed] to-[#6366f1] text-white hover:brightness-110'
-            }`}
-          >
-            <span>View Details</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="grid grid-cols-2 gap-2 mt-3">
+            <Link
+              href={`/events/${event.slug}`}
+              className={`py-3 px-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-all duration-200 border ${
+                isDark 
+                  ? 'border-purple-500/30 text-purple-300 hover:bg-purple-500/10' 
+                  : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <span>Details</span>
+            </Link>
+            {seatsLeft > 0 && event.status !== 'completed' ? (
+              <Link
+                href={`/register?event=${event.slug}`}
+                className={`py-3 px-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-all duration-200 shadow-md ${
+                  isDark 
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:brightness-110' 
+                    : 'bg-gradient-to-r from-[#7c3aed] to-[#6366f1] text-white hover:brightness-110'
+                }`}
+              >
+                <span>Register</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            ) : (
+              <button
+                disabled
+                className={`py-3 px-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center cursor-not-allowed border ${
+                  isDark ? 'bg-slate-800/50 border-slate-800 text-slate-500' : 'bg-slate-100 border-slate-200 text-slate-400'
+                }`}
+              >
+                <span>Closed</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>
