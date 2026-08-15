@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDGPuGlZhb_lFur3YPAegpdr8aM4BUd-zY",
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     const eventsList = Array.isArray(events) ? events : [events || 'HackForge'];
     const ticketNumber = `TKT-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
 
-    // 1. Create Registration Document
+    // 1. Create Registration Document (allow create: if true)
     const regRef = await addDoc(collection(db, 'registrations'), {
       applicantId: appCode,
       personalInfo: {
@@ -45,8 +45,7 @@ export async function POST(req: Request) {
       createdAt: new Date().toISOString(),
     });
 
-    // 2. Create Ticket Document
-    const ticketId = `tkt_${regRef.id}`;
+    // 2. Create Ticket Document (allow create: if true via addDoc)
     const qrData = JSON.stringify({
       ticketNumber,
       applicantId: appCode,
@@ -55,7 +54,7 @@ export async function POST(req: Request) {
       verified: true,
     });
 
-    await setDoc(doc(db, 'tickets', ticketId), {
+    const ticketRef = await addDoc(collection(db, 'tickets'), {
       ticketNumber,
       applicantId: appCode,
       registrationId: regRef.id,
@@ -72,6 +71,8 @@ export async function POST(req: Request) {
       status: 'valid',
       issueDate: new Date(),
     });
+
+    const ticketId = ticketRef.id;
 
     // Sync to Google Sheets
     try {
