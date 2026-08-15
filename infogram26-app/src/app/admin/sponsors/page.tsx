@@ -51,34 +51,41 @@ export default function SponsorsPage() {
     const unsub = onSnapshot(
       collection(db, 'sponsors'),
       (snap) => {
-        if (snap.empty) {
-          // Auto-seed default sponsors if collection is empty
-          DEFAULT_SPONSORS.forEach(async (sp) => {
-            try {
-              await addDoc(collection(db, 'sponsors'), {
-                ...sp,
-                createdAt: serverTimestamp(),
-              });
-            } catch (e) {}
-          });
-        } else {
-          const list = snap.docs.map((d) => ({
-            id: d.id,
-            ...d.data(),
-          })) as SponsorItem[];
-          setSponsors(list);
-        }
+        const list = snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        })) as SponsorItem[];
+        setSponsors(list);
         setLoading(false);
       },
       (err) => {
         console.warn('Sponsors live sync error:', err);
-        setSponsors(DEFAULT_SPONSORS.map((s, i) => ({ id: `default-${i}`, ...s })));
+        setSponsors([]);
         setLoading(false);
       }
     );
 
     return () => unsub();
   }, []);
+
+  /* ── Seed Defaults Handler ── */
+  const handleSeedDefaults = async () => {
+    if (!db) return;
+    const toastId = toast.loading('Adding default sponsors...');
+    try {
+      for (const sp of DEFAULT_SPONSORS) {
+        await addDoc(collection(db, 'sponsors'), {
+          ...sp,
+          createdAt: serverTimestamp(),
+        });
+      }
+      toast.dismiss(toastId);
+      toast.success('Default sponsors added!');
+    } catch (e) {
+      toast.dismiss(toastId);
+      toast.error('Failed to seed default sponsors.');
+    }
+  };
 
   /* ── 2. Open Modal for Create / Edit ── */
   const handleOpenAdd = () => {
@@ -215,12 +222,22 @@ export default function SponsorsPage() {
             Manage event partners, official branding tiers, and live website marquee logos
           </p>
         </div>
-        <button
-          onClick={handleOpenAdd}
-          className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 active:scale-95 transition-all"
-        >
-          <Plus className="w-4 h-4" /> Add New Sponsor
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          {sponsors.length === 0 && (
+            <button
+              onClick={handleSeedDefaults}
+              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
+            >
+              <RefreshCw className="w-4 h-4 text-[#00d4ff]" /> Seed Sample Sponsors
+            </button>
+          )}
+          <button
+            onClick={handleOpenAdd}
+            className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 active:scale-95 transition-all"
+          >
+            <Plus className="w-4 h-4" /> Add New Sponsor
+          </button>
+        </div>
       </div>
 
       {/* Loading state */}
