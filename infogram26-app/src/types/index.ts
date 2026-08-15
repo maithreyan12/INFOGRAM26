@@ -35,6 +35,7 @@ export interface Event {
   registrationDeadline: string; // ISO date string
   registrationFee: number; // in INR
   maxParticipants: number;
+  maxSlots?: number; // Total slot limit (200 slots per event)
   registeredCount: number;
   coordinatorName: string;
   staffIncharge?: string;

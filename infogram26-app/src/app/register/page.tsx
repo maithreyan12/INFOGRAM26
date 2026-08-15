@@ -421,7 +421,12 @@ export default function RegisterPage() {
                                 </div>
                               </div>
                               <p className={`text-xs mb-1 font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{event.time}</p>
-                              <p className="text-amber-500 font-extrabold text-sm">₹{event.fee}</p>
+                              <div className="flex items-center justify-between mt-1 pt-1 border-t border-slate-200/40 dark:border-slate-800">
+                                <p className="text-amber-500 font-extrabold text-sm">₹{event.fee}</p>
+                                <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${isDark ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                                  ⚡ 200 Slots
+                                </span>
+                              </div>
                             </div>
                           );
                         })}
@@ -452,7 +457,12 @@ export default function RegisterPage() {
                                 </div>
                               </div>
                               <p className={`text-xs mb-1 font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{event.time}</p>
-                              <p className="text-amber-500 font-extrabold text-sm">₹{event.fee}</p>
+                              <div className="flex items-center justify-between mt-1 pt-1 border-t border-slate-200/40 dark:border-slate-800">
+                                <p className="text-amber-500 font-extrabold text-sm">₹{event.fee}</p>
+                                <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${isDark ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                                  ⚡ 200 Slots
+                                </span>
+                              </div>
                             </div>
                           );
                         })}

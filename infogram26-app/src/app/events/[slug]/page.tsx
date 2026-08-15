@@ -125,8 +125,9 @@ export default function EventDetailPage() {
   }
 
   const isTechnical = event.category === 'technical';
-  const seatsLeft = event.maxParticipants - (event.registeredCount || 0);
-  const seatsPercentage = (seatsLeft / event.maxParticipants) * 100;
+  const totalSlots = event.maxSlots || 200;
+  const seatsLeft = Math.max(0, totalSlots - (event.registeredCount || 0));
+  const seatsPercentage = (seatsLeft / totalSlots) * 100;
   
   let progressColor = 'bg-emerald-500';
   if (seatsPercentage < 10) progressColor = 'bg-red-500';
@@ -328,8 +329,8 @@ export default function EventDetailPage() {
 
                     <div className={`pt-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
                       <div className="flex justify-between text-sm mb-2">
-                        <span className={`font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Seats Available</span>
-                        <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{seatsLeft} / {event.maxParticipants}</span>
+                        <span className={`font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Slots Available</span>
+                        <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{seatsLeft} / {totalSlots}</span>
                       </div>
                       <div className={`w-full h-2.5 rounded-full overflow-hidden ${isDark ? 'bg-slate-950' : 'bg-slate-200'}`}>
                         <div 

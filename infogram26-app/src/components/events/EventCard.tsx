@@ -16,8 +16,9 @@ export default function EventCard({ event }: EventCardProps) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const isTechnical = event.category === 'technical';
-  const seatsLeft = event.maxParticipants - (event.registeredCount || 0);
-  const seatsPercentage = (seatsLeft / event.maxParticipants) * 100;
+  const totalSlots = event.maxSlots || 200;
+  const seatsLeft = Math.max(0, totalSlots - (event.registeredCount || 0));
+  const seatsPercentage = (seatsLeft / totalSlots) * 100;
 
   let seatColor = 'text-emerald-600 dark:text-emerald-400';
   if (seatsPercentage < 10) seatColor = 'text-red-600 dark:text-red-400';
@@ -113,8 +114,8 @@ export default function EventCard({ event }: EventCardProps) {
                 <IndianRupee className="w-4 h-4 mr-0.5" />
                 <span>{event.registrationFee}</span>
               </div>
-              <span className={`text-xs font-black ${seatColor}`}>
-                {seatsLeft > 0 ? `${seatsLeft} seats left` : 'Registration Full'}
+              <span className={`text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${isDark ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                {seatsLeft > 0 ? `⚡ ${seatsLeft} / ${totalSlots} Slots` : 'Registration Full'}
               </span>
             </div>
           </div>
