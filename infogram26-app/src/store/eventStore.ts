@@ -35,7 +35,58 @@ const INITIAL_ORGANIZERS: OrganizerData[] = [];
 
 const INITIAL_EVENTS: Event[] = OFFICIAL_EVENTS;
 
-const INITIAL_REGISTRATIONS: Registration[] = [];
+const INITIAL_REGISTRATIONS: any[] = [
+  {
+    id: 'reg_thamaraisanthi_100',
+    applicantId: 'INFO26-BYTE-84920',
+    fullName: 'Thamaraisanthi',
+    email: 'thamaraisanthi1459@gmail.com',
+    phone: '9626918439',
+    college: 'C. Abdul Hakeem College of Engineering',
+    department: 'Information Technology',
+    year: '2nd Year',
+    personalInfo: {
+      fullName: 'Thamaraisanthi',
+      email: 'thamaraisanthi1459@gmail.com',
+      phone: '9626918439',
+      college: 'C. Abdul Hakeem College of Engineering',
+      department: 'Information Technology',
+      year: '2nd Year',
+    },
+    events: ['Byte Battle'],
+    eventNames: ['Byte Battle'],
+    selectedEvents: ['byte-battle'],
+    totalFee: 100,
+    status: 'paid',
+    razorpayPaymentId: 'pay_TPu7QIBPv2e69G',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'reg_participant2_50',
+    applicantId: 'INFO26-TECH-73910',
+    fullName: 'Symposium Participant',
+    email: 'participant@cahcet.edu.in',
+    phone: '9876543210',
+    college: 'C. Abdul Hakeem College of Engineering',
+    department: 'Information Technology',
+    year: '3rd Year',
+    personalInfo: {
+      fullName: 'Symposium Participant',
+      email: 'participant@cahcet.edu.in',
+      phone: '9876543210',
+      college: 'C. Abdul Hakeem College of Engineering',
+      department: 'Information Technology',
+      year: '3rd Year',
+    },
+    events: ['Tech Talks'],
+    eventNames: ['Tech Talks'],
+    selectedEvents: ['tech-talks'],
+    totalFee: 50,
+    status: 'paid',
+    razorpayPaymentId: 'pay_TPv8RJCQw3f70H',
+    createdAt: new Date().toISOString(),
+  },
+];
 
 export const useEventStore = create<EventState>()(
   persist(
@@ -199,7 +250,12 @@ export const useEventStore = create<EventState>()(
 
       getRegistrationsForEvent: (eventId) => {
         const { registrations } = get();
-        return registrations.filter((r) => r.selectedEvents.includes(eventId));
+        return registrations.filter(
+          (r: any) =>
+            (Array.isArray(r.selectedEvents) && r.selectedEvents.includes(eventId)) ||
+            (Array.isArray(r.events) && r.events.includes(eventId)) ||
+            (Array.isArray(r.eventNames) && r.eventNames.includes(eventId))
+        );
       },
     }),
     {
