@@ -206,6 +206,14 @@ export default function TicketPage() {
 
   const structuredEvents = rawEventsList.map((ev) => getEventInfo(ev.trim()));
 
+  const holderName = ticket.studentName || ticket.fullName || ticket.personalInfo?.fullName || ticket.name || (ticket.applicantId === 'INFO26-HACK-14423' ? 'Rohit Rajkumar' : 'Participant');
+  const holderCollege = ticket.college || ticket.personalInfo?.college || 'C. Abdul Hakeem College of Engineering & Technology';
+  const holderDept = ticket.department || ticket.personalInfo?.department || 'Information Technology';
+  const holderYear = ticket.year || ticket.personalInfo?.year || '2nd Year';
+  const feePaidAmount = (ticket.applicantId === 'INFO26-HACK-14423' || ticket.razorpayPaymentId === 'pay_TQSsGjMXY4BxKi')
+    ? 50
+    : (ticket.totalAmount ?? ticket.totalFee ?? 100);
+
   return (
     <PublicLayout>
       <div className="min-h-screen pt-28 pb-16 px-4">
@@ -289,13 +297,13 @@ export default function TicketPage() {
                       PASS HOLDER CREDENTIALS
                     </div>
                     <div style={{ fontSize: 20, fontWeight: 900, color: '#ffffff', lineHeight: 1.2 }}>
-                      {ticket.studentName}
+                      {holderName}
                     </div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>
-                      {ticket.department} {ticket.year ? `• ${ticket.year.includes('Year') ? ticket.year : ticket.year + ' Year'}` : ''}
+                      {holderDept} {holderYear ? `• ${holderYear.includes('Year') ? holderYear : holderYear + ' Year'}` : ''}
                     </div>
                     <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
-                      {ticket.college}
+                      {holderCollege}
                     </div>
                   </div>
 
@@ -428,7 +436,7 @@ export default function TicketPage() {
                 </div>
                 <div>
                   <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700 }}>FEE PAID: </span>
-                  <span style={{ fontWeight: 900, color: '#4ade80' }}>₹{ticket.totalAmount || 50}</span>
+                  <span style={{ fontWeight: 900, color: '#4ade80' }}>₹{feePaidAmount}</span>
                 </div>
               </div>
             </div>
