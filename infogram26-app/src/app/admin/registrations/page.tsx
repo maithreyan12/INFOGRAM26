@@ -34,10 +34,19 @@ export default function RegistrationsPage() {
       // Filter rawRegs to ONLY include paid registrations or those with a valid ticket
       const paidRegs = rawRegs.filter((r) => {
         const isPaidStatus = r.status === 'paid' || r.ticketId || ticketItems[r.applicantId];
-        const email = (r.personalInfo?.email || r.email || '').toLowerCase();
-        const name = (r.personalInfo?.fullName || r.studentName || r.name || '').toLowerCase();
-        const appId = (r.applicantId || '').toLowerCase();
-        const isDemo = name === 'participant' || appId === 'info26-hack-98035' || appId.includes('98035') || email.includes('verification.test') || email.includes('arunkumar.cahcet') || email === 'test@example.com';
+        const email = (r.personalInfo?.email || r.email || '').toLowerCase().trim();
+        const name = (r.personalInfo?.fullName || r.studentName || r.name || '').toLowerCase().trim();
+        const appId = (r.applicantId || '').toLowerCase().trim();
+        const isDemo =
+          !name ||
+          name === '' ||
+          name === '—' ||
+          name === 'participant' ||
+          appId.includes('98035') ||
+          appId.includes('14423') ||
+          email.includes('verification.test') ||
+          email.includes('arunkumar.cahcet') ||
+          email === 'test@example.com';
         return isPaidStatus && !isDemo;
       });
 
@@ -45,16 +54,25 @@ export default function RegistrationsPage() {
 
       // Add any tickets that are not in rawRegs
       Object.values(ticketItems).forEach((t: any) => {
-        const email = (t.email || '').toLowerCase();
-        const name = (t.studentName || t.name || '').toLowerCase();
-        const appId = (t.applicantId || '').toLowerCase();
-        const isDemo = name === 'participant' || appId === 'info26-hack-98035' || appId.includes('98035') || email.includes('verification.test') || email.includes('arunkumar.cahcet') || email === 'test@example.com';
+        const email = (t.email || '').toLowerCase().trim();
+        const name = (t.studentName || t.name || '').toLowerCase().trim();
+        const appId = (t.applicantId || '').toLowerCase().trim();
+        const isDemo =
+          !name ||
+          name === '' ||
+          name === '—' ||
+          name === 'participant' ||
+          appId.includes('98035') ||
+          appId.includes('14423') ||
+          email.includes('verification.test') ||
+          email.includes('arunkumar.cahcet') ||
+          email === 'test@example.com';
         if (isDemo) return;
 
         const exists = combined.some(
           (r) => r.applicantId === t.applicantId || (r.personalInfo?.email && r.personalInfo?.email === t.email)
         );
-        if (!exists && (t.studentName || t.email || t.applicantId)) {
+        if (!exists && (name || email)) {
           combined.push({
             id: t.registrationId || t.id,
             applicantId: t.applicantId || `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,

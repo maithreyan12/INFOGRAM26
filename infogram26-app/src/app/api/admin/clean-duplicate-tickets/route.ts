@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, collection, query, where, getDocs, deleteDoc, doc, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, query, where, getDocs, deleteDoc, doc, addDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDGPuGlZhb_lFur3YPAegpdr8aM4BUd-zY",
@@ -71,6 +71,18 @@ export async function POST(req: Request) {
         year: '2nd Year',
         events: ['HackForge'],
         amount: 100,
+      },
+      {
+        applicantId: 'INFO26-HACK-14423',
+        name: 'Rohit Rajkumar',
+        phone: '9740706586',
+        email: 'rajkumarrohit965@gmail.com',
+        college: 'C. Abdul Hakeem College of Engineering & Technology',
+        department: 'Information Technology',
+        year: '2nd Year',
+        events: ['HackForge'],
+        amount: 50,
+        razorpayPaymentId: 'pay_TQSsGjMXY4BxKi',
       },
     ];
 
@@ -235,4 +247,8 @@ export async function POST(req: Request) {
     console.error('Clean tickets error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+}
+
+export async function GET(req: Request) {
+  return POST(req);
 }
