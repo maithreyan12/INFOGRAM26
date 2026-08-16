@@ -50,33 +50,71 @@ export default function EventsPage() {
           return;
         }
 
+        // 1. Calculate live paid registration counts per event from registrations & tickets
+        const paidCountMap: Record<string, number> = {};
+        try {
+          const regSnap = await getDocs(collection(db, 'registrations'));
+          regSnap.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.status === 'paid' || data.paidAt || data.razorpayPaymentId) {
+              const evts: string[] = data.eventNames || data.events || [];
+              evts.forEach(evt => {
+                const norm = String(evt).toLowerCase().replace(/[^a-z0-9]/g, '');
+                paidCountMap[norm] = (paidCountMap[norm] || 0) + 1;
+              });
+            }
+          });
+
+          const tktSnap = await getDocs(collection(db, 'tickets'));
+          tktSnap.docs.forEach(doc => {
+            const data = doc.data();
+            if ((data.status === 'valid' || data.status === 'paid') && !data.registrationId) {
+              const evts: string[] = data.events || data.eventNames || [];
+              evts.forEach(evt => {
+                const norm = String(evt).toLowerCase().replace(/[^a-z0-9]/g, '');
+                paidCountMap[norm] = (paidCountMap[norm] || 0) + 1;
+              });
+            }
+          });
+        } catch (cntErr) {
+          console.warn('Paid registration count warning:', cntErr);
+        }
+
         const eventsRef = collection(db, 'events');
         const snapshot = await getDocs(eventsRef);
-        if (snapshot.empty) {
-          setEvents(initialList);
-        } else {
-          const eventsData = initialList.map(localEv => {
-            const normLocalSlug = localEv.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+        const eventsData = initialList.map(localEv => {
+          const normLocalSlug = localEv.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const normLocalName = localEv.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const liveCount = Math.max(paidCountMap[normLocalSlug] || 0, paidCountMap[normLocalName] || 0, paidCountMap[localEv.id] || 0);
+
+          let dbData: Partial<Event> | null = null;
+          let firestoreId = localEv.id;
+
+          if (!snapshot.empty) {
             const firestoreMatch = snapshot.docs.find(doc => {
               const d = doc.data();
-              const dNorm = (d.slug || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-              return dNorm === normLocalSlug || doc.id === localEv.id;
+              const dNorm = (d.slug || d.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+              return dNorm === normLocalSlug || dNorm === normLocalName || doc.id === localEv.id;
             });
-
             if (firestoreMatch) {
-              const dbData = firestoreMatch.data() as Event;
-              return {
-                ...localEv,
-                id: firestoreMatch.id,
-                registeredCount: dbData.registeredCount ?? localEv.registeredCount,
-                bannerUrl: dbData.bannerUrl || localEv.bannerUrl,
-                status: dbData.status || localEv.status,
-              };
+              dbData = firestoreMatch.data() as Event;
+              firestoreId = firestoreMatch.id;
             }
-            return localEv;
-          });
-          setEvents(eventsData);
-        }
+          }
+
+          const finalRegisteredCount = Math.max(dbData?.registeredCount || 0, liveCount, localEv.registeredCount || 0);
+
+          return {
+            ...localEv,
+            id: firestoreId,
+            registeredCount: finalRegisteredCount,
+            bannerUrl: dbData?.bannerUrl || localEv.bannerUrl,
+            status: dbData?.status || localEv.status,
+          };
+        });
+
+        setEvents(eventsData);
       } catch (error) {
         console.error("Error fetching events:", error);
         setEvents(demoEvents);
