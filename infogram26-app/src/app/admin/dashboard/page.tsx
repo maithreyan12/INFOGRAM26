@@ -6,10 +6,12 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { Users, IndianRupee, Calendar as CalendarIcon, Clock, Plus, Bell, UserCheck, ShieldCheck, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEventStore } from '@/store/eventStore';
+import { useAuth } from '@/hooks/useAuth';
 import { db } from '@/lib/firebase/config';
 import { collection, onSnapshot } from 'firebase/firestore';
 
 export default function AdminDashboard() {
+  const { user, adminUser } = useAuth();
   const { events, organizers, registrations: storeRegistrations } = useEventStore();
   const [liveRegistrations, setLiveRegistrations] = useState<any[]>([]);
 
@@ -112,7 +114,7 @@ export default function AdminDashboard() {
               Super Admin Mode
             </span>
             <span className="text-[11px] font-bold text-gray-400">
-              maithreyan2006@gmail.com
+              {user?.email || adminUser?.email || 'maithreyan2006@gmail.com'}
             </span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>

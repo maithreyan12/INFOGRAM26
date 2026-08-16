@@ -163,6 +163,11 @@ export default function EventDetailPage() {
               }`}>
                 {isTechnical ? 'Technical' : 'Non-Technical'}
               </span>
+              {(event.slug === 'flavour-fusion' || event.id === 'nontech-6' || event.name.toLowerCase().includes('flavour')) && (
+                <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-500/40 flex items-center gap-1 shadow-sm">
+                  🎀 Exclusively for Girls
+                </span>
+              )}
             </div>
             <h1 className={`text-3xl sm:text-5xl font-black ${
               isDark ? 'text-white' : 'text-slate-900'
@@ -179,6 +184,15 @@ export default function EventDetailPage() {
               <div className={`p-6 md:p-8 rounded-3xl border ${
                 isDark ? 'bg-slate-900/90 border-purple-500/30 text-white shadow-2xl' : 'bg-white/90 border-slate-200 text-slate-900 shadow-xl'
               }`}>
+                {(event.slug === 'flavour-fusion' || event.id === 'nontech-6' || event.name.toLowerCase().includes('flavour')) && (
+                  <div className="mb-5 p-4 rounded-2xl bg-pink-500/15 border border-pink-500/30 text-pink-300 flex items-center gap-3">
+                    <span className="text-2xl">🎀</span>
+                    <div>
+                      <p className="font-black text-sm uppercase tracking-wider text-pink-300">Exclusively For Girls</p>
+                      <p className="text-xs font-semibold text-pink-200/90">Flavour Fusion (No-fire cooking) is strictly open for female participants only.</p>
+                    </div>
+                  </div>
+                )}
                 <h2 className={`text-2xl font-bold mb-4 flex items-center ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   <AlertCircle className={`w-6 h-6 mr-3 ${isDark ? 'text-amber-300' : 'text-[#7c3aed]'}`} />
                   About the Event

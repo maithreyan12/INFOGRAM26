@@ -81,11 +81,18 @@ export default function EventCard({ event }: EventCardProps) {
 
         {/* Body */}
         <div className="p-6 flex-grow flex flex-col gap-3">
-          <h3 className={`font-black text-lg sm:text-xl leading-snug ${
-            isDark ? 'text-white' : 'text-slate-900'
-          }`}>
-            {event.name}
-          </h3>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className={`font-black text-lg sm:text-xl leading-snug ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
+              {event.name}
+            </h3>
+            {(event.slug === 'flavour-fusion' || event.id === 'nontech-6' || event.name.toLowerCase().includes('flavour')) && (
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30 flex items-center gap-1 shadow-sm">
+                🎀 Girls Only
+              </span>
+            )}
+          </div>
 
           <p className={`text-sm leading-relaxed line-clamp-2 flex-grow font-semibold ${
             isDark ? 'text-slate-300' : 'text-slate-700'

@@ -87,17 +87,26 @@ export function useAuth() {
             emailLower === 'maithreyan2006@gmail.com' || 
             emailLower === 'farnavith@gmail.com' || 
             emailLower === 'infoappziio@gmail.com' || 
+            emailLower === 'farish.sharieef@gmail.com' || 
             emailLower.includes('farnavith') || 
+            emailLower.includes('farish') || 
             emailLower.includes('admin') || 
             emailLower.includes('appziio');
 
-          // ── Main Admin & 2 Co-Admins: Instant Core Access ──
-          if (emailLower === 'maithreyan2006@gmail.com' || emailLower === 'farnavith@gmail.com' || emailLower === 'infoappziio@gmail.com') {
+          // ── Main Admin & Co-Admins: Instant Core Access ──
+          if (
+            emailLower === 'maithreyan2006@gmail.com' || 
+            emailLower === 'farnavith@gmail.com' || 
+            emailLower === 'infoappziio@gmail.com' ||
+            emailLower === 'farish.sharieef@gmail.com'
+          ) {
             const isMainAdmin = emailLower === 'maithreyan2006@gmail.com';
             const adminTitle = isMainAdmin
               ? 'Maithreyan D (Main Admin)'
               : emailLower.includes('farnavith')
               ? 'Farnavith (Co-Admin)'
+              : emailLower.includes('farish')
+              ? 'Farish Sharieef (Co-Admin)'
               : 'Appziio (Co-Admin)';
 
             setAdminUser({

@@ -145,12 +145,26 @@ export default function RegisterPage() {
       const ok = await trigger();
       if (ok) setStep(2);
     } else if (step === 2) {
-      if (selectedEvents.length > 0) setStep(3);
+      if (selectedEvents.length > 0) {
+        const hasFlavour = selectedEvents.some((id) => id === 'nontech-6' || events.find((e) => e.id === id)?.name.toLowerCase().includes('flavour'));
+        if (hasFlavour && formData.gender === 'Male') {
+          toast.error('Flavour Fusion is exclusively for Girls (Female participants only). Please remove Flavour Fusion or change gender.');
+          return;
+        }
+        setStep(3);
+      }
     }
   };
 
-  const toggleEvent = (id: string) =>
+  const toggleEvent = (id: string) => {
+    const target = events.find((e) => e.id === id);
+    const isFlavour = id === 'nontech-6' || (target && target.name.toLowerCase().includes('flavour'));
+    if (isFlavour && formData.gender === 'Male' && !selectedEvents.includes(id)) {
+      toast.error('Flavour Fusion is exclusively for Girls (Female participants only).');
+      return;
+    }
     setSelectedEvents(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
+  };
 
   const getTotalFee = () =>
     selectedEvents.reduce((sum, id) => sum + (events.find(e => e.id === id)?.fee || 0), 0);
@@ -455,7 +469,14 @@ export default function RegisterPage() {
                               }`}
                             >
                               <div className="flex justify-between items-start mb-1.5">
-                                <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.name}</h3>
+                                <div>
+                                  <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.name}</h3>
+                                  {(event.id === 'nontech-6' || event.name.toLowerCase().includes('flavour')) && (
+                                    <span className="inline-block mt-1 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-400 border border-pink-500/30">
+                                      🎀 Girls Only
+                                    </span>
+                                  )}
+                                </div>
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                                   sel ? 'border-teal-500 bg-teal-500' : isDark ? 'border-slate-700' : 'border-slate-300'
                                 }`}>

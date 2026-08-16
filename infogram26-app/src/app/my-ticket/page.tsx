@@ -16,14 +16,14 @@ export default function MyTicketPage() {
   const isDark = theme === 'dark';
 
   const [searchValue, setSearchValue] = useState('');
-  const [searchType, setSearchType] = useState<'phone' | 'appid' | 'email'>('phone');
+  const [searchType, setSearchType] = useState<'phone' | 'email'>('phone');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any[]>([]);
   const [searched, setSearched] = useState(false);
 
   const handleSearch = async () => {
     const val = searchValue.trim();
-    if (!val) { toast.error('Please enter your mobile number, email, or Applicant ID'); return; }
+    if (!val) { toast.error('Please enter your mobile number or email'); return; }
 
     setLoading(true);
     setSearched(false);
@@ -36,7 +36,7 @@ export default function MyTicketPage() {
       const searchLower = val.toLowerCase();
       const matchedMap = new Map<string, any>();
 
-      // ── 1. Search by Applicant ID (exact & formatted) ──
+      // ── 1. Search by Applicant ID (exact & formatted if user entered ID) ──
       const appCodeVariations = [
         val,
         val.toUpperCase(),
@@ -215,18 +215,12 @@ export default function MyTicketPage() {
           {/* Search Card */}
           <div className={`rounded-3xl border p-6 sm:p-8 shadow-2xl ${glassBg}`}>
             {/* Toggle Tabs */}
-            <div className={`grid grid-cols-3 gap-1 rounded-2xl p-1 mb-6 ${isDark ? 'bg-white/[0.06]' : 'bg-slate-100'}`}>
+            <div className={`grid grid-cols-2 gap-1 rounded-2xl p-1 mb-6 ${isDark ? 'bg-white/[0.06]' : 'bg-slate-100'}`}>
               <button
                 onClick={() => { setSearchType('phone'); setSearchValue(''); setSearched(false); }}
                 className={`flex items-center justify-center gap-1.5 py-3 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${searchType === 'phone' ? (isDark ? 'bg-amber-400 text-slate-900 shadow-lg shadow-amber-400/20' : 'bg-purple-600 text-white shadow-md') : (isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-800')}`}
               >
                 <Phone className="w-3.5 h-3.5" /> Mobile
-              </button>
-              <button
-                onClick={() => { setSearchType('appid'); setSearchValue(''); setSearched(false); }}
-                className={`flex items-center justify-center gap-1.5 py-3 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${searchType === 'appid' ? (isDark ? 'bg-amber-400 text-slate-900 shadow-lg shadow-amber-400/20' : 'bg-purple-600 text-white shadow-md') : (isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-800')}`}
-              >
-                <Ticket className="w-3.5 h-3.5" /> Applicant ID
               </button>
               <button
                 onClick={() => { setSearchType('email'); setSearchValue(''); setSearched(false); }}
@@ -239,7 +233,7 @@ export default function MyTicketPage() {
             {/* Input */}
             <div className="relative mb-4">
               <div className={`absolute left-4 top-1/2 -translate-y-1/2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                {searchType === 'phone' ? <Phone className="w-5 h-5" /> : searchType === 'appid' ? <Ticket className="w-5 h-5 text-amber-400" /> : <Mail className="w-5 h-5" />}
+                {searchType === 'phone' ? <Phone className="w-5 h-5" /> : <Mail className="w-5 h-5" />}
               </div>
               <input
                 type="text"
@@ -248,10 +242,8 @@ export default function MyTicketPage() {
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
                 placeholder={
                   searchType === 'phone'
-                    ? 'Enter 10-digit mobile number (e.g. 8072324512)'
-                    : searchType === 'appid'
-                    ? 'Enter Applicant ID (e.g. INFO26-EVT-73173 or INFO26EVT73173)'
-                    : 'Enter email (e.g. swethaparthiban42@gmail.com)'
+                    ? 'Enter 10-digit mobile number (e.g. 9876543210)'
+                    : 'Enter email address (e.g. student@gmail.com)'
                 }
                 className={`w-full pl-12 pr-4 py-4 rounded-2xl text-sm font-bold border transition-all focus:outline-none focus:ring-2 ${isDark ? 'bg-white/[0.06] border-white/[0.1] text-white placeholder-slate-500 focus:border-amber-400 focus:ring-amber-400/20' : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:border-purple-500 focus:ring-purple-500/20'}`}
               />

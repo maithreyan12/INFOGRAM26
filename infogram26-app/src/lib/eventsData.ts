@@ -399,8 +399,9 @@ export const OFFICIAL_EVENTS: Event[] = [
     slug: 'flavour-fusion',
     name: 'Flavour Fusion',
     category: 'non-technical',
-    description: 'No-fire cooking & culinary contest evaluated on food taste, presentation, area cleanliness, and number of dishes.',
+    description: 'No-fire cooking & culinary contest evaluated on food taste, presentation, area cleanliness, and number of dishes. (Exclusively for Girls)',
     rules: [
+      'Exclusively for Girls (Girls Only / Only Female Participants)',
       'Maximum of 4 members | ₹50 per head',
       'Pre-cooked food is not allowed. Required things should be brought by yourself.',
       'Winner will be decided based on: Food taste, Presentation, Cleanliness of the place, and Number of dishes.'
