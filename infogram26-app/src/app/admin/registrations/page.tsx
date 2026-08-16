@@ -34,8 +34,10 @@ export default function RegistrationsPage() {
       const paidRegs = rawRegs.filter((r) => {
         const isPaidStatus = r.status === 'paid' || r.ticketId || ticketItems[r.applicantId];
         const email = (r.personalInfo?.email || r.email || '').toLowerCase();
-        const isTestEmail = email.includes('verification.test') || email.includes('arunkumar.cahcet') || email === 'test@example.com';
-        return isPaidStatus && !isTestEmail;
+        const name = (r.personalInfo?.fullName || r.studentName || r.name || '').toLowerCase();
+        const appId = (r.applicantId || '').toLowerCase();
+        const isDemo = name === 'participant' || appId === 'info26-hack-98035' || appId.includes('98035') || email.includes('verification.test') || email.includes('arunkumar.cahcet') || email === 'test@example.com';
+        return isPaidStatus && !isDemo;
       });
 
       const combined = [...paidRegs];
@@ -43,8 +45,10 @@ export default function RegistrationsPage() {
       // Add any tickets that are not in rawRegs
       Object.values(ticketItems).forEach((t: any) => {
         const email = (t.email || '').toLowerCase();
-        const isTestEmail = email.includes('verification.test') || email.includes('arunkumar.cahcet') || email === 'test@example.com';
-        if (isTestEmail) return;
+        const name = (t.studentName || t.name || '').toLowerCase();
+        const appId = (t.applicantId || '').toLowerCase();
+        const isDemo = name === 'participant' || appId === 'info26-hack-98035' || appId.includes('98035') || email.includes('verification.test') || email.includes('arunkumar.cahcet') || email === 'test@example.com';
+        if (isDemo) return;
 
         const exists = combined.some(
           (r) => r.applicantId === t.applicantId || (r.personalInfo?.email && r.personalInfo?.email === t.email)
