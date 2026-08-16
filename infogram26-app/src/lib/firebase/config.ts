@@ -1,10 +1,10 @@
 // ============================================================
 // Firebase Configuration — INFOGRAM'26 Production Credentials
 // ============================================================
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { getStorage } from 'firebase/storage';
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
+import { getFirestore, initializeFirestore, type Firestore } from 'firebase/firestore';
+import { getAuth, type Auth } from 'firebase/auth';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDGPuGlZhb_lFur3YPAegpdr8aM4BUd-zY",
@@ -19,17 +19,38 @@ const firebaseConfig = {
 export const isFirebaseConfigured = true;
 
 // ─── Singleton Firebase App ───────────────────────────────────
-function getFirebaseApp() {
-  if (getApps().length > 0) {
-    return getApp();
-  }
-  return initializeApp(firebaseConfig);
+export const app: FirebaseApp =
+  getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+
+// ─── Singleton Auth ───────────────────────────────────────────
+let _auth: Auth | null = null;
+try {
+  _auth = getAuth(app);
+} catch {
+  _auth = null;
 }
+export const auth: Auth = _auth as Auth;
 
-const app = getFirebaseApp();
+// ─── Singleton Firestore ──────────────────────────────────────
+let _db: Firestore | null = null;
+try {
+  _db = getFirestore(app);
+} catch {
+  try {
+    _db = initializeFirestore(app, {});
+  } catch {
+    _db = null;
+  }
+}
+export const db: Firestore = _db as Firestore;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+// ─── Singleton Storage ────────────────────────────────────────
+let _storage: FirebaseStorage | null = null;
+try {
+  _storage = getStorage(app);
+} catch {
+  _storage = null;
+}
+export const storage: FirebaseStorage = _storage as FirebaseStorage;
 
 export default app;

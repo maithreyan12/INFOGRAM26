@@ -7,11 +7,23 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Core admin emails — fallback when users/ doc doesn't exist yet
+    function isAdminByEmail() {
+      return isAuthenticated() && (
+        request.auth.token.email == 'maithreyan2006@gmail.com' ||
+        request.auth.token.email == 'farnavith@gmail.com' ||
+        request.auth.token.email == 'infoappziio@gmail.com' ||
+        request.auth.token.email == 'farish.sharieef@gmail.com'
+      );
+    }
+
     function isAdmin() {
-      return isAuthenticated() &&
+      return isAdminByEmail() || (
+        isAuthenticated() &&
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin' &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isActive == true;
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isActive == true
+      );
     }
 
     function isOrganizer() {

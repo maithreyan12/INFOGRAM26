@@ -29,7 +29,7 @@ interface EventState {
   getRegistrationsForEvent: (eventId: string) => Registration[];
 }
 
-import { OFFICIAL_EVENTS } from '@/lib/eventsData';
+import { OFFICIAL_EVENTS, isEventMatch } from '@/lib/eventsData';
 
 const INITIAL_ORGANIZERS: OrganizerData[] = [];
 
@@ -39,8 +39,8 @@ const INITIAL_REGISTRATIONS: any[] = [
   {
     id: 'reg_hack_1001',
     applicantId: 'INFO26-HACK-1001',
-    studentName: 'Thamaraiselvi',
     fullName: 'Thamaraiselvi',
+    studentName: 'Thamaraiselvi',
     email: 'thamaraisanthi1459@gmail.com',
     phone: '9626918439',
     college: 'Vellore Institute of Technology',
@@ -60,25 +60,26 @@ const INITIAL_REGISTRATIONS: any[] = [
     totalFee: 100,
     status: 'paid',
     razorpayPaymentId: 'pay_TPu7QIBPv2e69G',
-    createdAt: new Date().toISOString(),
+    paymentMethod: 'UPI',
+    createdAt: '2026-08-15T03:54:00.000Z',
   },
   {
     id: 'reg_hack_1002',
     applicantId: 'INFO26-HACK-1002',
-    studentName: 'Lakshaya A',
     fullName: 'Lakshaya A',
+    studentName: 'Lakshaya A',
     email: 'lakshaya.arul16@gmail.com',
     phone: '8870333393',
     college: 'Vellore Institute of Technology',
     department: 'Software Engineering',
-    year: '4th Year',
+    year: '2nd Year',
     personalInfo: {
       fullName: 'Lakshaya A',
       email: 'lakshaya.arul16@gmail.com',
       phone: '8870333393',
       college: 'Vellore Institute of Technology',
       department: 'Software Engineering',
-      year: '4th Year',
+      year: '2nd Year',
     },
     events: ['HackForge'],
     eventNames: ['HackForge'],
@@ -86,13 +87,14 @@ const INITIAL_REGISTRATIONS: any[] = [
     totalFee: 100,
     status: 'paid',
     razorpayPaymentId: 'pay_TPuQG0j5pDrsf5',
-    createdAt: new Date().toISOString(),
+    paymentMethod: 'UPI',
+    createdAt: '2026-08-15T04:11:00.000Z',
   },
   {
     id: 'reg_hack_1003',
     applicantId: 'INFO26-HACK-1003',
-    studentName: 'Mithra',
     fullName: 'Mithra',
+    studentName: 'Mithra',
     email: 'mithrakasi26@gmail.com',
     phone: '7708271028',
     college: 'Vellore Institute of Technology',
@@ -111,22 +113,23 @@ const INITIAL_REGISTRATIONS: any[] = [
     selectedEvents: ['hack-forge'],
     totalFee: 100,
     status: 'paid',
-    razorpayPaymentId: 'pass_hack_1003',
-    createdAt: new Date().toISOString(),
+    razorpayPaymentId: 'pay_TPuwj3SRgCEJKU',
+    paymentMethod: 'UPI',
+    createdAt: '2026-08-15T04:42:00.000Z',
   },
   {
     id: 'reg_hack_1004',
     applicantId: 'INFO26-HACK-1004',
-    studentName: 'Rithika P T',
     fullName: 'Rithika P T',
-    email: 'rithikaparthiban169@gmail.com',
+    studentName: 'Rithika P T',
+    email: 'rithikaparthiban15@gmail.com',
     phone: '8807425155',
     college: 'Vellore Institute of Technology',
     department: 'Software Engineering',
     year: '2nd Year',
     personalInfo: {
       fullName: 'Rithika P T',
-      email: 'rithikaparthiban169@gmail.com',
+      email: 'rithikaparthiban15@gmail.com',
       phone: '8807425155',
       college: 'Vellore Institute of Technology',
       department: 'Software Engineering',
@@ -137,8 +140,36 @@ const INITIAL_REGISTRATIONS: any[] = [
     selectedEvents: ['hack-forge'],
     totalFee: 100,
     status: 'paid',
-    razorpayPaymentId: 'pass_hack_1004',
-    createdAt: new Date().toISOString(),
+    razorpayPaymentId: 'pay_TPut44rdIWMcfQ',
+    paymentMethod: 'UPI',
+    createdAt: '2026-08-15T04:39:00.000Z',
+  },
+  {
+    id: 'reg_evt_73173',
+    applicantId: 'INFO26-EVT-73173',
+    fullName: 'Swetha Parthiban',
+    studentName: 'Swetha Parthiban',
+    email: 'swethaparthiban42@gmail.com',
+    phone: '8072324512',
+    college: 'Kingston Engineering College',
+    department: 'Information Technology',
+    year: '2nd Year',
+    personalInfo: {
+      fullName: 'Swetha Parthiban',
+      email: 'swethaparthiban42@gmail.com',
+      phone: '8072324512',
+      college: 'Kingston Engineering College',
+      department: 'Information Technology',
+      year: '2nd Year',
+    },
+    events: ['Tech Talks'],
+    eventNames: ['Tech Talks'],
+    selectedEvents: ['tech-talks'],
+    totalFee: 100,
+    status: 'paid',
+    razorpayPaymentId: 'pay_TQ6VNz1QNvMbYA',
+    paymentMethod: 'UPI',
+    createdAt: '2026-08-15T16:01:00.000Z',
   },
 ];
 
@@ -303,17 +334,21 @@ export const useEventStore = create<EventState>()(
       },
 
       getRegistrationsForEvent: (eventId) => {
-        const { registrations } = get();
-        return registrations.filter(
-          (r: any) =>
-            (Array.isArray(r.selectedEvents) && r.selectedEvents.includes(eventId)) ||
-            (Array.isArray(r.events) && r.events.includes(eventId)) ||
-            (Array.isArray(r.eventNames) && r.eventNames.includes(eventId))
-        );
+        const { registrations, events } = get();
+        const targetEvt = events.find((e) => e.id === eventId || e.slug === eventId || e.name.toLowerCase() === eventId.toLowerCase());
+        if (!targetEvt) {
+          return registrations.filter(
+            (r: any) =>
+              (Array.isArray(r.selectedEvents) && r.selectedEvents.includes(eventId)) ||
+              (Array.isArray(r.events) && r.events.includes(eventId)) ||
+              (Array.isArray(r.eventNames) && r.eventNames.includes(eventId))
+          );
+        }
+        return registrations.filter((r: any) => isEventMatch(r, targetEvt));
       },
     }),
     {
-      name: 'infogram26-event-store-v14', // bumped version clears stale localStorage
+      name: 'infogram26-event-store-v17', // bumped version to ensure updated event registration mapping
     }
   )
 );

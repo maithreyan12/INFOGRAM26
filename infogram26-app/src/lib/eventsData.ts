@@ -572,3 +572,41 @@ export function generateApplicantId(eventList?: string[]): string {
   return `INFO26-${prefix}-${num}`;
 }
 
+export function isEventMatch(
+  candidate: any,
+  event: { id: string; slug?: string; name: string }
+): boolean {
+  if (!candidate || !event) return false;
+
+  const norm = (s: string) => (s ? String(s).toLowerCase().replace(/[^a-z0-9]/g, '') : '');
+
+  const targetNorms = [
+    norm(event.id),
+    event.slug ? norm(event.slug) : '',
+    norm(event.name),
+  ].filter(Boolean);
+
+  if (typeof candidate === 'string') {
+    const cNorm = norm(candidate);
+    if (!cNorm) return false;
+    return targetNorms.some((t) => cNorm === t || cNorm.includes(t) || t.includes(cNorm));
+  }
+
+  if (typeof candidate === 'object') {
+    const rawList: string[] = [
+      ...(Array.isArray(candidate.selectedEvents) ? candidate.selectedEvents : candidate.selectedEvents ? [candidate.selectedEvents] : []),
+      ...(Array.isArray(candidate.eventNames) ? candidate.eventNames : candidate.eventNames ? [candidate.eventNames] : []),
+      ...(Array.isArray(candidate.events) ? candidate.events : candidate.events ? [candidate.events] : []),
+    ].map(String);
+
+    return rawList.some((item) => {
+      const itemNorm = norm(item);
+      if (!itemNorm) return false;
+      return targetNorms.some((t) => itemNorm === t || itemNorm.includes(t) || t.includes(itemNorm));
+    });
+  }
+
+  return false;
+}
+
+

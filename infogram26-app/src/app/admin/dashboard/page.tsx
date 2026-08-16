@@ -9,6 +9,7 @@ import { useEventStore } from '@/store/eventStore';
 import { useAuth } from '@/hooks/useAuth';
 import { db } from '@/lib/firebase/config';
 import { collection, onSnapshot } from 'firebase/firestore';
+import { isEventMatch } from '@/lib/eventsData';
 
 export default function AdminDashboard() {
   const { user, adminUser } = useAuth();
@@ -77,20 +78,34 @@ export default function AdminDashboard() {
       setLiveRegistrations(combined.length > 0 ? combined : filteredStoreRegs);
     };
 
-    const unsubRegs = onSnapshot(collection(db, 'registrations'), (snap) => {
-      rawRegs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      updateMetrics();
-    });
+    const unsubRegs = onSnapshot(
+      collection(db, 'registrations'),
+      (snap) => {
+        rawRegs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        updateMetrics();
+      },
+      (err) => {
+        console.warn('Dashboard registrations live sync warning:', err);
+        updateMetrics();
+      }
+    );
 
-    const unsubTickets = onSnapshot(collection(db, 'tickets'), (snap) => {
-      const map: Record<string, any> = {};
-      snap.docs.forEach((d) => {
-        const data = d.data();
-        if (data.applicantId) map[data.applicantId] = data;
-      });
-      ticketMap = map;
-      updateMetrics();
-    });
+    const unsubTickets = onSnapshot(
+      collection(db, 'tickets'),
+      (snap) => {
+        const map: Record<string, any> = {};
+        snap.docs.forEach((d) => {
+          const data = d.data();
+          if (data.applicantId) map[data.applicantId] = data;
+        });
+        ticketMap = map;
+        updateMetrics();
+      },
+      (err) => {
+        console.warn('Dashboard tickets live sync warning:', err);
+        updateMetrics();
+      }
+    );
 
     return () => {
       unsubRegs();
@@ -100,7 +115,7 @@ export default function AdminDashboard() {
 
   const activeRegistrations = liveRegistrations.length > 0 ? liveRegistrations : storeRegistrations;
   const totalRegistrations = activeRegistrations.length;
-  const totalRevenue = activeRegistrations.reduce((sum, r) => sum + (r.totalFee || 50), 0);
+  const totalRevenue = activeRegistrations.reduce((sum, r) => sum + (r.totalFee || 0), 0);
   const activeEventsCount = events.length;
   const organizersCount = organizers.length;
 
@@ -114,7 +129,7 @@ export default function AdminDashboard() {
               Super Admin Mode
             </span>
             <span className="text-[11px] font-bold text-gray-400">
-              {user?.email || adminUser?.email || 'maithreyan2006@gmail.com'}
+              {user?.email || adminUser?.email || ''}
             </span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
@@ -238,6 +253,8 @@ export default function AdminDashboard() {
               <tbody className="divide-y divide-gray-800/80">
                 {events.map((evt) => {
                   const org = organizers.find((o) => o.uid === evt.organizerUid || o.assignedEventId === evt.id);
+                  const evtCount = activeRegistrations.filter((r: any) => isEventMatch(r, evt)).length;
+
                   return (
                     <tr key={evt.id} className="transition-colors hover:bg-gray-800/50">
                       <td className="px-4 py-3.5 font-black text-sm text-white">{evt.name}</td>
@@ -254,7 +271,7 @@ export default function AdminDashboard() {
                         {org ? org.displayName : 'IT Association'}
                       </td>
                       <td className="px-4 py-3.5 text-right font-black text-amber-400">
-                        {evt.registeredCount} / {evt.maxParticipants}
+                        {evtCount} / {evt.maxSlots || 200}
                       </td>
                     </tr>
                   );
@@ -287,8 +304,8 @@ export default function AdminDashboard() {
               </thead>
               <tbody className="divide-y divide-gray-800/80">
                 {activeRegistrations.slice(0, 5).map((reg: any) => {
-                  const name = reg.personalInfo?.fullName || reg.fullName || 'Participant';
-                  const college = reg.personalInfo?.college || reg.college || 'CAHCET';
+                  const name = reg.personalInfo?.fullName || reg.fullName || '—';
+                  const college = reg.personalInfo?.college || reg.college || '—';
                   return (
                     <tr key={reg.id} className="transition-colors hover:bg-gray-800/50">
                       <td className="px-4 py-3.5 font-mono text-[#00d4ff] font-bold">{reg.applicantId}</td>

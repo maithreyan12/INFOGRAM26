@@ -100,8 +100,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               )}
             </div>
             <div className="overflow-hidden">
-              <p className="font-black text-xs text-white truncate">{user.displayName || 'Maithreyan D'}</p>
-              <p className="text-[10px] text-gray-400 truncate">{user.email || 'maithreyan2006@gmail.com'}</p>
+              <p className="font-black text-xs text-white truncate">{user.displayName || 'Admin'}</p>
+              <p className="text-[10px] text-gray-400 truncate">{user.email || 'admin@infogram26.in'}</p>
             </div>
           </div>
         )}

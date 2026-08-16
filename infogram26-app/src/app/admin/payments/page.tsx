@@ -18,13 +18,13 @@ export default function PaymentsPage() {
 
   // Manual Reconcile Modal state
   const [showModal, setShowModal] = useState(false);
-  const [paymentIdInput, setPaymentIdInput] = useState('pay_TPu7QIBPv2e69G');
+  const [paymentIdInput, setPaymentIdInput] = useState('');
   const [nameInput, setNameInput] = useState('');
-  const [emailInput, setEmailInput] = useState('thamaraisanthi1459@gmail.com');
-  const [phoneInput, setPhoneInput] = useState('9626918439');
+  const [emailInput, setEmailInput] = useState('');
+  const [phoneInput, setPhoneInput] = useState('');
   const [amountInput, setAmountInput] = useState<number>(100);
   const [collegeInput, setCollegeInput] = useState('');
-  const [selectedEventsInput, setSelectedEventsInput] = useState('Byte Battle');
+  const [selectedEventsInput, setSelectedEventsInput] = useState('');
 
   /* ── 1. Live Firestore Sync ── */
   useEffect(() => {
@@ -206,7 +206,7 @@ export default function PaymentsPage() {
 
   /* ── 3. Metrics calculation ── */
   const paidRegs = registrations.filter((r) => r.status === 'paid' || r.razorpayPaymentId);
-  const totalRevenue = paidRegs.reduce((sum, r) => sum + (r.totalFee || r.totalAmount || 100), 0);
+  const totalRevenue = paidRegs.reduce((sum, r) => sum + (r.totalFee || r.totalAmount || 0), 0);
   const paidCount = paidRegs.length;
   const razorpayVerified = registrations.filter((r) => r.razorpayPaymentId && !r.razorpayPaymentId.startsWith('pass_')).length;
 
@@ -339,7 +339,7 @@ export default function PaymentsPage() {
                   const email = reg.personalInfo?.email || reg.email || '';
                   const phone = reg.personalInfo?.phone || reg.phone || '';
                   const college = reg.personalInfo?.college || reg.college || 'CAHCET';
-                  const payId = reg.razorpayPaymentId || reg.utrNumber || 'pay_verified_up';
+                  const payId = reg.razorpayPaymentId || reg.utrNumber || '—';
 
                   return (
                     <tr key={reg.id} className="hover:bg-gray-800/50 transition-colors">
@@ -350,7 +350,7 @@ export default function PaymentsPage() {
                         <div className="text-[10px] text-gray-500 font-mono">{email} {phone ? `• ${phone}` : ''}</div>
                       </td>
                       <td className="px-6 py-4 font-mono text-purple-300 font-black text-xs">{payId}</td>
-                      <td className="px-6 py-4 font-black text-emerald-400 text-sm">₹{reg.totalFee || 50}</td>
+                      <td className="px-6 py-4 font-black text-emerald-400 text-sm">₹{reg.totalFee || 0}</td>
                       <td className="px-6 py-4 text-gray-400 uppercase font-mono text-[11px]">UPI / Razorpay</td>
                       <td className="px-6 py-4 text-right">
                         <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">

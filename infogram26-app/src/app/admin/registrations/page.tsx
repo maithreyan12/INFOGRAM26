@@ -8,6 +8,7 @@ import { db } from '@/lib/firebase/config';
 import { collection, onSnapshot, doc, updateDoc, addDoc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { useEventStore } from '@/store/eventStore';
 import { toast } from 'sonner';
+import { OFFICIAL_EVENTS, isEventMatch } from '@/lib/eventsData';
 
 export default function RegistrationsPage() {
   const storeRegistrations = useEventStore((state) => state.registrations);
@@ -58,16 +59,16 @@ export default function RegistrationsPage() {
             id: t.registrationId || t.id,
             applicantId: t.applicantId || `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
             personalInfo: {
-              fullName: t.studentName || t.fullName || 'Registered Participant',
+              fullName: t.studentName || t.fullName || '',
               email: t.email || '',
               phone: t.phone || '',
-              college: t.college || 'CAHCET Participant',
-              department: t.department || 'Information Technology',
-              year: t.year || '1st',
+              college: t.college || '',
+              department: t.department || '',
+              year: t.year || '',
             },
-            eventNames: Array.isArray(t.events) ? t.events : [t.events || 'Symposium Event'],
-            events: Array.isArray(t.events) ? t.events : [t.events || 'Symposium Event'],
-            totalFee: t.totalAmount || 50,
+            eventNames: Array.isArray(t.events) ? t.events : (t.events ? [t.events] : []),
+            events: Array.isArray(t.events) ? t.events : (t.events ? [t.events] : []),
+            totalFee: t.totalAmount || 0,
             status: 'paid',
             checkedIn: t.status === 'used' || t.checkedIn,
             attendanceStatus: t.status === 'used' || t.checkedIn ? 'checked_in' : 'pending',
@@ -282,7 +283,7 @@ export default function RegistrationsPage() {
         `"${reg.personalInfo?.email || reg.email || ''}"`,
         `"${reg.personalInfo?.phone || reg.phone || ''}"`,
         `"${eventsStr}"`,
-        `"${reg.totalFee || 50}"`,
+        `"${reg.totalFee || 0}"`,
         `"${reg.status === 'paid' ? 'Paid' : 'Pending'}"`,
         `"${isCheckedIn ? 'CHECKED IN (PRESENT)' : 'NOT CHECKED IN'}"`,
       ].join(',');
@@ -308,8 +309,7 @@ export default function RegistrationsPage() {
 
     const matchesSearch = name.includes(q) || email.includes(q) || appId.includes(q);
 
-    const eventsList = (reg.eventNames || reg.events || []).map((e: string) => e.toLowerCase());
-    const matchesEvent = !selectedEvent || eventsList.some((e: string) => e.includes(selectedEvent.toLowerCase()));
+    const matchesEvent = !selectedEvent || isEventMatch(reg, { id: selectedEvent, slug: selectedEvent, name: selectedEvent });
 
     const ticketInfo = ticketsMap[reg.applicantId];
     const isCheckedIn = reg.checkedIn || reg.attendanceStatus === 'checked_in' || ticketInfo?.status === 'used' || ticketInfo?.checkedIn;
@@ -390,14 +390,12 @@ export default function RegistrationsPage() {
               onChange={(e) => setSelectedEvent(e.target.value)}
               className="rounded-xl px-4 py-2.5 text-xs font-bold border border-gray-700 bg-black/60 text-white focus:outline-none focus:border-[#00d4ff]"
             >
-              <option value="">All Events</option>
-              <option value="byte">Byte Battle</option>
-              <option value="tech">Tech Talks</option>
-              <option value="code">Codestorm</option>
-              <option value="pixel">Pixel Craft</option>
-              <option value="hack">Hack Forge</option>
-              <option value="bgmi">Battle Verse (BGMI)</option>
-              <option value="quest">Quest X</option>
+              <option value="">All Events (All 16)</option>
+              {OFFICIAL_EVENTS.map((evt) => (
+                <option key={evt.id} value={evt.name}>
+                  {evt.name} ({evt.category === 'technical' ? 'Tech' : 'Non-Tech'})
+                </option>
+              ))}
             </select>
             <select
               value={statusFilter}
@@ -449,10 +447,10 @@ export default function RegistrationsPage() {
                     ticketInfo?.status === 'used' ||
                     ticketInfo?.checkedIn;
 
-                  const name = reg.personalInfo?.fullName || reg.fullName || 'Participant';
-                  const college = reg.personalInfo?.college || reg.college || 'CAHCET';
-                  const dept = reg.personalInfo?.department || reg.department || 'IT';
-                  const year = reg.personalInfo?.year || reg.year || '1st';
+                  const name = reg.personalInfo?.fullName || reg.fullName || '—';
+                  const college = reg.personalInfo?.college || reg.college || '—';
+                  const dept = reg.personalInfo?.department || reg.department || '—';
+                  const year = reg.personalInfo?.year || reg.year || '';
                   const email = reg.personalInfo?.email || reg.email || '';
                   const phone = reg.personalInfo?.phone || reg.phone || '';
                   const eventsList = reg.eventNames || reg.events || [];
@@ -495,7 +493,7 @@ export default function RegistrationsPage() {
 
                       {/* Payment */}
                       <td className="px-6 py-4">
-                        <div className="font-black text-amber-400 text-sm">₹{reg.totalFee || 50}</div>
+                        <div className="font-black text-amber-400 text-sm">₹{reg.totalFee || 0}</div>
                         <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                           {reg.status === 'paid' ? 'PAID' : 'PAID'}
                         </span>

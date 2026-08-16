@@ -6,11 +6,12 @@ import { useState } from 'react';
 import { Plus, Edit2, Trash2, X, UserCheck, Calendar, MapPin, Clock, Tag } from 'lucide-react';
 import { useEventStore } from '@/store/eventStore';
 import type { Event, EventCategory } from '@/types';
+import { isEventMatch } from '@/lib/eventsData';
 
 import { useTheme } from '@/context/ThemeContext';
 
 export default function EventsPage() {
-  const { events, organizers, addEvent, updateEvent, deleteEvent } = useEventStore();
+  const { events, organizers, registrations, addEvent, updateEvent, deleteEvent } = useEventStore();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const [showModal, setShowModal] = useState(false);
@@ -216,9 +217,14 @@ export default function EventsPage() {
                       </select>
                     </td>
                     <td className="px-6 py-4 text-center font-black">
-                      <span className="bg-black/60 px-3 py-1 rounded-full border border-gray-800 text-xs text-amber-400">
-                        {evt.registeredCount} / {evt.maxParticipants}
-                      </span>
+                      {(() => {
+                        const count = (registrations || []).filter((r: any) => isEventMatch(r, evt)).length;
+                        return (
+                          <span className="bg-black/60 px-3 py-1 rounded-full border border-gray-800 text-xs text-amber-400">
+                            {count} / {evt.maxSlots || 200}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
                       <button 
