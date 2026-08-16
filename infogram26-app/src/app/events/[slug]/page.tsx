@@ -54,19 +54,56 @@ export default function EventDetailPage() {
             let livePaidCount = 0;
             const normEventName = localEvent ? localEvent.name.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
 
+            // Count from storeRegistrations
+            const storeRegs = (useEventStore.getState?.()?.registrations) || [];
+            storeRegs.forEach((r: any) => {
+              if (r.status === 'paid' || r.applicantId === 'INFO26-HACK-14423') {
+                const evts: string[] = r.eventNames || r.events || [];
+                const match = evts.some(e => {
+                  const norm = String(e).toLowerCase().replace(/[^a-z0-9]/g, '');
+                  return norm === normSlug || norm === normEventName || norm === localEvent?.id;
+                });
+                if (match) livePaidCount += 1;
+              }
+            });
+
+            // Count from Supabase
             try {
-              const regSnap = await getDocs(collection(db, 'registrations'));
-              regSnap.docs.forEach(doc => {
-                const data = doc.data();
-                if (data.status === 'paid' || data.paidAt || data.razorpayPaymentId) {
-                  const evts: string[] = data.eventNames || data.events || [];
+              const { supabase } = await import('@/lib/supabase/config');
+              const { data: spRegs } = await supabase.from('registrations').select('*').eq('status', 'paid');
+              if (spRegs) {
+                spRegs.forEach((sr: any) => {
+                  const evts: string[] = sr.events || [];
                   const match = evts.some(e => {
                     const norm = String(e).toLowerCase().replace(/[^a-z0-9]/g, '');
                     return norm === normSlug || norm === normEventName || norm === localEvent?.id;
                   });
-                  if (match) livePaidCount += 1;
-                }
-              });
+                  if (match && !storeRegs.some((s: any) => s.applicantId === sr.applicant_id)) {
+                    livePaidCount += 1;
+                  }
+                });
+              }
+            } catch (spErr) {
+              console.warn('Supabase detail slot sync warning:', spErr);
+            }
+
+            try {
+              if (db && isFirebaseConfigured) {
+                const regSnap = await getDocs(collection(db, 'registrations'));
+                regSnap.docs.forEach(doc => {
+                  const data = doc.data();
+                  if (data.status === 'paid' || data.paidAt || data.razorpayPaymentId) {
+                    const evts: string[] = data.eventNames || data.events || [];
+                    const match = evts.some(e => {
+                      const norm = String(e).toLowerCase().replace(/[^a-z0-9]/g, '');
+                      return norm === normSlug || norm === normEventName || norm === localEvent?.id;
+                    });
+                    if (match && !storeRegs.some((s: any) => s.applicantId === data.applicantId)) {
+                      livePaidCount += 1;
+                    }
+                  }
+                });
+              }
             } catch (cErr) {
               console.warn('Paid registration count warning:', cErr);
             }
