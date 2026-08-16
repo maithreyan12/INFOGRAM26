@@ -69,6 +69,44 @@ export async function POST(req: Request) {
           });
 
           ticketId = `tkt_${registrationId}`;
+
+          // Dual-write ticket & update registration in Supabase
+          try {
+            const { supabaseAdmin } = await import('@/lib/supabase/config');
+            await supabaseAdmin
+              .from('registrations')
+              .update({
+                status: 'paid',
+                razorpay_payment_id: razorpay_payment_id || '',
+                razorpay_order_id: razorpay_order_id || '',
+                paid_at: new Date().toISOString(),
+              })
+              .or(`id.eq.${registrationId},applicant_id.eq.${appCode}`);
+
+            await supabaseAdmin.from('tickets').upsert([
+              {
+                id: ticketId,
+                ticket_number: ticketNumber,
+                applicant_id: appCode,
+                registration_id: registrationId,
+                student_name: name,
+                email: regData.personalInfo?.email || regData.email || '',
+                phone: regData.personalInfo?.phone || regData.phone || '',
+                college: regData.personalInfo?.college || regData.college || '',
+                department: regData.personalInfo?.department || regData.department || '',
+                year: regData.personalInfo?.year || regData.year || '',
+                events: eventsList,
+                total_amount: regData.totalFee || 100,
+                payment_method: 'razorpay',
+                razorpay_payment_id: razorpay_payment_id || '',
+                qr_data: qrData,
+                status: 'valid',
+                issue_date: new Date().toISOString(),
+              },
+            ]);
+          } catch (spErr) {
+            console.warn('Supabase payment sync warning:', spErr);
+          }
           await setDoc(
             doc(db, 'tickets', ticketId),
             {

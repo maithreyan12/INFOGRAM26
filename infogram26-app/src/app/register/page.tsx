@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '@/lib/firebase/config';
+import { supabase } from '@/lib/supabase/config';
 import { collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import PublicLayout from '@/components/layout/PublicLayout';
@@ -193,6 +194,27 @@ export default function RegisterPage() {
             createdAt: serverTimestamp(),
           });
           targetRegId = docRef.id;
+
+          // Dual-write registration to Supabase database
+          try {
+            await supabase.from('registrations').upsert([
+              {
+                id: targetRegId,
+                applicant_id: applicantId,
+                full_name: formData.fullName,
+                email: formData.email,
+                phone: formData.phone,
+                college: formData.college,
+                department: formData.department,
+                year: formData.year,
+                events: eventNamesList,
+                total_fee: totalFee,
+                status: 'pending_payment',
+              },
+            ]);
+          } catch (spErr) {
+            console.warn('Supabase registration sync warning:', spErr);
+          }
 
           // Non-blocking sync to Google Sheets upon registration completion
           try {

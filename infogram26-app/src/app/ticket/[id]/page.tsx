@@ -51,16 +51,14 @@ export default function TicketPage() {
   useEffect(() => {
     const fetchTicket = async () => {
       try {
-        if (!db) {
-          setError('Database connection unavailable');
-          setLoading(false);
-          return;
-        }
-        const ticketDoc = await getDoc(doc(db, 'tickets', id));
-        if (ticketDoc.exists()) {
-          setTicket({ id: ticketDoc.id, ...ticketDoc.data() });
-        } else {
-          // Fallback check in registrations collection
+        // 1. Try Firestore tickets collection
+        if (db) {
+          const ticketDoc = await getDoc(doc(db, 'tickets', id));
+          if (ticketDoc.exists()) {
+            setTicket({ id: ticketDoc.id, ...ticketDoc.data() });
+            setLoading(false);
+            return;
+          }
           const regDoc = await getDoc(doc(db, 'registrations', id));
           if (regDoc.exists()) {
             const data = regDoc.data();
@@ -79,10 +77,44 @@ export default function TicketPage() {
               qrData: JSON.stringify({ applicantId: data.applicantId, verified: true }),
               status: data.status === 'paid' ? 'valid' : 'pending',
             });
-          } else {
-            setError('Ticket pass not found in database');
+            setLoading(false);
+            return;
           }
         }
+
+        // 2. Supabase production database fallback
+        try {
+          const { supabase } = await import('@/lib/supabase/config');
+          const { data: spTicket } = await supabase
+            .from('tickets')
+            .select('*')
+            .or(`id.eq.${id},applicant_id.eq.${id}`)
+            .maybeSingle();
+
+          if (spTicket) {
+            setTicket({
+              id: spTicket.id,
+              ticketNumber: spTicket.ticket_number,
+              applicantId: spTicket.applicant_id,
+              studentName: spTicket.student_name,
+              email: spTicket.email,
+              phone: spTicket.phone,
+              college: spTicket.college,
+              department: spTicket.department,
+              year: spTicket.year,
+              events: spTicket.events,
+              totalAmount: spTicket.total_amount,
+              qrData: spTicket.qr_data,
+              status: spTicket.status,
+            });
+            setLoading(false);
+            return;
+          }
+        } catch (spErr) {
+          console.warn('Supabase ticket lookup error:', spErr);
+        }
+
+        setError('Ticket pass not found in database');
       } catch (error) {
         console.error('Error fetching ticket:', error);
       } finally {
