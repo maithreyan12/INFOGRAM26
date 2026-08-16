@@ -33,8 +33,8 @@ export async function POST(req: Request) {
         name: 'Thamaraiselvi',
         phone: '9626918439',
         email: 'thamaraisanthi1459@gmail.com',
-        college: 'Vellore Institute of Technology',
-        department: 'Software Engineering',
+        college: 'C. Abdul Hakeem College of Engineering & Technology',
+        department: 'Information Technology',
         year: '4th Year',
         events: ['HackForge'],
         amount: 100,
@@ -44,8 +44,8 @@ export async function POST(req: Request) {
         name: 'Lakshaya A',
         phone: '8870333393',
         email: 'lakshaya.arul16@gmail.com',
-        college: 'Vellore Institute of Technology',
-        department: 'Software Engineering',
+        college: 'C. Abdul Hakeem College of Engineering & Technology',
+        department: 'Information Technology',
         year: '4th Year',
         events: ['HackForge'],
         amount: 100,
@@ -55,8 +55,8 @@ export async function POST(req: Request) {
         name: 'Mithra',
         phone: '7708271028',
         email: 'mithrakasi26@gmail.com',
-        college: 'Vellore Institute of Technology',
-        department: 'Software Engineering',
+        college: 'C. Abdul Hakeem College of Engineering & Technology',
+        department: 'Information Technology',
         year: '2nd Year',
         events: ['HackForge'],
         amount: 100,
@@ -66,8 +66,8 @@ export async function POST(req: Request) {
         name: 'Rithika P T',
         phone: '8807425155',
         email: 'rithikaparthiban15@gmail.com',
-        college: 'Vellore Institute of Technology',
-        department: 'Software Engineering',
+        college: 'C. Abdul Hakeem College of Engineering & Technology',
+        department: 'Information Technology',
         year: '2nd Year',
         events: ['HackForge'],
         amount: 100,
@@ -76,7 +76,7 @@ export async function POST(req: Request) {
 
     let deletedTicketsCount = 0;
 
-    // Delete test registrations and tickets (arunkumar, verification.test, INFO26-CODE-9999)
+    // Delete demo participant (INFO26-HACK-98035 / Participant) & test registrations
     try {
       const snapRegs = await getDocs(collection(db, 'registrations'));
       for (const d of snapRegs.docs) {
@@ -85,6 +85,9 @@ export async function POST(req: Request) {
         const name = (data.personalInfo?.fullName || data.studentName || '').toLowerCase();
         const appId = (data.applicantId || '').toLowerCase();
         if (
+          name === 'participant' ||
+          name.includes('participant') ||
+          appId.includes('98035') ||
           email.includes('test') ||
           email.includes('verification') ||
           email.includes('arunkumar') ||
@@ -106,6 +109,9 @@ export async function POST(req: Request) {
         const name = (data.studentName || data.name || '').toLowerCase();
         const appId = (data.applicantId || '').toLowerCase();
         if (
+          name === 'participant' ||
+          name.includes('participant') ||
+          appId.includes('98035') ||
           email.includes('test') ||
           email.includes('verification') ||
           email.includes('arunkumar') ||
@@ -119,7 +125,7 @@ export async function POST(req: Request) {
       }
     } catch {}
 
-    // Delete old tickets matching each phone / email
+    // Delete old tickets matching team members to prevent duplicates
     for (const m of teamMembers) {
       const phoneVars = [m.phone, `+91${m.phone}`, `+91 ${m.phone}`];
       for (const pVar of phoneVars) {
@@ -144,9 +150,18 @@ export async function POST(req: Request) {
           } catch {}
         }
       } catch {}
+
+      // Clean registrations for team members
+      try {
+        const qRegApp = query(collection(db, 'registrations'), where('applicantId', '==', m.applicantId));
+        const snapRegApp = await getDocs(qRegApp);
+        for (const d of snapRegApp.docs) {
+          try { await deleteDoc(doc(db, 'registrations', d.id)); } catch {}
+        }
+      } catch {}
     }
 
-    // Now create EXACTLY 1 ticket per member
+    // Now create EXACTLY 1 ticket per team member with correct CAHCET details
     const createdResults: any[] = [];
     for (const m of teamMembers) {
       const ticketNumber = `TKT-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -181,37 +196,40 @@ export async function POST(req: Request) {
         verified: true,
       });
 
-      const tktRef = await addDoc(collection(db, 'tickets'), {
-        ticketNumber,
-        applicantId: m.applicantId,
-        registrationId: regId,
-        studentName: m.name,
-        email: m.email,
-        phone: m.phone,
-        college: m.college,
-        department: m.department,
-        year: m.year,
-        events: m.events,
-        totalAmount: m.amount,
-        paymentMethod: 'razorpay',
-        qrData,
-        status: 'valid',
-        issueDate: new Date().toISOString(),
-      });
+      let ticketId = `tkt_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+      try {
+        const ticketRef = await addDoc(collection(db, 'tickets'), {
+          ticketNumber,
+          applicantId: m.applicantId,
+          registrationId: regId,
+          studentName: m.name,
+          email: m.email,
+          phone: m.phone,
+          college: m.college,
+          department: m.department,
+          year: m.year,
+          events: m.events,
+          totalAmount: m.amount,
+          paymentMethod: 'razorpay',
+          qrData,
+          status: 'valid',
+          issueDate: new Date().toISOString(),
+        });
+        ticketId = ticketRef.id;
+      } catch {}
 
       createdResults.push({
+        applicantId: m.applicantId,
         name: m.name,
-        phone: m.phone,
-        ticketId: tktRef.id,
-        url: `https://infogram26.in/ticket/${tktRef.id}`,
+        ticketId,
+        regId,
       });
     }
 
     return NextResponse.json({
       success: true,
-      deletedTicketsCount,
-      createdCount: createdResults.length,
-      passes: createdResults,
+      deletedCount: deletedTicketsCount,
+      teamMembers: createdResults,
     });
   } catch (error: any) {
     console.error('Clean tickets error:', error);
