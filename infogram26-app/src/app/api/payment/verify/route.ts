@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, doc, getDoc, updateDoc, setDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, updateDoc, setDoc, collection, addDoc, getDocs, serverTimestamp, increment } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDGPuGlZhb_lFur3YPAegpdr8aM4BUd-zY",
@@ -93,7 +93,36 @@ export async function POST(req: Request) {
             { merge: true }
           );
 
-          // 3. Sync to Google Sheets
+          // 3. Increment registeredCount for each registered event in Firestore
+          if (Array.isArray(eventsList)) {
+            try {
+              const eventsSnap = await getDocs(collection(db, 'events'));
+              for (const evtNameOrId of eventsList) {
+                const normName = String(evtNameOrId).toLowerCase().replace(/[^a-z0-9]/g, '');
+                const matchDoc = eventsSnap.docs.find(d => {
+                  const data = d.data();
+                  const dNorm = (data.name || data.slug || d.id).toLowerCase().replace(/[^a-z0-9]/g, '');
+                  return dNorm === normName || d.id === evtNameOrId;
+                });
+
+                if (matchDoc) {
+                  await updateDoc(doc(db, 'events', matchDoc.id), {
+                    registeredCount: increment(1),
+                  });
+                } else {
+                  await setDoc(doc(db, 'events', evtNameOrId), {
+                    name: evtNameOrId,
+                    registeredCount: 1,
+                    createdAt: serverTimestamp(),
+                  }, { merge: true });
+                }
+              }
+            } catch (evtCntErr) {
+              console.warn('Event registeredCount increment warning:', evtCntErr);
+            }
+          }
+
+          // 4. Sync to Google Sheets
           fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://infogram26.in'}/api/sheets`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

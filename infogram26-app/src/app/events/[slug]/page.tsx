@@ -50,20 +50,40 @@ export default function EventDetailPage() {
         // 2. Check Firebase if configured for live metrics
         if (db && isFirebaseConfigured) {
           try {
+            // Count live paid registrations for this event
+            let livePaidCount = 0;
+            const normEventName = localEvent ? localEvent.name.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+
+            try {
+              const regSnap = await getDocs(collection(db, 'registrations'));
+              regSnap.docs.forEach(doc => {
+                const data = doc.data();
+                if (data.status === 'paid' || data.paidAt || data.razorpayPaymentId) {
+                  const evts: string[] = data.eventNames || data.events || [];
+                  const match = evts.some(e => {
+                    const norm = String(e).toLowerCase().replace(/[^a-z0-9]/g, '');
+                    return norm === normSlug || norm === normEventName || norm === localEvent?.id;
+                  });
+                  if (match) livePaidCount += 1;
+                }
+              });
+            } catch (cErr) {
+              console.warn('Paid registration count warning:', cErr);
+            }
+
             const eventsRef = collection(db, 'events');
             const snapshot = await getDocs(eventsRef);
             if (!snapshot.empty) {
               const firestoreMatch = snapshot.docs.find(doc => {
                 const data = doc.data();
-                const dNorm = (data.slug || doc.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-                return dNorm === normSlug || doc.id === rawSlug || doc.id === localEvent?.id;
+                const dNorm = (data.slug || data.name || doc.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                return dNorm === normSlug || dNorm === normEventName || doc.id === rawSlug || doc.id === localEvent?.id;
               });
 
               if (firestoreMatch) {
                 const dbData = firestoreMatch.data() as Event;
                 const dbSlugNorm = (dbData.slug || firestoreMatch.id).toLowerCase().replace(/[^a-z0-9]/g, '');
                 
-                // Always map to official brochure definition from demoEvents
                 const brochureMatch = demoEvents.find(e => {
                   const eNorm = e.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
                   return eNorm === dbSlugNorm || eNorm === normSlug || e.id === firestoreMatch.id;
@@ -73,12 +93,16 @@ export default function EventDetailPage() {
                   resultEvent = {
                     ...brochureMatch,
                     id: firestoreMatch.id,
-                    registeredCount: dbData.registeredCount ?? brochureMatch.registeredCount,
+                    registeredCount: Math.max(dbData.registeredCount || 0, livePaidCount, brochureMatch.registeredCount || 0),
                     bannerUrl: dbData.bannerUrl || brochureMatch.bannerUrl,
                     status: dbData.status || brochureMatch.status,
                   };
                 }
               }
+            }
+
+            if (resultEvent) {
+              resultEvent.registeredCount = Math.max(resultEvent.registeredCount || 0, livePaidCount);
             }
           } catch (err) {
             console.error("Firestore error:", err);
