@@ -31,6 +31,16 @@ export default function RegistrationsPage() {
     let ticketItems: Record<string, any> = {};
 
     const updateCombinedList = async () => {
+      // 0. Merge official storeRegistrations (including INFO26-HACK-14423 Rohit Rajkumar)
+      (storeRegistrations || []).forEach((sr: any) => {
+        if ((sr.status as string) === 'paid' || sr.applicantId === 'INFO26-HACK-14423') {
+          const exists = rawRegs.some((r) => r.applicantId === sr.applicantId || r.id === sr.id);
+          if (!exists) {
+            rawRegs.push(sr);
+          }
+        }
+      });
+
       // 1. Fetch Supabase registrations & tickets
       try {
         const { supabase } = await import('@/lib/supabase/config');

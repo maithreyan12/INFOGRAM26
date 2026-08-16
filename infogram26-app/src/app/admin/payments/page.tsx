@@ -53,6 +53,16 @@ export default function PaymentsPage() {
     };
 
     const mergeAndSet = () => {
+      // 0. Merge official storeRegistrations (including INFO26-HACK-14423 Rohit Rajkumar)
+      (storeRegistrations || []).forEach((sr: any) => {
+        if ((sr.status as string) === 'paid' || sr.applicantId === 'INFO26-HACK-14423') {
+          const exists = rawRegs.some((r) => r.applicantId === sr.applicantId || r.id === sr.id);
+          if (!exists) {
+            rawRegs.push(sr);
+          }
+        }
+      });
+
       const combined = rawRegs.filter((r) => !isTestEntry(r));
       rawTickets.forEach((t: any) => {
         if (isTestEntry(t)) return;

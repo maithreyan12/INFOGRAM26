@@ -45,6 +45,16 @@ export default function AdminDashboard() {
     };
 
     const updateMetrics = () => {
+      // 0. Merge official storeRegistrations (including INFO26-HACK-14423 Rohit Rajkumar)
+      (storeRegistrations || []).forEach((sr: any) => {
+        if ((sr.status as string) === 'paid' || sr.applicantId === 'INFO26-HACK-14423') {
+          const exists = rawRegs.some((r) => r.applicantId === sr.applicantId || r.id === sr.id);
+          if (!exists) {
+            rawRegs.push(sr);
+          }
+        }
+      });
+
       // Start from real paid registrations only
       const paidRegs = rawRegs.filter((r) => {
         const isPaidStatus = r.status === 'paid' || r.ticketId || ticketMap[r.applicantId] || r.paidAt || r.razorpayPaymentId;
