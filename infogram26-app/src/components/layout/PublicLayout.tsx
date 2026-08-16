@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import ScrollProgress from '@/components/ui/ScrollProgress';
+import MusicPlayer from '@/components/home/MusicPlayer';
 import { useTheme } from '@/context/ThemeContext';
 
 interface PublicLayoutProps { children: ReactNode; }
@@ -55,6 +56,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         {children}
       </main>
       <Footer />
+      <MusicPlayer />
     </div>
   );
 }

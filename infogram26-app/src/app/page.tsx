@@ -22,12 +22,8 @@ export default function Home() {
       <StatsSection />
       <FeaturedEvents />
       <SponsorsSection />
-      {/* Floating background music player — place bg-music.mp3 in /public/ */}
-      <MusicPlayer
-        src="/bg-music.mp3"
-        songName="Vaathi Coming"
-        artist="Vijay · Master (2021)"
-      />
+      {/* Floating background music player with online playlist & track chooser */}
+      <MusicPlayer />
     </PublicLayout>
   );
 }
