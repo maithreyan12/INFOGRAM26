@@ -26,13 +26,17 @@ export default function AdminDashboard() {
     let ticketMap: Record<string, any> = {};
 
     const isTestEntry = (item: any) => {
-      const email = (item.personalInfo?.email || item.email || '').toLowerCase();
-      const name = (item.personalInfo?.fullName || item.studentName || item.name || '').toLowerCase();
-      const appId = (item.applicantId || '').toLowerCase();
+      const email = (item.personalInfo?.email || item.email || '').toLowerCase().trim();
+      const name = (item.personalInfo?.fullName || item.studentName || item.name || '').toLowerCase().trim();
+      const appId = (item.applicantId || '').toLowerCase().trim();
       return (
+        name === 'participant' ||
+        name.includes('participant') ||
+        appId.includes('98035') ||
+        email.includes('verification.test') ||
+        email.includes('arunkumar.cahcet') ||
+        email === 'test@example.com' ||
         email.includes('test') ||
-        email.includes('verification') ||
-        email.includes('arunkumar') ||
         name.includes('test') ||
         name.includes('verification') ||
         appId.includes('9999') ||
@@ -41,30 +45,41 @@ export default function AdminDashboard() {
     };
 
     const updateMetrics = () => {
-      // Start from real registrations only
-      const combined = rawRegs.filter((r) => !isTestEntry(r));
+      // Start from real paid registrations only
+      const paidRegs = rawRegs.filter((r) => {
+        const isPaidStatus = r.status === 'paid' || r.ticketId || ticketMap[r.applicantId] || r.paidAt || r.razorpayPaymentId;
+        return isPaidStatus && !isTestEntry(r);
+      });
 
-      // Add ticket-only entries (HackForge team passes, manually issued passes)
-      // that don't already exist in registrations
+      const combined = [...paidRegs];
+
+      // Add ticket-only entries that don't already exist in registrations
       Object.values(ticketMap).forEach((t: any) => {
         if (isTestEntry(t)) return;
 
         const exists = combined.some(
           (r) =>
             r.applicantId === t.applicantId ||
-            (r.personalInfo?.email && t.email && r.personalInfo?.email === t.email)
+            ((r.personalInfo?.email || r.email) && t.email && (r.personalInfo?.email || r.email) === t.email)
         );
-        if (!exists && (t.studentName || t.applicantId)) {
+        if (!exists && (t.studentName || t.fullName || t.name || t.email || t.applicantId)) {
+          const sName = t.studentName || t.name || t.fullName || '';
+          const sCollege = t.college || '';
           combined.push({
             id: t.ticketId || t.id,
             applicantId: t.applicantId,
-            totalFee: t.totalAmount || 100,
+            fullName: sName,
+            studentName: sName,
+            college: sCollege,
+            department: t.department || t.branch || '',
+            year: t.year || '',
+            totalFee: t.totalAmount ?? t.totalFee ?? (t.applicantId === 'INFO26-HACK-14423' ? 50 : 100),
             status: 'paid',
             personalInfo: {
-              fullName: t.studentName || t.name || '',
+              fullName: sName,
               email: t.email || '',
               phone: t.phone || '',
-              college: t.college || '',
+              college: sCollege,
               department: t.department || t.branch || '',
               year: t.year || '',
             },
@@ -74,7 +89,7 @@ export default function AdminDashboard() {
         }
       });
 
-      const filteredStoreRegs = (storeRegistrations || []).filter((r) => !isTestEntry(r));
+      const filteredStoreRegs = (storeRegistrations || []).filter((r) => !isTestEntry(r) && (r.status as string) === 'paid');
       setLiveRegistrations(combined.length > 0 ? combined : filteredStoreRegs);
     };
 
@@ -113,9 +128,12 @@ export default function AdminDashboard() {
     };
   }, [storeRegistrations]);
 
-  const activeRegistrations = liveRegistrations.length > 0 ? liveRegistrations : storeRegistrations;
+  const activeRegistrations = liveRegistrations.length > 0 ? liveRegistrations : (storeRegistrations || []).filter(r => (r.status as string) === 'paid');
   const totalRegistrations = activeRegistrations.length;
-  const totalRevenue = activeRegistrations.reduce((sum, r) => sum + (r.totalFee || 0), 0);
+  const totalRevenue = activeRegistrations.reduce((sum, r) => {
+    const fee = r.totalFee ?? r.totalAmount ?? r.fee ?? (r.applicantId === 'INFO26-HACK-14423' ? 50 : 100);
+    return sum + Number(fee || 0);
+  }, 0);
   const activeEventsCount = events.length;
   const organizersCount = organizers.length;
 
@@ -303,9 +321,9 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/80">
-                {activeRegistrations.slice(0, 5).map((reg: any) => {
-                  const name = reg.personalInfo?.fullName || reg.fullName || '—';
-                  const college = reg.personalInfo?.college || reg.college || '—';
+                {activeRegistrations.map((reg: any) => {
+                  const name = reg.personalInfo?.fullName || reg.fullName || reg.studentName || reg.name || '—';
+                  const college = reg.personalInfo?.college || reg.college || 'C. Abdul Hakeem College of Engineering & Technology';
                   return (
                     <tr key={reg.id} className="transition-colors hover:bg-gray-800/50">
                       <td className="px-4 py-3.5 font-mono text-[#00d4ff] font-bold">{reg.applicantId}</td>

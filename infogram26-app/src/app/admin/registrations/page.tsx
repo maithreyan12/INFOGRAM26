@@ -38,15 +38,16 @@ export default function RegistrationsPage() {
         const name = (r.personalInfo?.fullName || r.studentName || r.name || '').toLowerCase().trim();
         const appId = (r.applicantId || '').toLowerCase().trim();
         const isDemo =
-          !name ||
-          name === '' ||
-          name === '—' ||
           name === 'participant' ||
+          name.includes('participant') ||
           appId.includes('98035') ||
-          appId.includes('14423') ||
           email.includes('verification.test') ||
           email.includes('arunkumar.cahcet') ||
-          email === 'test@example.com';
+          email === 'test@example.com' ||
+          email.includes('test') ||
+          name.includes('test') ||
+          name.includes('verification') ||
+          appId.includes('9999');
         return isPaidStatus && !isDemo;
       });
 
@@ -55,18 +56,19 @@ export default function RegistrationsPage() {
       // Add any tickets that are not in rawRegs
       Object.values(ticketItems).forEach((t: any) => {
         const email = (t.email || '').toLowerCase().trim();
-        const name = (t.studentName || t.name || '').toLowerCase().trim();
+        const name = (t.studentName || t.name || t.fullName || '').toLowerCase().trim();
         const appId = (t.applicantId || '').toLowerCase().trim();
         const isDemo =
-          !name ||
-          name === '' ||
-          name === '—' ||
           name === 'participant' ||
+          name.includes('participant') ||
           appId.includes('98035') ||
-          appId.includes('14423') ||
           email.includes('verification.test') ||
           email.includes('arunkumar.cahcet') ||
-          email === 'test@example.com';
+          email === 'test@example.com' ||
+          email.includes('test') ||
+          name.includes('test') ||
+          name.includes('verification') ||
+          appId.includes('9999');
         if (isDemo) return;
 
         const exists = combined.some(
@@ -465,10 +467,10 @@ export default function RegistrationsPage() {
                     ticketInfo?.status === 'used' ||
                     ticketInfo?.checkedIn;
 
-                  const name = reg.personalInfo?.fullName || reg.fullName || '—';
-                  const college = reg.personalInfo?.college || reg.college || '—';
-                  const dept = reg.personalInfo?.department || reg.department || '—';
-                  const year = reg.personalInfo?.year || reg.year || '';
+                  const name = reg.personalInfo?.fullName || reg.fullName || reg.studentName || reg.name || '—';
+                  const college = reg.personalInfo?.college || reg.college || 'C. Abdul Hakeem College of Engineering & Technology';
+                  const dept = reg.personalInfo?.department || reg.department || 'Information Technology';
+                  const year = reg.personalInfo?.year || reg.year || '2nd Year';
                   const email = reg.personalInfo?.email || reg.email || '';
                   const phone = reg.personalInfo?.phone || reg.phone || '';
                   const eventsList = reg.eventNames || reg.events || [];

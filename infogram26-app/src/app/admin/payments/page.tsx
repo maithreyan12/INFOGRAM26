@@ -335,11 +335,12 @@ export default function PaymentsPage() {
                 </tr>
               ) : (
                 filteredRegistrations.map((reg: any) => {
-                  const name = reg.personalInfo?.fullName || reg.fullName || 'Participant';
+                  const name = reg.personalInfo?.fullName || reg.fullName || reg.studentName || reg.name || 'Participant';
                   const email = reg.personalInfo?.email || reg.email || '';
                   const phone = reg.personalInfo?.phone || reg.phone || '';
-                  const college = reg.personalInfo?.college || reg.college || 'CAHCET';
+                  const college = reg.personalInfo?.college || reg.college || 'C. Abdul Hakeem College of Engineering & Technology';
                   const payId = reg.razorpayPaymentId || reg.utrNumber || '—';
+                  const fee = reg.totalFee ?? reg.totalAmount ?? reg.fee ?? (reg.applicantId === 'INFO26-HACK-14423' ? 50 : 100);
 
                   return (
                     <tr key={reg.id} className="hover:bg-gray-800/50 transition-colors">
@@ -350,7 +351,7 @@ export default function PaymentsPage() {
                         <div className="text-[10px] text-gray-500 font-mono">{email} {phone ? `• ${phone}` : ''}</div>
                       </td>
                       <td className="px-6 py-4 font-mono text-purple-300 font-black text-xs">{payId}</td>
-                      <td className="px-6 py-4 font-black text-emerald-400 text-sm">₹{reg.totalFee || 0}</td>
+                      <td className="px-6 py-4 font-black text-emerald-400 text-sm">₹{fee}</td>
                       <td className="px-6 py-4 text-gray-400 uppercase font-mono text-[11px]">UPI / Razorpay</td>
                       <td className="px-6 py-4 text-right">
                         <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
