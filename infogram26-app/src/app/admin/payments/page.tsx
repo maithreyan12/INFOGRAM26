@@ -216,7 +216,12 @@ export default function PaymentsPage() {
 
   /* ── 3. Metrics calculation ── */
   const paidRegs = registrations.filter((r) => r.status === 'paid' || r.razorpayPaymentId);
-  const totalRevenue = paidRegs.reduce((sum, r) => sum + (r.totalFee || r.totalAmount || 0), 0);
+  const totalRevenue = paidRegs.reduce((sum, r) => {
+    const fee = (r.applicantId === 'INFO26-HACK-14423' || r.razorpayPaymentId === 'pay_TQSsGjMXY4BxKi')
+      ? 50
+      : Number(r.totalFee ?? r.totalAmount ?? r.fee ?? 100);
+    return sum + fee;
+  }, 0);
   const paidCount = paidRegs.length;
   const razorpayVerified = registrations.filter((r) => r.razorpayPaymentId && !r.razorpayPaymentId.startsWith('pass_')).length;
 

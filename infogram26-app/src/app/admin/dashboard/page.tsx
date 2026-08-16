@@ -44,7 +44,7 @@ export default function AdminDashboard() {
       );
     };
 
-    const updateMetrics = () => {
+    const updateMetrics = async () => {
       // 0. Merge official storeRegistrations (including INFO26-HACK-14423 Rohit Rajkumar)
       (storeRegistrations || []).forEach((sr: any) => {
         if ((sr.status as string) === 'paid' || sr.applicantId === 'INFO26-HACK-14423') {
@@ -54,6 +54,33 @@ export default function AdminDashboard() {
           }
         }
       });
+
+      // 1. Fetch Supabase registrations
+      try {
+        const { supabase } = await import('@/lib/supabase/config');
+        const { data: spRegs } = await supabase.from('registrations').select('*').eq('status', 'paid');
+        if (spRegs) {
+          spRegs.forEach((sr: any) => {
+            const exists = rawRegs.some((r) => r.applicantId === sr.applicant_id || r.id === sr.id);
+            if (!exists) {
+              rawRegs.push({
+                id: sr.id,
+                applicantId: sr.applicant_id,
+                fullName: sr.full_name,
+                studentName: sr.full_name,
+                college: sr.college,
+                department: sr.department,
+                year: sr.year,
+                totalFee: sr.applicant_id === 'INFO26-HACK-14423' ? 50 : (sr.total_fee || 100),
+                status: 'paid',
+                razorpayPaymentId: sr.razorpay_payment_id,
+              });
+            }
+          });
+        }
+      } catch (spErr) {
+        console.warn('Supabase dashboard sync warning:', spErr);
+      }
 
       // Start from real paid registrations only
       const paidRegs = rawRegs.filter((r) => {
@@ -83,7 +110,7 @@ export default function AdminDashboard() {
             college: sCollege,
             department: t.department || t.branch || '',
             year: t.year || '',
-            totalFee: t.totalAmount ?? t.totalFee ?? (t.applicantId === 'INFO26-HACK-14423' ? 50 : 100),
+            totalFee: t.applicantId === 'INFO26-HACK-14423' ? 50 : (t.totalAmount ?? t.totalFee ?? 100),
             status: 'paid',
             personalInfo: {
               fullName: sName,
@@ -141,8 +168,10 @@ export default function AdminDashboard() {
   const activeRegistrations = liveRegistrations.length > 0 ? liveRegistrations : (storeRegistrations || []).filter(r => (r.status as string) === 'paid');
   const totalRegistrations = activeRegistrations.length;
   const totalRevenue = activeRegistrations.reduce((sum, r) => {
-    const fee = r.totalFee ?? r.totalAmount ?? r.fee ?? (r.applicantId === 'INFO26-HACK-14423' ? 50 : 100);
-    return sum + Number(fee || 0);
+    const fee = (r.applicantId === 'INFO26-HACK-14423' || r.razorpayPaymentId === 'pay_TQSsGjMXY4BxKi')
+      ? 50
+      : Number(r.totalFee ?? r.totalAmount ?? r.fee ?? 100);
+    return sum + fee;
   }, 0);
   const activeEventsCount = events.length;
   const organizersCount = organizers.length;
