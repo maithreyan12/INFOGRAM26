@@ -30,7 +30,68 @@ export default function RegistrationsPage() {
     let rawRegs: any[] = [];
     let ticketItems: Record<string, any> = {};
 
-    const updateCombinedList = () => {
+    const updateCombinedList = async () => {
+      // 1. Fetch Supabase registrations & tickets
+      try {
+        const { supabase } = await import('@/lib/supabase/config');
+        const { data: spRegs } = await supabase.from('registrations').select('*').eq('status', 'paid');
+        if (spRegs) {
+          spRegs.forEach((sr: any) => {
+            const exists = rawRegs.some((r) => r.applicantId === sr.applicant_id || r.id === sr.id);
+            if (!exists) {
+              rawRegs.push({
+                id: sr.id,
+                applicantId: sr.applicant_id,
+                fullName: sr.full_name,
+                email: sr.email,
+                phone: sr.phone,
+                college: sr.college,
+                department: sr.department,
+                year: sr.year,
+                personalInfo: {
+                  fullName: sr.full_name,
+                  email: sr.email,
+                  phone: sr.phone,
+                  college: sr.college,
+                  department: sr.department,
+                  year: sr.year,
+                },
+                events: sr.events || [],
+                eventNames: sr.events || [],
+                totalFee: sr.total_fee || 100,
+                status: 'paid',
+                razorpayPaymentId: sr.razorpay_payment_id,
+              });
+            }
+          });
+        }
+
+        const { data: spTkts } = await supabase.from('tickets').select('*');
+        if (spTkts) {
+          spTkts.forEach((st: any) => {
+            if (st.applicant_id && !ticketItems[st.applicant_id]) {
+              ticketItems[st.applicant_id] = {
+                id: st.id,
+                ticketNumber: st.ticket_number,
+                applicantId: st.applicant_id,
+                studentName: st.student_name,
+                email: st.email,
+                phone: st.phone,
+                college: st.college,
+                department: st.department,
+                year: st.year,
+                events: st.events,
+                totalAmount: st.total_amount,
+                status: st.status,
+                qrData: st.qr_data,
+              };
+            }
+          });
+        }
+      } catch (spErr) {
+        console.warn('Supabase admin registrations fetch warning:', spErr);
+      }
+
       // Filter rawRegs to ONLY include paid registrations or those with a valid ticket
       const paidRegs = rawRegs.filter((r) => {
         const isPaidStatus = r.status === 'paid' || r.ticketId || ticketItems[r.applicantId];
