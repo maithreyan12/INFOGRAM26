@@ -10,9 +10,17 @@ import Link from 'next/link';
 
 export default function AdminLogin() {
   const router = useRouter();
-  const { signIn, signOut, loginAsDemoSuperAdmin, loading: authLoading, isAdmin, isOrganizer } = useAuth();
+  const { signIn, signOut, loading: authLoading, isAdmin, isOrganizer } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // ── Auto-cleanup stale demo session on mount ────────────────
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Clear any leftover demo session that could interfere with real auth
+      localStorage.removeItem('infogram26_demo_user');
+    }
+  }, []);
 
   // ── Auto-redirect if already logged in ────────────────────────
   useEffect(() => {
@@ -25,6 +33,47 @@ export default function AdminLogin() {
     }
   }, [authLoading, isAdmin, isOrganizer, router]);
 
+  // Full session reset: clear localStorage + IndexedDB Firebase caches
+  const handleFullReset = async () => {
+    setError(null);
+    setLoading(true);
+
+    // 1. Sign out from Firebase Auth
+    await signOut();
+
+    // 2. Clear all demo/session keys from localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('infogram26_demo_user');
+      // Clear any zustand persisted caches that may have stale data
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.includes('infogram') || key.includes('firebase'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((k) => localStorage.removeItem(k));
+    }
+
+    // 3. Clear Firebase IndexedDB caches (fixes "Database is closing/hidden")
+    if (typeof window !== 'undefined' && window.indexedDB) {
+      try {
+        const dbs = await window.indexedDB.databases();
+        for (const dbInfo of dbs) {
+          if (dbInfo.name && (dbInfo.name.includes('firebase') || dbInfo.name.includes('firestore'))) {
+            window.indexedDB.deleteDatabase(dbInfo.name);
+          }
+        }
+      } catch {
+        // indexedDB.databases() not supported in all browsers - ignore
+      }
+    }
+
+    setLoading(false);
+    // Hard reload to reinitialize Firebase from scratch
+    window.location.reload();
+  };
+
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError(null);
@@ -34,11 +83,13 @@ export default function AdminLogin() {
           const result = await signIn();
           if (result && result.user) {
             const userEmail = (result.user.email || '').toLowerCase().trim();
-            const name = result.user.displayName || 'Admin';
 
             // Check if user email is one of the 4 designated Super Admin emails
+            // Note: We do NOT call loginAsDemoSuperAdmin here — the real
+            // Firebase Auth token from signInWithPopup is needed for Firestore
+            // security rules.  The onAuthStateChanged listener in useAuth
+            // automatically sets admin state for authorized emails.
             if (isAuthorizedSuperAdmin(userEmail)) {
-              loginAsDemoSuperAdmin(userEmail, name);
               window.location.href = '/admin/dashboard';
               return;
             }
@@ -65,6 +116,13 @@ export default function AdminLogin() {
             setLoading(false);
             return;
           }
+          // Detect "Database is closing/hidden" and similar IndexedDB errors
+          const errMsg = popupErr?.message || '';
+          if (errMsg.includes('closing') || errMsg.includes('hidden') || errMsg.includes('Database')) {
+            setError('Browser database cache is corrupted. Click "Reset & Reload" below to fix this, then sign in again.');
+            setLoading(false);
+            return;
+          }
           setError(popupErr?.message || 'Google Sign-In failed. Please check credentials.');
           setLoading(false);
           return;
@@ -74,7 +132,12 @@ export default function AdminLogin() {
       }
     } catch (err: any) {
       console.error('Login error:', err);
-      setError(err?.message || 'Login failed. Unauthorized account.');
+      const errMsg = err?.message || '';
+      if (errMsg.includes('closing') || errMsg.includes('hidden') || errMsg.includes('Database')) {
+        setError('Browser database cache is corrupted. Click "Reset & Reload" below to fix this, then sign in again.');
+      } else {
+        setError(errMsg || 'Login failed. Unauthorized account.');
+      }
     } finally {
       setLoading(false);
     }
@@ -132,10 +195,10 @@ export default function AdminLogin() {
           <div className="bg-red-500/10 border border-red-500/30 text-red-200 p-4 rounded-2xl text-xs text-center font-bold">
             {error}
             <button
-              onClick={() => { setError(null); signOut(); }}
+              onClick={handleFullReset}
               className="mt-3 flex items-center justify-center w-full bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-white py-2 rounded-xl text-xs transition-all"
             >
-              <LogOut className="w-4 h-4 mr-2" /> Reset Session
+              <LogOut className="w-4 h-4 mr-2" /> Reset & Reload
             </button>
           </div>
         )}

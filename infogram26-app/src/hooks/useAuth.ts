@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { auth, db } from '@/lib/firebase/config';
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as firebaseSignOut, browserPopupRedirectResolver } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import type { AdminUser } from '@/types';
 import { useEventStore } from '@/store/eventStore';
@@ -37,70 +37,80 @@ export function useAuth() {
   const organizers = useEventStore((state) => state.organizers);
 
   useEffect(() => {
-    // Check if demo user session exists in localStorage
-    if (typeof window !== 'undefined') {
+    // Helper: apply a demo session from localStorage
+    const applyDemoSession = () => {
+      if (typeof window === 'undefined') return false;
       const savedDemo = localStorage.getItem(DEMO_USER_KEY);
-      if (savedDemo) {
-        try {
-          const parsed = JSON.parse(savedDemo) as DemoSession;
-          const parsedEmail = (parsed.email || '').toLowerCase().trim();
-          const isSuper = isAuthorizedSuperAdmin(parsedEmail);
-          const matchedOrg = (organizers || []).find((o) => o.email.toLowerCase().trim() === parsedEmail);
+      if (!savedDemo) return false;
 
-          if (isSuper && parsed.role === 'super_admin') {
-            setUser({
-              uid: parsed.uid,
-              email: parsed.email,
-              displayName: parsed.displayName,
-              photoURL: null,
-            });
-            setAdminUser({
-              uid: parsed.uid,
-              email: parsed.email,
-              displayName: parsed.displayName,
-              role: 'super_admin',
-              assignedEventId: parsed.assignedEventId,
-              createdAt: new Date(),
-              isActive: true,
-            });
-            setRole('super_admin');
-            setLoading(false);
-            return;
-          } else if (matchedOrg && parsed.role === 'organizer') {
-            setUser({
-              uid: parsed.uid,
-              email: parsed.email,
-              displayName: parsed.displayName,
-              photoURL: null,
-            });
-            setAdminUser(matchedOrg);
-            setRole('organizer');
-            setLoading(false);
-            return;
-          } else {
-            // Unauthorized stored session - purge it!
-            localStorage.removeItem(DEMO_USER_KEY);
-          }
-        } catch (e) {
-          console.error("Error reading demo session:", e);
+      try {
+        const parsed = JSON.parse(savedDemo) as DemoSession;
+        const parsedEmail = (parsed.email || '').toLowerCase().trim();
+        const isSuper = isAuthorizedSuperAdmin(parsedEmail);
+        const matchedOrg = (organizers || []).find((o) => o.email.toLowerCase().trim() === parsedEmail);
+
+        if (isSuper && parsed.role === 'super_admin') {
+          setUser({
+            uid: parsed.uid,
+            email: parsed.email,
+            displayName: parsed.displayName,
+            photoURL: null,
+          });
+          setAdminUser({
+            uid: parsed.uid,
+            email: parsed.email,
+            displayName: parsed.displayName,
+            role: 'super_admin',
+            assignedEventId: parsed.assignedEventId,
+            createdAt: new Date(),
+            isActive: true,
+          });
+          setRole('super_admin');
+          return true;
+        } else if (matchedOrg && parsed.role === 'organizer') {
+          setUser({
+            uid: parsed.uid,
+            email: parsed.email,
+            displayName: parsed.displayName,
+            photoURL: null,
+          });
+          setAdminUser(matchedOrg);
+          setRole('organizer');
+          return true;
+        } else {
+          // Unauthorized stored session - purge it!
           localStorage.removeItem(DEMO_USER_KEY);
         }
+      } catch (e) {
+        console.error("Error reading demo session:", e);
+        localStorage.removeItem(DEMO_USER_KEY);
       }
-    }
+      return false;
+    };
 
+    // If Firebase Auth is unavailable, fall back to demo session
     if (!auth) {
-      setUser(null);
-      setAdminUser(null);
-      setRole(null);
+      const applied = applyDemoSession();
+      if (!applied) {
+        setUser(null);
+        setAdminUser(null);
+        setRole(null);
+      }
       setLoading(false);
       return;
     }
 
+    // Firebase Auth IS available — always prefer the real auth token
     let unsubscribe: (() => void) | undefined;
     try {
       unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
         setLoading(true);
         if (firebaseUser) {
+          // Real Firebase user is signed in — clear any stale demo session
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(DEMO_USER_KEY);
+          }
+
           const emailLower = (firebaseUser.email || '').toLowerCase().trim();
           const isSuperAdminEmail = isAuthorizedSuperAdmin(emailLower);
           const matchedOrg = (organizers || []).find((o) => o.email.toLowerCase().trim() === emailLower);
@@ -137,7 +147,6 @@ export function useAuth() {
           }
 
           // ── Unauthorized Account ──
-          // Reject and forcibly sign out non-whitelisted emails
           console.warn(`Unauthorized login attempt blocked for: ${emailLower}`);
           setUser(null);
           setAdminUser(null);
@@ -151,54 +160,9 @@ export function useAuth() {
           setLoading(false);
           return;
         } else {
-          // Check if demo user session exists in localStorage
-          const savedDemo = typeof window !== 'undefined' ? localStorage.getItem(DEMO_USER_KEY) : null;
-          if (savedDemo) {
-            try {
-              const parsed = JSON.parse(savedDemo) as DemoSession;
-              const parsedEmail = (parsed.email || '').toLowerCase().trim();
-              const isSuper = isAuthorizedSuperAdmin(parsedEmail);
-              const matchedOrg = (organizers || []).find((o) => o.email.toLowerCase().trim() === parsedEmail);
-
-              if (isSuper && parsed.role === 'super_admin') {
-                setUser({
-                  uid: parsed.uid,
-                  email: parsed.email,
-                  displayName: parsed.displayName,
-                  photoURL: null,
-                });
-                setAdminUser({
-                  uid: parsed.uid,
-                  email: parsed.email,
-                  displayName: parsed.displayName,
-                  role: 'super_admin',
-                  assignedEventId: parsed.assignedEventId,
-                  createdAt: new Date(),
-                  isActive: true,
-                });
-                setRole('super_admin');
-              } else if (matchedOrg && parsed.role === 'organizer') {
-                setUser({
-                  uid: parsed.uid,
-                  email: parsed.email,
-                  displayName: parsed.displayName,
-                  photoURL: null,
-                });
-                setAdminUser(matchedOrg);
-                setRole('organizer');
-              } else {
-                localStorage.removeItem(DEMO_USER_KEY);
-                setUser(null);
-                setAdminUser(null);
-                setRole(null);
-              }
-            } catch (e) {
-              localStorage.removeItem(DEMO_USER_KEY);
-              setUser(null);
-              setAdminUser(null);
-              setRole(null);
-            }
-          } else {
+          // No Firebase user — fall back to demo session
+          const applied = applyDemoSession();
+          if (!applied) {
             setUser(null);
             setAdminUser(null);
             setRole(null);
@@ -208,6 +172,13 @@ export function useAuth() {
       });
     } catch (e) {
       console.warn("Firebase Auth listener error:", e);
+      // Last resort: try demo session
+      const applied = applyDemoSession();
+      if (!applied) {
+        setUser(null);
+        setAdminUser(null);
+        setRole(null);
+      }
       setLoading(false);
     }
 
@@ -222,7 +193,7 @@ export function useAuth() {
     }
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    return signInWithPopup(auth, provider);
+    return signInWithPopup(auth, provider, browserPopupRedirectResolver);
   };
 
   const loginAsDemoSuperAdmin = (customEmail?: string, customName?: string) => {
