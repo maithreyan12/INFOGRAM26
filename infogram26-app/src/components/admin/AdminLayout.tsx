@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, isAuthorizedSuperAdmin } from '@/hooks/useAuth';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -33,9 +33,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         router.replace('/organizer/dashboard');
       } else if (!isAdmin) {
         router.replace('/admin-login');
+      } else {
+        const activeEmail = (user?.email || adminUser?.email || '').toLowerCase().trim();
+        if (activeEmail && !isAuthorizedSuperAdmin(activeEmail)) {
+          console.warn(`AdminLayout fail-safe: Kicking out unauthorized email ${activeEmail}`);
+          signOut();
+          router.replace('/admin-login');
+        }
       }
     }
-  }, [loading, isAdmin, isOrganizer, router]);
+  }, [loading, isAdmin, isOrganizer, user, adminUser, router, signOut]);
 
   if (loading || !isAdmin) {
     return (
