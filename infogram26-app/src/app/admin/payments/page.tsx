@@ -38,13 +38,17 @@ export default function PaymentsPage() {
     let rawTickets: any[] = [];
 
     const isTestEntry = (item: any) => {
-      const email = (item.personalInfo?.email || item.email || '').toLowerCase();
-      const name = (item.personalInfo?.fullName || item.studentName || item.name || '').toLowerCase();
-      const appId = (item.applicantId || '').toLowerCase();
+      const email = (item.personalInfo?.email || item.email || '').toLowerCase().trim();
+      const name = (item.personalInfo?.fullName || item.studentName || item.name || '').toLowerCase().trim();
+      const appId = (item.applicantId || '').toLowerCase().trim();
       return (
+        name === 'participant' ||
+        name.includes('participant') ||
+        appId.includes('98035') ||
+        email.includes('verification.test') ||
+        email.includes('arunkumar.cahcet') ||
+        email === 'test@example.com' ||
         email.includes('test') ||
-        email.includes('verification') ||
-        email.includes('arunkumar') ||
         name.includes('test') ||
         name.includes('verification') ||
         appId.includes('9999') ||
