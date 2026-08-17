@@ -191,7 +191,7 @@ export const OFFICIAL_EVENTS: Event[] = [
       'Round 1: 5-minute prototype pitch.',
       'Round 2: 1-minute final pitch.'
     ],
-    venue: 'AIDS Smart Room',
+    venue: 'Tech Tower Lab 1 & 2',
     date: '2026-08-22',
     startTime: '12:00',
     endTime: '13:30',
