@@ -254,9 +254,9 @@ export const OFFICIAL_EVENTS: Event[] = [
       'Connect the images displayed on the screen and find the answer.',
       'Non-technical-based questions/hints.'
     ],
-    venue: 'Drawing Hall (IT Side)',
+    venue: 'MBA Seminar Hall',
     date: '2026-08-22',
-    startTime: '13:00',
+    startTime: '12:30',
     endTime: '15:00',
     registrationDeadline: '2026-08-20',
     registrationFee: 50,
