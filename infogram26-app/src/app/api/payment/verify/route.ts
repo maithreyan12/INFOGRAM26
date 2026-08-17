@@ -36,7 +36,8 @@ export async function POST(req: Request) {
 
     // ── Instant Ticket Auto-Generation ──
     const db = getDB();
-    let ticketId = `tkt_${Date.now()}`;
+    let ticketId = `tkt_${registrationId || Date.now()}`;
+    let regData: any = null;
 
     if (registrationId && db) {
       try {
@@ -44,69 +45,115 @@ export async function POST(req: Request) {
         const regSnap = await getDoc(regRef);
 
         if (regSnap.exists()) {
-          const regData = regSnap.data();
-
-          // 1. Update registration status to paid
-          await updateDoc(regRef, {
-            status: 'paid',
-            razorpayPaymentId: razorpay_payment_id || '',
-            razorpayOrderId: razorpay_order_id || '',
-            paidAt: new Date().toISOString(),
-          });
-
-          // 2. Auto-generate ticket document
-          const appCode = regData.applicantId || `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`;
-          const ticketNumber = `TKT-${Math.floor(100000 + Math.random() * 900000)}`;
-          const name = regData.personalInfo?.fullName || regData.fullName || 'Participant';
-          const eventsList = regData.eventNames || regData.events || ['Symposium Event'];
-
-          const qrData = JSON.stringify({
-            ticketNumber,
-            applicantId: appCode,
-            name,
-            events: eventsList,
-            verified: true,
-          });
-
-          ticketId = `tkt_${registrationId}`;
-
-          // Dual-write ticket & update registration in Supabase
+          regData = regSnap.data();
           try {
-            const { supabaseAdmin } = await import('@/lib/supabase/config');
-            await supabaseAdmin
-              .from('registrations')
-              .update({
-                status: 'paid',
-                razorpay_payment_id: razorpay_payment_id || '',
-                razorpay_order_id: razorpay_order_id || '',
-                paid_at: new Date().toISOString(),
-              })
-              .or(`id.eq.${registrationId},applicant_id.eq.${appCode}`);
+            await updateDoc(regRef, {
+              status: 'paid',
+              razorpayPaymentId: razorpay_payment_id || '',
+              razorpayOrderId: razorpay_order_id || '',
+              paidAt: new Date().toISOString(),
+            });
+          } catch {}
+        }
+      } catch (fsErr) {
+        console.warn('Firestore reg fetch notice:', fsErr);
+      }
+    }
 
-            await supabaseAdmin.from('tickets').upsert([
-              {
-                id: ticketId,
-                ticket_number: ticketNumber,
-                applicant_id: appCode,
-                registration_id: registrationId,
-                student_name: name,
-                email: regData.personalInfo?.email || regData.email || '',
-                phone: regData.personalInfo?.phone || regData.phone || '',
-                college: regData.personalInfo?.college || regData.college || '',
-                department: regData.personalInfo?.department || regData.department || '',
-                year: regData.personalInfo?.year || regData.year || '',
-                events: eventsList,
-                total_amount: regData.totalFee || 100,
-                payment_method: 'razorpay',
-                razorpay_payment_id: razorpay_payment_id || '',
-                qr_data: qrData,
-                status: 'valid',
-                issue_date: new Date().toISOString(),
-              },
-            ]);
-          } catch (spErr) {
-            console.warn('Supabase payment sync warning:', spErr);
-          }
+    // Fallback to Supabase lookup if regData is not in Firestore yet
+    if (!regData && registrationId) {
+      try {
+        const { supabaseAdmin } = await import('@/lib/supabase/config');
+        const { data: spReg } = await supabaseAdmin
+          .from('registrations')
+          .select('*')
+          .or(`id.eq.${registrationId},applicant_id.eq.${registrationId}`)
+          .maybeSingle();
+
+        if (spReg) {
+          regData = {
+            applicantId: spReg.applicant_id,
+            fullName: spReg.full_name,
+            email: spReg.email,
+            phone: spReg.phone,
+            college: spReg.college,
+            department: spReg.department,
+            year: spReg.year,
+            events: spReg.events,
+            eventNames: spReg.events,
+            totalFee: spReg.total_fee,
+            personalInfo: {
+              fullName: spReg.full_name,
+              email: spReg.email,
+              phone: spReg.phone,
+              college: spReg.college,
+              department: spReg.department,
+              year: spReg.year,
+            },
+          };
+        }
+      } catch (spErr) {
+        console.warn('Supabase reg lookup notice:', spErr);
+      }
+    }
+
+    if (regData) {
+      const appCode = regData.applicantId || `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`;
+      const ticketNumber = `TKT-${Math.floor(100000 + Math.random() * 900000)}`;
+      const name = regData.personalInfo?.fullName || regData.fullName || 'Participant';
+      const eventsList = regData.eventNames || regData.events || ['Symposium Event'];
+
+      const qrData = JSON.stringify({
+        ticketNumber,
+        applicantId: appCode,
+        name,
+        events: eventsList,
+        verified: true,
+      });
+
+      ticketId = `tkt_${registrationId}`;
+
+      // 1. Dual-write ticket & update registration in Supabase
+      try {
+        const { supabaseAdmin } = await import('@/lib/supabase/config');
+        await supabaseAdmin
+          .from('registrations')
+          .update({
+            status: 'paid',
+            razorpay_payment_id: razorpay_payment_id || '',
+            razorpay_order_id: razorpay_order_id || '',
+            paid_at: new Date().toISOString(),
+          })
+          .or(`id.eq.${registrationId},applicant_id.eq.${appCode}`);
+
+        await supabaseAdmin.from('tickets').upsert([
+          {
+            id: ticketId,
+            ticket_number: ticketNumber,
+            applicant_id: appCode,
+            registration_id: registrationId,
+            student_name: name,
+            email: regData.personalInfo?.email || regData.email || '',
+            phone: regData.personalInfo?.phone || regData.phone || '',
+            college: regData.personalInfo?.college || regData.college || '',
+            department: regData.personalInfo?.department || regData.department || '',
+            year: regData.personalInfo?.year || regData.year || '',
+            events: eventsList,
+            total_amount: regData.totalFee || 100,
+            payment_method: 'razorpay',
+            razorpay_payment_id: razorpay_payment_id || '',
+            qr_data: qrData,
+            status: 'valid',
+            issue_date: new Date().toISOString(),
+          },
+        ]);
+      } catch (spErr) {
+        console.warn('Supabase payment sync warning:', spErr);
+      }
+
+      // 2. Dual-write ticket in Firestore
+      if (db) {
+        try {
           await setDoc(
             doc(db, 'tickets', ticketId),
             {
@@ -130,6 +177,10 @@ export async function POST(req: Request) {
             },
             { merge: true }
           );
+        } catch (tktErr) {
+          console.warn('Firestore ticket set error:', tktErr);
+        }
+      }
 
           // 3. Increment registeredCount for each registered event in Firestore
           if (Array.isArray(eventsList)) {
@@ -180,10 +231,6 @@ export async function POST(req: Request) {
               razorpayPaymentId: razorpay_payment_id || '',
             }),
           }).catch((e) => console.warn('Sheets sync warning:', e));
-        }
-      } catch (dbErr: any) {
-        console.error('Firestore ticket auto-gen error:', dbErr);
-      }
     }
 
     return NextResponse.json({ success: true, ticketId });
