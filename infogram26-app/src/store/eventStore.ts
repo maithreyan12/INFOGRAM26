@@ -225,6 +225,33 @@ const INITIAL_REGISTRATIONS: any[] = [
     paymentMethod: 'UPI',
     createdAt: '2026-08-17T05:01:48.000Z',
   },
+  {
+    id: 'Knn0TVhDmHJU5r5B9h1q',
+    applicantId: 'INFO26-QSTX-23449',
+    fullName: 'Aysha Daniya M',
+    studentName: 'Aysha Daniya M',
+    email: 'darfmo313@gmail.com',
+    phone: '7824984485',
+    college: "Islamiah Women's Arts and Science College (Autonomous)",
+    department: 'B.Sc Data Science',
+    year: '3rd Year',
+    personalInfo: {
+      fullName: 'Aysha Daniya M',
+      email: 'darfmo313@gmail.com',
+      phone: '7824984485',
+      college: "Islamiah Women's Arts and Science College (Autonomous)",
+      department: 'B.Sc Data Science',
+      year: '3rd Year',
+    },
+    events: ['Quest X', 'Fun Fiesta'],
+    eventNames: ['Quest X', 'Fun Fiesta'],
+    selectedEvents: ['quest-x', 'fun-fiesta'],
+    totalFee: 100,
+    status: 'paid',
+    razorpayPaymentId: 'pay_manual_reconcile_aysha',
+    paymentMethod: 'UPI',
+    createdAt: '2026-08-17T06:59:24.000Z',
+  },
 ];
 
 export const useEventStore = create<EventState>()(
