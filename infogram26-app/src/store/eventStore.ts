@@ -198,6 +198,33 @@ const INITIAL_REGISTRATIONS: any[] = [
     paymentMethod: 'UPI',
     createdAt: '2026-08-15T16:01:00.000Z',
   },
+  {
+    id: 'SOrNtS85NAjUIGOaE4xK',
+    applicantId: 'INFO26-QSTX-30555',
+    fullName: 'Mohammed faizan',
+    studentName: 'Mohammed faizan',
+    email: 'mohdfaizanfaizu786@gmail.com',
+    phone: '6382013260',
+    college: 'Islamiah college vaniyambadi',
+    department: 'Bsc computer science',
+    year: '3rd Year',
+    personalInfo: {
+      fullName: 'Mohammed faizan',
+      email: 'mohdfaizanfaizu786@gmail.com',
+      phone: '6382013260',
+      college: 'Islamiah college vaniyambadi',
+      department: 'Bsc computer science',
+      year: '3rd Year',
+    },
+    events: ['Quest X', 'Fun Fiesta'],
+    eventNames: ['Quest X', 'Fun Fiesta'],
+    selectedEvents: ['quest-x', 'fun-fiesta'],
+    totalFee: 100,
+    status: 'paid',
+    razorpayPaymentId: 'pay_manual_reconcile_faizan',
+    paymentMethod: 'UPI',
+    createdAt: '2026-08-17T05:01:48.000Z',
+  },
 ];
 
 export const useEventStore = create<EventState>()(

@@ -84,6 +84,18 @@ export async function POST(req: Request) {
         amount: 50,
         razorpayPaymentId: 'pay_TQSsGjMXY4BxKi',
       },
+      {
+        applicantId: 'INFO26-QSTX-30555',
+        name: 'Mohammed faizan',
+        phone: '6382013260',
+        email: 'mohdfaizanfaizu786@gmail.com',
+        college: 'Islamiah college vaniyambadi',
+        department: 'Bsc computer science',
+        year: '3rd Year',
+        events: ['Quest X', 'Fun Fiesta'],
+        amount: 100,
+        razorpayPaymentId: 'pay_manual_reconcile_faizan',
+      },
     ];
 
     let deletedTicketsCount = 0;
