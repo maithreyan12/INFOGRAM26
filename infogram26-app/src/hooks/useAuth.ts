@@ -89,22 +89,9 @@ export function useAuth() {
     }
 
     if (!auth) {
-      // Default fallback demo super admin if Firebase is unconfigured and no demo session
-      setUser({
-        uid: 'super-admin-1',
-        email: 'maithreyan2006@gmail.com',
-        displayName: 'Maithreyan D (Main Admin)',
-        photoURL: null,
-      });
-      setAdminUser({
-        uid: 'super-admin-1',
-        email: 'maithreyan2006@gmail.com',
-        displayName: 'Maithreyan D (Main Admin)',
-        role: 'super_admin',
-        createdAt: new Date(),
-        isActive: true,
-      });
-      setRole('super_admin');
+      setUser(null);
+      setAdminUser(null);
+      setRole(null);
       setLoading(false);
       return;
     }
