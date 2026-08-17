@@ -29,17 +29,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (!loading) {
+      const activeEmail = (user?.email || adminUser?.email || '').toLowerCase().trim();
+      const isSuper = isAuthorizedSuperAdmin(activeEmail);
+
+      if (!isSuper) {
+        console.warn(`AdminLayout security gate: Blocking unauthorized access attempt from ${activeEmail || 'unauthenticated user'}`);
+        signOut();
+        router.replace('/admin-login');
+        return;
+      }
+
       if (isOrganizer) {
         router.replace('/organizer/dashboard');
       } else if (!isAdmin) {
         router.replace('/admin-login');
-      } else {
-        const activeEmail = (user?.email || adminUser?.email || '').toLowerCase().trim();
-        if (activeEmail && !isAuthorizedSuperAdmin(activeEmail)) {
-          console.warn(`AdminLayout fail-safe: Kicking out unauthorized email ${activeEmail}`);
-          signOut();
-          router.replace('/admin-login');
-        }
       }
     }
   }, [loading, isAdmin, isOrganizer, user, adminUser, router, signOut]);

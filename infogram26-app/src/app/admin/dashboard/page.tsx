@@ -12,7 +12,7 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import { isEventMatch } from '@/lib/eventsData';
 
 export default function AdminDashboard() {
-  const { user, adminUser } = useAuth();
+  const { user, adminUser, role } = useAuth();
   const { events, organizers, registrations: storeRegistrations } = useEventStore();
   const [liveRegistrations, setLiveRegistrations] = useState<any[]>([]);
 
@@ -183,7 +183,7 @@ export default function AdminDashboard() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[10px] bg-[#00d4ff]/20 text-[#00d4ff] border border-[#00d4ff]/40 px-3 py-0.5 rounded-full font-black uppercase tracking-wider">
-              Super Admin Mode
+              {role === 'super_admin' ? 'Super Admin Mode' : 'Event Admin Mode'}
             </span>
             <span className="text-[11px] font-bold text-gray-400">
               {user?.email || adminUser?.email || ''}
