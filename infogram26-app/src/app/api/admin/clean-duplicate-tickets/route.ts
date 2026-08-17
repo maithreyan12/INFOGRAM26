@@ -120,10 +120,10 @@ export async function POST(req: Request) {
           appId.includes('9999') ||
           appId.includes('test')
         ) {
-          try { await deleteDoc(doc(db, 'registrations', d.id)); } catch {}
+          try { await deleteDoc(doc(db, 'registrations', d.id)); } catch { }
         }
       }
-    } catch {}
+    } catch { }
 
     try {
       const snapTkts = await getDocs(collection(db, 'tickets'));
@@ -144,10 +144,10 @@ export async function POST(req: Request) {
           appId.includes('9999') ||
           appId.includes('test')
         ) {
-          try { await deleteDoc(doc(db, 'tickets', d.id)); } catch {}
+          try { await deleteDoc(doc(db, 'tickets', d.id)); } catch { }
         }
       }
-    } catch {}
+    } catch { }
 
     // Delete old tickets matching team members to prevent duplicates
     for (const m of teamMembers) {
@@ -160,9 +160,9 @@ export async function POST(req: Request) {
             try {
               await deleteDoc(doc(db, 'tickets', d.id));
               deletedTicketsCount++;
-            } catch {}
+            } catch { }
           }
-        } catch {}
+        } catch { }
       }
       try {
         const qE = query(collection(db, 'tickets'), where('email', '==', m.email));
@@ -171,18 +171,18 @@ export async function POST(req: Request) {
           try {
             await deleteDoc(doc(db, 'tickets', d.id));
             deletedTicketsCount++;
-          } catch {}
+          } catch { }
         }
-      } catch {}
+      } catch { }
 
       // Clean registrations for team members
       try {
         const qRegApp = query(collection(db, 'registrations'), where('applicantId', '==', m.applicantId));
         const snapRegApp = await getDocs(qRegApp);
         for (const d of snapRegApp.docs) {
-          try { await deleteDoc(doc(db, 'registrations', d.id)); } catch {}
+          try { await deleteDoc(doc(db, 'registrations', d.id)); } catch { }
         }
-      } catch {}
+      } catch { }
     }
 
     // Now create EXACTLY 1 ticket per team member with correct CAHCET details
@@ -190,7 +190,7 @@ export async function POST(req: Request) {
     for (const m of teamMembers) {
       const ticketNumber = `TKT-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
 
-      let regId = `reg_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+      let regId = `reg_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
       try {
         const regRef = await addDoc(collection(db, 'registrations'), {
           applicantId: m.applicantId,
@@ -210,7 +210,7 @@ export async function POST(req: Request) {
           createdAt: new Date().toISOString(),
         });
         regId = regRef.id;
-      } catch {}
+      } catch { }
 
       const qrData = JSON.stringify({
         ticketNumber,
@@ -220,7 +220,7 @@ export async function POST(req: Request) {
         verified: true,
       });
 
-      let ticketId = `tkt_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+      let ticketId = `tkt_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
       try {
         const ticketRef = await addDoc(collection(db, 'tickets'), {
           ticketNumber,
@@ -240,7 +240,7 @@ export async function POST(req: Request) {
           issueDate: new Date().toISOString(),
         });
         ticketId = ticketRef.id;
-      } catch {}
+      } catch { }
 
       createdResults.push({
         applicantId: m.applicantId,

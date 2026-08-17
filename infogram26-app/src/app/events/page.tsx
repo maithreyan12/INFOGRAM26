@@ -11,7 +11,7 @@ import { collection, getDocs } from 'firebase/firestore';
 
 import { useEventStore } from '@/store/eventStore';
 
-import { OFFICIAL_EVENTS } from '@/lib/eventsData';
+import { OFFICIAL_EVENTS, isEventMatch } from '@/lib/eventsData';
 const demoEvents: Event[] = OFFICIAL_EVENTS;
 
 import { useTheme } from '@/context/ThemeContext';
@@ -44,67 +44,73 @@ export default function EventsPage() {
           return demo;
         });
 
-        if (!db || !isFirebaseConfigured) {
-          setEvents(initialList);
-          setLoading(false);
-          return;
-        }
+        // Calculate live paid registration counts per event from storeRegistrations, Supabase & Firestore without double counting
+        const allPaidRecords: Array<{ applicantId: string; email?: string; events: string[] }> = [];
 
-        // 1. Calculate live paid registration counts per event from storeRegistrations, Supabase & Firestore
-        const paidCountMap: Record<string, number> = {};
-
-        // A. Count from official storeRegistrations
-        (storeEvents || []).forEach(se => {
-          if (se.registeredCount && se.registeredCount > 0) {
-            const norm = String(se.name || se.slug || se.id).toLowerCase().replace(/[^a-z0-9]/g, '');
-            paidCountMap[norm] = Math.max(paidCountMap[norm] || 0, se.registeredCount);
-          }
-        });
+        const isTest = (item: any) => {
+          const email = (item.email || item.personalInfo?.email || '').toLowerCase();
+          const name = (item.fullName || item.studentName || item.name || '').toLowerCase();
+          const appId = (item.applicantId || '').toLowerCase();
+          return (
+            name === 'participant' ||
+            name.includes('participant') ||
+            email.includes('test') ||
+            email.includes('verification') ||
+            appId.includes('98035') ||
+            appId.includes('9999') ||
+            appId.includes('test')
+          );
+        };
 
         const storeRegs = (useEventStore.getState?.()?.registrations) || [];
         storeRegs.forEach((r: any) => {
-          if (r.status === 'paid' || r.applicantId === 'INFO26-HACK-14423') {
-            const evts: string[] = r.eventNames || r.events || [];
-            evts.forEach(evt => {
-              const norm = String(evt).toLowerCase().replace(/[^a-z0-9]/g, '');
-              paidCountMap[norm] = (paidCountMap[norm] || 0) + 1;
+          if ((r.status === 'paid' || r.applicantId === 'INFO26-HACK-14423') && !isTest(r)) {
+            allPaidRecords.push({
+              applicantId: r.applicantId || r.id,
+              email: r.email || r.personalInfo?.email,
+              events: r.eventNames || r.events || [],
             });
           }
         });
 
-        // B. Count from Supabase production database
         try {
           const { supabase } = await import('@/lib/supabase/config');
           const { data: spRegs } = await supabase.from('registrations').select('*').eq('status', 'paid');
           if (spRegs) {
             spRegs.forEach((sr: any) => {
-              const evts: string[] = sr.events || [];
-              evts.forEach(evt => {
-                const norm = String(evt).toLowerCase().replace(/[^a-z0-9]/g, '');
-                if (!storeRegs.some((s: any) => s.applicantId === sr.applicant_id)) {
-                  paidCountMap[norm] = (paidCountMap[norm] || 0) + 1;
-                }
-              });
+              if (isTest(sr)) return;
+              const exists = allPaidRecords.some(
+                r => r.applicantId === sr.applicant_id || (sr.email && r.email === sr.email)
+              );
+              if (!exists) {
+                allPaidRecords.push({
+                  applicantId: sr.applicant_id || sr.id,
+                  email: sr.email,
+                  events: sr.events || [],
+                });
+              }
             });
           }
         } catch (spErr) {
           console.warn('Supabase slot count warning:', spErr);
         }
 
-        // C. Count from Firestore live collections
         try {
           if (db && isFirebaseConfigured) {
             const regSnap = await getDocs(collection(db, 'registrations'));
             regSnap.docs.forEach(doc => {
               const data = doc.data();
-              if (data.status === 'paid' || data.paidAt || data.razorpayPaymentId) {
-                const evts: string[] = data.eventNames || data.events || [];
-                evts.forEach(evt => {
-                  const norm = String(evt).toLowerCase().replace(/[^a-z0-9]/g, '');
-                  if (!storeRegs.some((s: any) => s.applicantId === data.applicantId)) {
-                    paidCountMap[norm] = (paidCountMap[norm] || 0) + 1;
-                  }
-                });
+              if ((data.status === 'paid' || data.paidAt || data.razorpayPaymentId) && !isTest(data)) {
+                const exists = allPaidRecords.some(
+                  r => r.applicantId === data.applicantId || (data.email && r.email === data.email)
+                );
+                if (!exists) {
+                  allPaidRecords.push({
+                    applicantId: data.applicantId || doc.id,
+                    email: data.personalInfo?.email || data.email,
+                    events: data.eventNames || data.events || [],
+                  });
+                }
               }
             });
 
@@ -112,10 +118,12 @@ export default function EventsPage() {
             tktSnap.docs.forEach(doc => {
               const data = doc.data();
               if ((data.status === 'valid' || data.status === 'paid') && !data.registrationId) {
-                const evts: string[] = data.events || data.eventNames || [];
-                evts.forEach(evt => {
-                  const norm = String(evt).toLowerCase().replace(/[^a-z0-9]/g, '');
-                  paidCountMap[norm] = (paidCountMap[norm] || 0) + 1;
+                const eventsList = data.events || data.eventNames || [];
+                // Tickets might be duplicates, but we assume distinct ticket objects
+                allPaidRecords.push({
+                  applicantId: data.applicantId || doc.id,
+                  email: data.email,
+                  events: eventsList,
                 });
               }
             });
@@ -133,14 +141,14 @@ export default function EventsPage() {
         }
 
         const eventsData = initialList.map(localEv => {
-          const normLocalSlug = localEv.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
-          const normLocalName = localEv.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-          const liveCount = Math.max(paidCountMap[normLocalSlug] || 0, paidCountMap[normLocalName] || 0, paidCountMap[localEv.id] || 0);
+          const liveCount = allPaidRecords.filter(rec => isEventMatch(rec, localEv)).length;
 
           let dbData: Partial<Event> | null = null;
           let firestoreId = localEv.id;
 
           if (!snapshot.empty) {
+            const normLocalSlug = localEv.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const normLocalName = localEv.name.toLowerCase().replace(/[^a-z0-9]/g, '');
             const firestoreMatch = snapshot.docs.find((doc: any) => {
               const d = doc.data();
               const dNorm = (d.slug || d.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
