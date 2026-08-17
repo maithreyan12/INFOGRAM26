@@ -17,6 +17,18 @@ export interface DemoSession {
   assignedEventName?: string;
 }
 
+export const AUTHORIZED_SUPER_ADMIN_EMAILS = [
+  'maithreyan2006@gmail.com',
+  'farnavith@gmail.com',
+  'infoappziio@gmail.com',
+  'farish.sharieef@gmail.com',
+];
+
+export function isAuthorizedSuperAdmin(email?: string | null): boolean {
+  if (!email) return false;
+  return AUTHORIZED_SUPER_ADMIN_EMAILS.includes(email.toLowerCase().trim());
+}
+
 export function useAuth() {
   const [user, setUser] = useState<any>(null);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
@@ -31,26 +43,47 @@ export function useAuth() {
       if (savedDemo) {
         try {
           const parsed = JSON.parse(savedDemo) as DemoSession;
-          setUser({
-            uid: parsed.uid,
-            email: parsed.email,
-            displayName: parsed.displayName,
-            photoURL: null,
-          });
-          setAdminUser({
-            uid: parsed.uid,
-            email: parsed.email,
-            displayName: parsed.displayName,
-            role: parsed.role,
-            assignedEventId: parsed.assignedEventId,
-            createdAt: new Date(),
-            isActive: true,
-          });
-          setRole(parsed.role);
-          setLoading(false);
-          return;
+          const parsedEmail = (parsed.email || '').toLowerCase().trim();
+          const isSuper = isAuthorizedSuperAdmin(parsedEmail);
+          const matchedOrg = (organizers || []).find((o) => o.email.toLowerCase().trim() === parsedEmail);
+
+          if (isSuper && parsed.role === 'super_admin') {
+            setUser({
+              uid: parsed.uid,
+              email: parsed.email,
+              displayName: parsed.displayName,
+              photoURL: null,
+            });
+            setAdminUser({
+              uid: parsed.uid,
+              email: parsed.email,
+              displayName: parsed.displayName,
+              role: 'super_admin',
+              assignedEventId: parsed.assignedEventId,
+              createdAt: new Date(),
+              isActive: true,
+            });
+            setRole('super_admin');
+            setLoading(false);
+            return;
+          } else if (matchedOrg && parsed.role === 'organizer') {
+            setUser({
+              uid: parsed.uid,
+              email: parsed.email,
+              displayName: parsed.displayName,
+              photoURL: null,
+            });
+            setAdminUser(matchedOrg);
+            setRole('organizer');
+            setLoading(false);
+            return;
+          } else {
+            // Unauthorized stored session - purge it!
+            localStorage.removeItem(DEMO_USER_KEY);
+          }
         } catch (e) {
           console.error("Error reading demo session:", e);
+          localStorage.removeItem(DEMO_USER_KEY);
         }
       }
     }
@@ -59,14 +92,14 @@ export function useAuth() {
       // Default fallback demo super admin if Firebase is unconfigured and no demo session
       setUser({
         uid: 'super-admin-1',
-        email: 'admin@infogram26.com',
-        displayName: 'Super Admin',
+        email: 'maithreyan2006@gmail.com',
+        displayName: 'Maithreyan D (Main Admin)',
         photoURL: null,
       });
       setAdminUser({
         uid: 'super-admin-1',
-        email: 'admin@infogram26.com',
-        displayName: 'Super Admin',
+        email: 'maithreyan2006@gmail.com',
+        displayName: 'Maithreyan D (Main Admin)',
         role: 'super_admin',
         createdAt: new Date(),
         isActive: true,
@@ -81,37 +114,23 @@ export function useAuth() {
       unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
         setLoading(true);
         if (firebaseUser) {
-          setUser(firebaseUser);
-          const emailLower = firebaseUser.email?.toLowerCase() || '';
-          const isSuperAdminEmail = 
-            emailLower === 'maithreyan2006@gmail.com' || 
-            emailLower === 'farnavith@gmail.com' || 
-            emailLower === 'infoappziio@gmail.com' || 
-            emailLower === 'farish.sharieef@gmail.com' || 
-            emailLower.includes('farnavith') || 
-            emailLower.includes('farish') || 
-            emailLower.includes('admin') || 
-            emailLower.includes('appziio');
+          const emailLower = (firebaseUser.email || '').toLowerCase().trim();
+          const isSuperAdminEmail = isAuthorizedSuperAdmin(emailLower);
+          const matchedOrg = (organizers || []).find((o) => o.email.toLowerCase().trim() === emailLower);
 
-          // ── Main Admin & Co-Admins: Instant Core Access ──
-          if (
-            emailLower === 'maithreyan2006@gmail.com' || 
-            emailLower === 'farnavith@gmail.com' || 
-            emailLower === 'infoappziio@gmail.com' ||
-            emailLower === 'farish.sharieef@gmail.com'
-          ) {
-            const isMainAdmin = emailLower === 'maithreyan2006@gmail.com';
-            const adminTitle = isMainAdmin
+          if (isSuperAdminEmail) {
+            const adminTitle = emailLower === 'maithreyan2006@gmail.com'
               ? 'Maithreyan D (Main Admin)'
-              : emailLower.includes('farnavith')
+              : emailLower === 'farnavith@gmail.com'
               ? 'Farnavith (Co-Admin)'
-              : emailLower.includes('farish')
+              : emailLower === 'farish.sharieef@gmail.com'
               ? 'Farish Sharieef (Co-Admin)'
               : 'Appziio (Co-Admin)';
 
+            setUser(firebaseUser);
             setAdminUser({
               uid: firebaseUser.uid,
-              email: firebaseUser.email || '',
+              email: firebaseUser.email || emailLower,
               displayName: firebaseUser.displayName || adminTitle,
               role: 'super_admin',
               createdAt: new Date(),
@@ -122,77 +141,72 @@ export function useAuth() {
             return;
           }
 
-
-          try {
-            if (db) {
-              const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-              if (userDoc.exists()) {
-                const data = userDoc.data() as AdminUser;
-                // If it's maithreyan2006@gmail.com, ensure role is super_admin
-                if (isSuperAdminEmail) {
-                  setAdminUser({ ...data, role: 'super_admin' });
-                  setRole('super_admin');
-                } else {
-                  setAdminUser(data);
-                  setRole(data.role as 'super_admin' | 'organizer');
-                }
-              } else {
-                // Check if email matches any pre-configured organizer in store
-                const matchedOrg = organizers.find((o) => o.email.toLowerCase() === emailLower);
-                if (matchedOrg && !isSuperAdminEmail) {
-                  setAdminUser(matchedOrg);
-                  setRole('organizer');
-                } else {
-                  // Default to super_admin for admin/maithreyan2006@gmail.com
-                  setRole('super_admin');
-                  setAdminUser({
-                    uid: firebaseUser.uid,
-                    email: firebaseUser.email || 'maithreyan2006@gmail.com',
-                    displayName: firebaseUser.displayName || 'Maithreyan (Admin)',
-                    role: 'super_admin',
-                    createdAt: new Date(),
-                    isActive: true,
-                  });
-                }
-              }
-            } else {
-              setRole('super_admin');
-              setAdminUser({
-                uid: firebaseUser.uid,
-                email: firebaseUser.email || 'maithreyan2006@gmail.com',
-                displayName: firebaseUser.displayName || 'Maithreyan (Admin)',
-                role: 'super_admin',
-                createdAt: new Date(),
-                isActive: true,
-              });
-            }
-          } catch (error) {
-            console.error("Error fetching user role:", error);
-            setRole('super_admin');
+          if (matchedOrg) {
+            setUser(firebaseUser);
+            setAdminUser(matchedOrg);
+            setRole('organizer');
+            setLoading(false);
+            return;
           }
+
+          // ── Unauthorized Account ──
+          // Reject and forcibly sign out non-whitelisted emails
+          console.warn(`Unauthorized login attempt blocked for: ${emailLower}`);
+          setUser(null);
+          setAdminUser(null);
+          setRole(null);
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(DEMO_USER_KEY);
+          }
+          if (auth) {
+            try { await firebaseSignOut(auth); } catch {}
+          }
+          setLoading(false);
+          return;
         } else {
           // Check if demo user session exists in localStorage
           const savedDemo = typeof window !== 'undefined' ? localStorage.getItem(DEMO_USER_KEY) : null;
           if (savedDemo) {
             try {
               const parsed = JSON.parse(savedDemo) as DemoSession;
-              setUser({
-                uid: parsed.uid,
-                email: parsed.email,
-                displayName: parsed.displayName,
-                photoURL: null,
-              });
-              setAdminUser({
-                uid: parsed.uid,
-                email: parsed.email,
-                displayName: parsed.displayName,
-                role: parsed.role,
-                assignedEventId: parsed.assignedEventId,
-                createdAt: new Date(),
-                isActive: true,
-              });
-              setRole(parsed.role);
+              const parsedEmail = (parsed.email || '').toLowerCase().trim();
+              const isSuper = isAuthorizedSuperAdmin(parsedEmail);
+              const matchedOrg = (organizers || []).find((o) => o.email.toLowerCase().trim() === parsedEmail);
+
+              if (isSuper && parsed.role === 'super_admin') {
+                setUser({
+                  uid: parsed.uid,
+                  email: parsed.email,
+                  displayName: parsed.displayName,
+                  photoURL: null,
+                });
+                setAdminUser({
+                  uid: parsed.uid,
+                  email: parsed.email,
+                  displayName: parsed.displayName,
+                  role: 'super_admin',
+                  assignedEventId: parsed.assignedEventId,
+                  createdAt: new Date(),
+                  isActive: true,
+                });
+                setRole('super_admin');
+              } else if (matchedOrg && parsed.role === 'organizer') {
+                setUser({
+                  uid: parsed.uid,
+                  email: parsed.email,
+                  displayName: parsed.displayName,
+                  photoURL: null,
+                });
+                setAdminUser(matchedOrg);
+                setRole('organizer');
+              } else {
+                localStorage.removeItem(DEMO_USER_KEY);
+                setUser(null);
+                setAdminUser(null);
+                setRole(null);
+              }
             } catch (e) {
+              localStorage.removeItem(DEMO_USER_KEY);
               setUser(null);
               setAdminUser(null);
               setRole(null);
@@ -225,7 +239,10 @@ export function useAuth() {
   };
 
   const loginAsDemoSuperAdmin = (customEmail?: string, customName?: string) => {
-    const emailToUse = customEmail || 'maithreyan2006@gmail.com';
+    const emailToUse = (customEmail || 'maithreyan2006@gmail.com').toLowerCase().trim();
+    if (!isAuthorizedSuperAdmin(emailToUse)) {
+      throw new Error(`Unauthorized: ${emailToUse} is not authorized for Super Admin access.`);
+    }
     const nameToUse = customName || 'Maithreyan D (Super Admin)';
     const demoUser: DemoSession = {
       uid: 'super-admin-1',
@@ -253,7 +270,10 @@ export function useAuth() {
   };
 
   const loginAsDemoOrganizer = (organizerUid: string) => {
-    const targetOrg = organizers.find((o) => o.uid === organizerUid) || organizers[0];
+    const targetOrg = (organizers || []).find((o) => o.uid === organizerUid) || organizers[0];
+    if (!targetOrg) {
+      throw new Error("Organizer not found.");
+    }
     const demoUser: DemoSession = {
       uid: targetOrg.uid,
       email: targetOrg.email,

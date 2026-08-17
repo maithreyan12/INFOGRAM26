@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, isAuthorizedSuperAdmin } from '@/hooks/useAuth';
 import { auth, isFirebaseConfigured } from '@/lib/firebase/config';
 import { LogOut, ShieldCheck, Phone, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -33,10 +33,29 @@ export default function AdminLogin() {
         try {
           const result = await signIn();
           if (result && result.user) {
-            const email = result.user.email || 'infoappziio@gmail.com';
-            const name = result.user.displayName || 'Appziio Super Admin';
-            loginAsDemoSuperAdmin(email, name);
-            window.location.href = '/admin/dashboard';
+            const userEmail = (result.user.email || '').toLowerCase().trim();
+            const name = result.user.displayName || 'Admin';
+
+            // Check if user email is one of the 4 designated Super Admin emails
+            if (isAuthorizedSuperAdmin(userEmail)) {
+              loginAsDemoSuperAdmin(userEmail, name);
+              window.location.href = '/admin/dashboard';
+              return;
+            }
+
+            // Check if user is a designated organizer
+            const { useEventStore } = await import('@/store/eventStore');
+            const orgs = useEventStore.getState().organizers || [];
+            const matchedOrg = orgs.find(o => o.email.toLowerCase().trim() === userEmail);
+            if (matchedOrg) {
+              window.location.href = '/organizer/dashboard';
+              return;
+            }
+
+            // ── Access Denied for non-whitelisted emails ──
+            await signOut();
+            setError(`Unauthorized Access: Email "${userEmail}" is not authorized for Admin Panel access. Access is strictly restricted to designated administrators.`);
+            setLoading(false);
             return;
           }
         } catch (popupErr: any) {
@@ -46,14 +65,16 @@ export default function AdminLogin() {
             setLoading(false);
             return;
           }
+          setError(popupErr?.message || 'Google Sign-In failed. Please check credentials.');
+          setLoading(false);
+          return;
         }
+      } else {
+        setError('Firebase Authentication is unconfigured.');
       }
-      loginAsDemoSuperAdmin('infoappziio@gmail.com', 'Appziio Super Admin');
-      window.location.href = '/admin/dashboard';
     } catch (err: any) {
       console.error('Login error:', err);
-      loginAsDemoSuperAdmin('infoappziio@gmail.com', 'Appziio Super Admin');
-      window.location.href = '/admin/dashboard';
+      setError(err?.message || 'Login failed. Unauthorized account.');
     } finally {
       setLoading(false);
     }
