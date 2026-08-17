@@ -186,7 +186,7 @@ export default function AdminDashboard() {
               {role === 'super_admin' ? 'Super Admin Mode' : 'Event Admin Mode'}
             </span>
             <span className="text-[11px] font-bold text-gray-400">
-              {user?.email || adminUser?.email || ''}
+              {user?.displayName || adminUser?.displayName || 'Administrator'}
             </span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
