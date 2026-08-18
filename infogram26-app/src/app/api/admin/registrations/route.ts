@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
-import { supabase } from '@/lib/supabase/config';
+import { supabase, supabaseAdmin } from '@/lib/supabase/config';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,8 +40,10 @@ export async function GET() {
         }
       });
     }
-  } catch (fsErr) {
-    console.warn('API registrations Firestore fetch warning:', fsErr);
+  } catch (fsErr: any) {
+    if (fsErr?.code !== 'permission-denied') {
+      console.warn('API registrations Firestore fetch note:', fsErr?.message || fsErr);
+    }
   }
 
   // 2. Fetch from Firestore tickets (to catch any tickets that might not be in registrations collection)
@@ -76,14 +78,17 @@ export async function GET() {
         }
       });
     }
-  } catch (tktErr) {
-    console.warn('API tickets Firestore fetch warning:', tktErr);
+  } catch (tktErr: any) {
+    if (tktErr?.code !== 'permission-denied') {
+      console.warn('API tickets Firestore fetch note:', tktErr?.message || tktErr);
+    }
   }
 
-  // 3. Fetch from Supabase registrations
+  // 3. Fetch from Supabase registrations (Admin client)
   try {
-    if (supabase) {
-      const { data: spRegs } = await supabase.from('registrations').select('*');
+    const spClient = supabaseAdmin || supabase;
+    if (spClient) {
+      const { data: spRegs } = await spClient.from('registrations').select('*');
       if (spRegs) {
         spRegs.forEach((sr: any) => {
           const appId = sr.applicant_id || sr.id;
@@ -167,12 +172,10 @@ export async function GET() {
     });
   }
 
-  // Reconcile and ensure Lithika Ganapathy's payment is confirmed
+  // Reconcile and ensure Lithika Ganapathy's Codestorm payment is confirmed
   let foundLithika = false;
   registrations.forEach((r) => {
     if (
-      r.email === 'lithikaganapathy@gmail.com' ||
-      r.phone === '7418792577' ||
       r.applicantId === 'INFO26-CODE-79257' ||
       r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ'
     ) {
@@ -219,44 +222,53 @@ export async function GET() {
     });
   }
 
-  // Deduplicate and filter confirmed paid registrations (by email, phone, and name)
-  const seenEmails = new Set<string>();
-  const seenPhones = new Set<string>();
-  const seenNames = new Set<string>();
+  // Sort so paid registrations come before pending registrations for proper deduplication preference
+  registrations.sort((a, b) => {
+    const aPaid = a.status === 'paid' || a.ticketId || a.paidAt || a.razorpayPaymentId ? 1 : 0;
+    const bPaid = b.status === 'paid' || b.ticketId || b.paidAt || b.razorpayPaymentId ? 1 : 0;
+    return bPaid - aPaid;
+  });
 
-  const confirmedPaidRegistrations = registrations.filter((r) => {
-    const isPaid = r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId;
+  // Deduplicate and filter real registrations (Event-aware: allows same user for multiple events)
+  const seenEventKeys = new Set<string>();
+  const seenAppIds = new Set<string>();
+
+  const validRegistrations = registrations.filter((r) => {
     const email = (r.personalInfo?.email || r.email || '').toLowerCase().trim();
     const phone = (r.personalInfo?.phone || r.phone || '').replace(/\D/g, '').slice(-10);
     const name = (r.personalInfo?.fullName || r.studentName || r.name || '').toLowerCase().trim();
+    const appId = (r.applicantId || '').toUpperCase().trim();
     const isTest =
       !name ||
       name === '—' ||
       name === 'participant' ||
       email.includes('test@example.com') ||
       email.includes('arunkumar') ||
-      phone === '9876543210';
+      phone === '9876543210' ||
+      appId.includes('LIVE-7771');
 
+    const isPaid = r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId;
     if (!isPaid || isTest) return false;
 
-    if (email && email.includes('@')) {
-      if (seenEmails.has(email)) return false;
-      seenEmails.add(email);
+    if (appId) {
+      if (seenAppIds.has(appId)) return false;
+      seenAppIds.add(appId);
     }
-    if (phone && phone.length === 10) {
-      if (seenPhones.has(phone)) return false;
-      seenPhones.add(phone);
+
+    const eventList = (Array.isArray(r.events) ? r.events : r.eventNames || []).slice().sort().join(',').toLowerCase();
+    const identifier = email || phone || name;
+    if (identifier && eventList) {
+      const compositeKey = `${identifier}::${eventList}`;
+      if (seenEventKeys.has(compositeKey)) return false;
+      seenEventKeys.add(compositeKey);
     }
-    if (name && name.length > 2) {
-      if (seenNames.has(name)) return false;
-      seenNames.add(name);
-    }
+
     return true;
   });
 
   return NextResponse.json({
     success: true,
-    count: confirmedPaidRegistrations.length,
-    registrations: confirmedPaidRegistrations,
+    count: validRegistrations.length,
+    registrations: validRegistrations,
   });
 }

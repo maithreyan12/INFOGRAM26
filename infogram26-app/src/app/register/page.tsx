@@ -224,6 +224,31 @@ export default function RegisterPage() {
           }
 
           const applicantId = generateApplicantId(eventNamesList as string[]);
+
+          // Save registration details to Supabase database so details are fetched immediately
+          try {
+            const { supabase } = await import('@/lib/supabase/config');
+            if (supabase) {
+              await supabase.from('registrations').upsert([
+                {
+                  id: targetRegId,
+                  applicant_id: applicantId,
+                  full_name: formData.fullName || '',
+                  email: formData.email || '',
+                  phone: formData.phone || '',
+                  college: formData.college || '',
+                  department: formData.department || '',
+                  year: formData.year || '',
+                  events: eventNamesList,
+                  total_fee: totalFee,
+                  status: 'pending_payment',
+                },
+              ]);
+            }
+          } catch (spErr) {
+            console.warn('Supabase registration initial capture warning:', spErr);
+          }
+
           const params = new URLSearchParams({
             regId: targetRegId,
             appId: applicantId,
@@ -238,7 +263,7 @@ export default function RegisterPage() {
             year: formData.year || '',
             auto: 'true',
           });
-          toast.success('Redirecting to payment...');
+          toast.success('Registration details saved! Opening payment...');
           router.push(`/payment?${params.toString()}`);
           return;
         } catch (dbErr) {
@@ -246,6 +271,26 @@ export default function RegisterPage() {
         }
       }
       const applicantId = generateApplicantId(eventNamesList as string[]);
+      try {
+        const { supabase } = await import('@/lib/supabase/config');
+        if (supabase) {
+          await supabase.from('registrations').upsert([
+            {
+              id: targetRegId,
+              applicant_id: applicantId,
+              full_name: formData.fullName || '',
+              email: formData.email || '',
+              phone: formData.phone || '',
+              college: formData.college || '',
+              department: formData.department || '',
+              year: formData.year || '',
+              events: eventNamesList,
+              total_fee: totalFee,
+              status: 'pending_payment',
+            },
+          ]);
+        }
+      } catch {}
       const params = new URLSearchParams({
         regId: targetRegId,
         appId: applicantId,

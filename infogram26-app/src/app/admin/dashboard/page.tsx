@@ -161,14 +161,10 @@ export default function AdminDashboard() {
         });
       }
 
-      // Reconcile and ensure Lithika Ganapathy's payment is confirmed
+      // Reconcile and ensure Lithika Ganapathy's Codestorm payment is confirmed
       let foundLithika = false;
       combined.forEach((r) => {
         if (
-          r.email === 'lithikaganapathy@gmail.com' ||
-          r.personalInfo?.email === 'lithikaganapathy@gmail.com' ||
-          r.phone === '7418792577' ||
-          r.personalInfo?.phone === '7418792577' ||
           r.applicantId === 'INFO26-CODE-79257' ||
           r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ'
         ) {
@@ -212,10 +208,16 @@ export default function AdminDashboard() {
         });
       }
 
-      // Strict multi-attribute deduplication (by email, phone, and name)
-      const seenE = new Set<string>();
-      const seenP = new Set<string>();
-      const seenN = new Set<string>();
+      // Sort so paid registrations come before pending registrations for proper deduplication preference
+      combined.sort((a, b) => {
+        const aPaid = a.status === 'paid' || a.ticketId || a.paidAt || a.razorpayPaymentId ? 1 : 0;
+        const bPaid = b.status === 'paid' || b.ticketId || b.paidAt || b.razorpayPaymentId ? 1 : 0;
+        return bPaid - aPaid;
+      });
+
+      // Deduplicate and filter real registrations (Event-aware: allows same user for multiple events)
+      const seenEventKeys = new Set<string>();
+      const seenAppIds = new Set<string>();
 
       const dedupedList = combined.filter((r) => {
         const isRohit =
@@ -226,18 +228,14 @@ export default function AdminDashboard() {
           r.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
           r.email === 'rajkumarrohit965@gmail.com';
 
-        const isLithika =
+        const isLithikaCodestorm =
           r.applicantId === 'INFO26-CODE-79257' ||
-          r.personalInfo?.phone === '7418792577' ||
-          r.phone === '7418792577' ||
-          r.personalInfo?.email === 'lithikaganapathy@gmail.com' ||
-          r.email === 'lithikaganapathy@gmail.com' ||
           r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ';
 
         const email = (
           isRohit
             ? 'rajkumarrohit965@gmail.com'
-            : isLithika
+            : isLithikaCodestorm
             ? 'lithikaganapathy@gmail.com'
             : r.personalInfo?.email || r.email || ''
         )
@@ -245,7 +243,7 @@ export default function AdminDashboard() {
           .trim();
 
         const phone = (
-          isRohit ? '9740706586' : isLithika ? '7418792577' : r.personalInfo?.phone || r.phone || ''
+          isRohit ? '9740706586' : isLithikaCodestorm ? '7418792577' : r.personalInfo?.phone || r.phone || ''
         )
           .replace(/\D/g, '')
           .slice(-10);
@@ -253,34 +251,31 @@ export default function AdminDashboard() {
         const name = (
           isRohit
             ? 'Rohit Rajkumar'
-            : isLithika
+            : isLithikaCodestorm
             ? 'Lithika Ganapathy'
             : r.personalInfo?.fullName || r.fullName || r.studentName || r.name || ''
         )
           .toLowerCase()
           .trim();
 
+        const appId = (r.applicantId || '').toUpperCase().trim();
+
         // Filter out empty/dummy participant entries
-        if (!name || name === '—' || name === 'participant' || email.includes('test@example.com')) {
+        if (!name || name === '—' || name === 'participant' || email.includes('test@example.com') || phone === '9876543210' || appId.includes('LIVE-7771')) {
           return false;
         }
 
-        // Deduplicate by email
-        if (email && email.includes('@')) {
-          if (seenE.has(email)) return false;
-          seenE.add(email);
+        if (appId) {
+          if (seenAppIds.has(appId)) return false;
+          seenAppIds.add(appId);
         }
 
-        // Deduplicate by phone
-        if (phone && phone.length === 10) {
-          if (seenP.has(phone)) return false;
-          seenP.add(phone);
-        }
-
-        // Deduplicate by name
-        if (name && name.length > 2) {
-          if (seenN.has(name)) return false;
-          seenN.add(name);
+        const eventList = (Array.isArray(r.events) ? r.events : r.eventNames || []).slice().sort().join(',').toLowerCase();
+        const identifier = email || phone || name;
+        if (identifier && eventList) {
+          const compositeKey = `${identifier}::${eventList}`;
+          if (seenEventKeys.has(compositeKey)) return false;
+          seenEventKeys.add(compositeKey);
         }
 
         return true;
@@ -314,8 +309,10 @@ export default function AdminDashboard() {
         }
         updateMetrics();
       },
-      (err) => {
-        console.warn('Dashboard registrations live sync warning:', err);
+      (err: any) => {
+        if (err?.code !== 'permission-denied') {
+          console.warn('Dashboard registrations live sync note:', err?.message || err);
+        }
         updateMetrics();
       }
     );
@@ -331,8 +328,10 @@ export default function AdminDashboard() {
         ticketMap = map;
         updateMetrics();
       },
-      (err) => {
-        console.warn('Dashboard tickets live sync warning:', err);
+      (err: any) => {
+        if (err?.code !== 'permission-denied') {
+          console.warn('Dashboard tickets live sync note:', err?.message || err);
+        }
         updateMetrics();
       }
     );
@@ -491,12 +490,12 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/80">
-                {events.map((evt) => {
+                {events.map((evt, idx) => {
                   const org = organizers.find((o) => o.uid === evt.organizerUid || o.assignedEventId === evt.id);
                   const evtCount = paidRegistrations.filter((r: any) => isEventMatch(r, evt)).length;
 
                   return (
-                    <tr key={evt.id} className="transition-colors hover:bg-gray-800/50">
+                    <tr key={evt.id || evt.slug || `evt-${idx}`} className="transition-colors hover:bg-gray-800/50">
                       <td className="px-4 py-3.5 font-black text-sm text-white">{evt.name}</td>
                       <td className="px-4 py-3.5 capitalize">
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${
@@ -544,7 +543,7 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/80">
-                {liveRegistrations.slice(0, 15).map((reg: any) => {
+                {liveRegistrations.slice(0, 15).map((reg: any, index: number) => {
                   const isRohit =
                     reg.applicantId === 'INFO26-HACK-14423' ||
                     reg.personalInfo?.phone === '9740706586' ||
@@ -559,7 +558,7 @@ export default function AdminDashboard() {
                   const isPaid = reg.status === 'paid' || reg.ticketId || reg.paidAt || reg.razorpayPaymentId;
                   const displayFee = isRohit ? 50 : (reg.totalFee ?? reg.totalAmount ?? reg.fee ?? 100);
                   return (
-                    <tr key={reg.id} className="transition-colors hover:bg-gray-800/50">
+                    <tr key={reg.id || reg.applicantId || `reg-${index}`} className="transition-colors hover:bg-gray-800/50">
                       <td className="px-4 py-3.5 font-mono text-[#00d4ff] font-bold">{reg.applicantId}</td>
                       <td className="px-4 py-3.5 font-black text-white">{name}</td>
                       <td className="px-4 py-3.5 text-gray-300">{college}</td>

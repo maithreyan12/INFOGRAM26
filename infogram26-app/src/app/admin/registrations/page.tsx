@@ -105,10 +105,10 @@ export default function RegistrationsPage() {
         );
       };
 
-      const paidRegs = rawRegs.filter(
+      const validRegs = rawRegs.filter(
         (r) => !isTestEntry(r) && (r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId)
       );
-      const combined = [...paidRegs];
+      const combined = [...validRegs];
 
       // Add any tickets that are not in rawRegs
       Object.values(ticketItems).forEach((t: any) => {
@@ -194,14 +194,10 @@ export default function RegistrationsPage() {
         });
       }
 
-      // Reconcile and ensure Lithika Ganapathy's payment is confirmed
+      // Reconcile and ensure Lithika Ganapathy's Codestorm payment is confirmed
       let foundLithika = false;
       combined.forEach((r) => {
         if (
-          r.email === 'lithikaganapathy@gmail.com' ||
-          r.personalInfo?.email === 'lithikaganapathy@gmail.com' ||
-          r.phone === '7418792577' ||
-          r.personalInfo?.phone === '7418792577' ||
           r.applicantId === 'INFO26-CODE-79257' ||
           r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ'
         ) {
@@ -247,10 +243,16 @@ export default function RegistrationsPage() {
         });
       }
 
-      // Strict multi-attribute deduplication (by email, phone, and name)
-      const seenE = new Set<string>();
-      const seenP = new Set<string>();
-      const seenN = new Set<string>();
+      // Sort so paid registrations come before pending registrations for proper deduplication preference
+      combined.sort((a, b) => {
+        const aPaid = a.status === 'paid' || a.ticketId || a.paidAt || a.razorpayPaymentId ? 1 : 0;
+        const bPaid = b.status === 'paid' || b.ticketId || b.paidAt || b.razorpayPaymentId ? 1 : 0;
+        return bPaid - aPaid;
+      });
+
+      // Deduplicate and filter real registrations (Event-aware: allows same user for multiple events)
+      const seenEventKeys = new Set<string>();
+      const seenAppIds = new Set<string>();
 
       const dedupedList = combined.filter((r) => {
         const isRohit =
@@ -261,18 +263,14 @@ export default function RegistrationsPage() {
           r.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
           r.email === 'rajkumarrohit965@gmail.com';
 
-        const isLithika =
+        const isLithikaCodestorm =
           r.applicantId === 'INFO26-CODE-79257' ||
-          r.personalInfo?.phone === '7418792577' ||
-          r.phone === '7418792577' ||
-          r.personalInfo?.email === 'lithikaganapathy@gmail.com' ||
-          r.email === 'lithikaganapathy@gmail.com' ||
           r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ';
 
         const email = (
           isRohit
             ? 'rajkumarrohit965@gmail.com'
-            : isLithika
+            : isLithikaCodestorm
             ? 'lithikaganapathy@gmail.com'
             : r.personalInfo?.email || r.email || ''
         )
@@ -280,7 +278,7 @@ export default function RegistrationsPage() {
           .trim();
 
         const phone = (
-          isRohit ? '9740706586' : isLithika ? '7418792577' : r.personalInfo?.phone || r.phone || ''
+          isRohit ? '9740706586' : isLithikaCodestorm ? '7418792577' : r.personalInfo?.phone || r.phone || ''
         )
           .replace(/\D/g, '')
           .slice(-10);
@@ -288,34 +286,33 @@ export default function RegistrationsPage() {
         const name = (
           isRohit
             ? 'Rohit Rajkumar'
-            : isLithika
+            : isLithikaCodestorm
             ? 'Lithika Ganapathy'
             : r.personalInfo?.fullName || r.fullName || r.studentName || r.name || ''
         )
           .toLowerCase()
           .trim();
 
-        // Filter out empty/dummy participant entries
-        if (!name || name === '—' || name === 'participant' || email.includes('test@example.com')) {
+        const appId = (r.applicantId || '').toUpperCase().trim();
+
+        const isPaid = r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId;
+
+        // Filter out empty/dummy participant entries or unpaid entries
+        if (!isPaid || !name || name === '—' || name === 'participant' || email.includes('test@example.com') || phone === '9876543210' || appId.includes('LIVE-7771')) {
           return false;
         }
 
-        // Deduplicate by email
-        if (email && email.includes('@')) {
-          if (seenE.has(email)) return false;
-          seenE.add(email);
+        if (appId) {
+          if (seenAppIds.has(appId)) return false;
+          seenAppIds.add(appId);
         }
 
-        // Deduplicate by phone
-        if (phone && phone.length === 10) {
-          if (seenP.has(phone)) return false;
-          seenP.add(phone);
-        }
-
-        // Deduplicate by name
-        if (name && name.length > 2) {
-          if (seenN.has(name)) return false;
-          seenN.add(name);
+        const eventList = (Array.isArray(r.events) ? r.events : r.eventNames || []).slice().sort().join(',').toLowerCase();
+        const identifier = email || phone || name;
+        if (identifier && eventList) {
+          const compositeKey = `${identifier}::${eventList}`;
+          if (seenEventKeys.has(compositeKey)) return false;
+          seenEventKeys.add(compositeKey);
         }
 
         return true;
@@ -351,8 +348,10 @@ export default function RegistrationsPage() {
         }));
         updateCombinedList();
       },
-      (err) => {
-        console.warn('Registrations live sync error:', err);
+      (err: any) => {
+        if (err?.code !== 'permission-denied') {
+          console.warn('Registrations live sync note:', err?.message || err);
+        }
         updateCombinedList();
       }
     );
@@ -370,7 +369,11 @@ export default function RegistrationsPage() {
         setTicketsMap(map);
         updateCombinedList();
       },
-      (err) => console.warn('Tickets live sync error:', err)
+      (err: any) => {
+        if (err?.code !== 'permission-denied') {
+          console.warn('Tickets live sync note:', err?.message || err);
+        }
+      }
     );
 
     return () => {
@@ -632,17 +635,17 @@ export default function RegistrationsPage() {
       {/* Metrics Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="p-5 rounded-2xl border border-gray-800 bg-[#08182b] text-white">
-          <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Total Registered</p>
-          <p className="text-3xl font-black text-white mt-1">{totalCount}</p>
-          <p className="text-xs text-gray-400 mt-1">{paidCount} Paid • {pendingPaymentCount} Pending</p>
+          <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Total Confirmed</p>
+          <p className="text-3xl font-black text-white mt-1">{paidCount}</p>
+          <p className="text-xs text-gray-400 mt-1">100% Verified Paid Participants</p>
         </div>
         <div className="p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-white">
           <div className="flex items-center justify-between">
             <p className="text-[10px] font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4" /> Confirmed &amp; Paid
+              <CheckCircle2 className="w-4 h-4" /> Total Revenue
             </p>
             <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-md">
-              Total Cost
+              Live Balance
             </span>
           </div>
           <div className="flex items-baseline justify-between mt-1">
@@ -651,19 +654,19 @@ export default function RegistrationsPage() {
           </div>
           <p className="text-xs text-emerald-400/80 mt-1 font-semibold">₹{totalRevenue.toLocaleString()} Total Collected</p>
         </div>
-        <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-white">
-          <p className="text-[10px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-            <Clock className="w-4 h-4" /> Pending Payment
-          </p>
-          <p className="text-3xl font-black text-amber-400 mt-1">{pendingPaymentCount}</p>
-          <p className="text-xs text-amber-400/80 mt-1">Incomplete / unconfirmed</p>
-        </div>
         <div className="p-5 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-white">
           <p className="text-[10px] font-black uppercase tracking-wider text-[#00d4ff] flex items-center gap-1.5">
-            <UserCheck className="w-4 h-4" /> QR Scanned &amp; Present
+            <UserCheck className="w-4 h-4" /> QR Scanned (Present)
           </p>
           <p className="text-3xl font-black text-[#00d4ff] mt-1">{checkedInCount}</p>
-          <p className="text-xs text-[#00d4ff]/80 mt-1">Verified at college venue</p>
+          <p className="text-xs text-[#00d4ff]/80 mt-1">Checked in at venue</p>
+        </div>
+        <div className="p-5 rounded-2xl border border-purple-500/30 bg-purple-500/10 text-white">
+          <p className="text-[10px] font-black uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+            <Clock className="w-4 h-4" /> Pending Venue Check-in
+          </p>
+          <p className="text-3xl font-black text-purple-400 mt-1">{Math.max(0, paidCount - checkedInCount)}</p>
+          <p className="text-xs text-purple-400/80 mt-1">Awaiting QR scan on symposium day</p>
         </div>
       </div>
 

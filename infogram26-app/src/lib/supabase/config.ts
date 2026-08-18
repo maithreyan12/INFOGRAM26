@@ -15,20 +15,34 @@ const supabaseServiceKey =
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
-// Public Supabase client for browser usage
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-});
+// Public Supabase client for browser usage (Singleton)
+const globalForSupabase = globalThis as unknown as {
+  supabase?: any;
+  supabaseAdmin?: any;
+};
+
+export const supabase: any =
+  globalForSupabase.supabase ||
+  createClient<any>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: typeof window !== 'undefined',
+      autoRefreshToken: typeof window !== 'undefined',
+    },
+  });
 
 // Admin Supabase client for API routes (bypasses RLS)
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-});
+export const supabaseAdmin: any =
+  globalForSupabase.supabaseAdmin ||
+  createClient<any>(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForSupabase.supabase = supabase;
+  globalForSupabase.supabaseAdmin = supabaseAdmin;
+}
 
 export default supabase;
