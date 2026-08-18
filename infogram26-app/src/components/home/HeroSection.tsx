@@ -188,9 +188,8 @@ export default function HeroSection() {
 
   return (
     <section
-      className={`relative flex flex-col items-center justify-center overflow-hidden transition-colors duration-300 ${
-        isDark ? 'bg-[#04060f] text-white' : 'bg-[#f0f4ff] text-slate-950'
-      }`}
+      className={`relative flex flex-col items-center justify-center overflow-hidden transition-colors duration-300 ${isDark ? 'bg-[#04060f] text-white' : 'bg-[#f0f4ff] text-slate-950'
+        }`}
       style={{
         minHeight: '100svh',
         // GPU composite layer for the whole section
@@ -258,9 +257,8 @@ export default function HeroSection() {
         style={{ top: '22%', left: '5%', zIndex: 5 }}
       >
         <motion.div
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border shadow-lg text-sm font-black ${
-            isDark ? 'bg-slate-900/95 border-purple-500/30 text-white' : 'bg-white/95 border-slate-200 text-slate-950'
-          }`}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border shadow-lg text-sm font-black ${isDark ? 'bg-slate-900/95 border-purple-500/30 text-white' : 'bg-white/95 border-slate-200 text-slate-950'
+            }`}
           animate={{ y: [0, -7, 0] }}
           transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', repeatType: 'mirror' }}
         >
@@ -280,9 +278,8 @@ export default function HeroSection() {
         style={{ bottom: '30%', left: '4%', zIndex: 5 }}
       >
         <motion.div
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border shadow-lg text-sm font-black ${
-            isDark ? 'bg-slate-900/95 border-emerald-500/30 text-white' : 'bg-white/95 border-slate-200 text-slate-950'
-          }`}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border shadow-lg text-sm font-black ${isDark ? 'bg-slate-900/95 border-emerald-500/30 text-white' : 'bg-white/95 border-slate-200 text-slate-950'
+            }`}
           animate={{ y: [0, 7, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', repeatType: 'mirror' }}
         >
@@ -302,9 +299,8 @@ export default function HeroSection() {
         style={{ top: '22%', right: '5%', zIndex: 5 }}
       >
         <motion.div
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border shadow-lg text-sm font-black ${
-            isDark ? 'bg-slate-900/95 border-cyan-500/30 text-white' : 'bg-white/95 border-slate-200 text-slate-950'
-          }`}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border shadow-lg text-sm font-black ${isDark ? 'bg-slate-900/95 border-cyan-500/30 text-white' : 'bg-white/95 border-slate-200 text-slate-950'
+            }`}
           animate={{ y: [0, -9, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', repeatType: 'mirror' }}
         >
@@ -324,9 +320,8 @@ export default function HeroSection() {
         style={{ bottom: '30%', right: '4%', zIndex: 5 }}
       >
         <motion.div
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border shadow-lg ${
-            isDark ? 'bg-slate-900/95 border-pink-500/30 text-white' : 'bg-white/95 border-slate-200 text-slate-950'
-          }`}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border shadow-lg ${isDark ? 'bg-slate-900/95 border-pink-500/30 text-white' : 'bg-white/95 border-slate-200 text-slate-950'
+            }`}
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', repeatType: 'mirror' }}
         >
@@ -611,11 +606,10 @@ export default function HeroSection() {
           >
             <Link
               href="/events"
-              className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-black text-sm uppercase tracking-wider w-full sm:w-auto border transition-colors duration-150 ${
-                isDark
+              className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-black text-sm uppercase tracking-wider w-full sm:w-auto border transition-colors duration-150 ${isDark
                   ? 'bg-slate-900/90 text-white border-purple-500/40 hover:border-purple-400 shadow-lg'
                   : 'bg-white/90 text-slate-950 border-slate-300 hover:border-[#7c3aed] shadow-md'
-              }`}
+                }`}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <Zap className="w-4 h-4 text-amber-400 shrink-0" />
@@ -625,7 +619,7 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      {/* ── Scroll Hint ── */}
+      {/* ── Scroll Hint ── 
       <motion.div
         className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none"
         style={{ bottom: 18, zIndex: 10 }}
@@ -639,7 +633,7 @@ export default function HeroSection() {
           Scroll
         </span>
         <ChevronDown className={`w-4 h-4 ${isDark ? 'text-purple-400' : 'text-[#7c3aed]'}`} />
-      </motion.div>
+      </motion.div>*/}
     </section>
   );
 }
