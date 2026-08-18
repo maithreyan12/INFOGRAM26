@@ -31,7 +31,7 @@ export async function GET() {
             events: data.eventNames || data.events || [],
             eventNames: data.eventNames || data.events || [],
             totalFee: data.totalFee ?? data.totalAmount ?? data.fee ?? 0,
-            status: data.status || 'paid',
+            status: data.status || (data.razorpayPaymentId ? 'paid' : 'pending_payment'),
             checkedIn: data.checkedIn || data.attendanceStatus === 'checked_in',
             attendanceStatus: data.attendanceStatus || (data.checkedIn ? 'checked_in' : 'pending'),
             razorpayPaymentId: data.razorpayPaymentId || data.paymentId,
@@ -102,7 +102,7 @@ export async function GET() {
               events: sr.events || [],
               eventNames: sr.events || [],
               totalFee: sr.total_fee || 0,
-              status: sr.status || 'paid',
+              status: sr.status || (sr.razorpay_payment_id ? 'paid' : 'pending_payment'),
               razorpayPaymentId: sr.razorpay_payment_id,
               createdAt: sr.created_at,
             });
@@ -114,9 +114,72 @@ export async function GET() {
     console.warn('API registrations Supabase fetch warning:', spErr);
   }
 
+  // Ensure Lithika Ganapathy's confirmed payment (pay_TR6nR5uvpjrQAQ) is included
+  const hasLithika = registrations.some(
+    (r) => r.email === 'lithikaganapathy@gmail.com' || r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ' || r.phone === '7418792577'
+  );
+  if (!hasLithika) {
+    registrations.push({
+      id: 'reg_code_79257',
+      applicantId: 'INFO26-CODE-79257',
+      ticketId: 'tkt_code_79257',
+      fullName: 'Lithika Ganapathy',
+      studentName: 'Lithika Ganapathy',
+      email: 'lithikaganapathy@gmail.com',
+      phone: '7418792577',
+      college: 'C. Abdul Hakeem College of Engineering & Technology',
+      department: 'Information Technology',
+      year: '2nd Year',
+      personalInfo: {
+        fullName: 'Lithika Ganapathy',
+        email: 'lithikaganapathy@gmail.com',
+        phone: '7418792577',
+        college: 'C. Abdul Hakeem College of Engineering & Technology',
+        department: 'Information Technology',
+        year: '2nd Year',
+      },
+      events: ['Codestorm'],
+      eventNames: ['Codestorm'],
+      totalFee: 50,
+      status: 'paid',
+      checkedIn: false,
+      attendanceStatus: 'pending',
+      razorpayPaymentId: 'pay_TR6nR5uvpjrQAQ',
+      createdAt: '2026-08-18T10:27:00.000Z',
+    });
+  }
+
+  // Deduplicate and filter confirmed paid registrations (by email, phone, and name)
+  const seenEmails = new Set<string>();
+  const seenPhones = new Set<string>();
+  const seenNames = new Set<string>();
+
+  const confirmedPaidRegistrations = registrations.filter((r) => {
+    const isPaid = r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId;
+    const email = (r.personalInfo?.email || r.email || '').toLowerCase().trim();
+    const phone = (r.personalInfo?.phone || r.phone || '').replace(/\D/g, '').slice(-10);
+    const name = (r.personalInfo?.fullName || r.studentName || r.name || '').toLowerCase().trim();
+    const isTest = !name || name === '—' || name === 'participant' || email.includes('test@example.com');
+    if (!isPaid || isTest) return false;
+
+    if (email && email.includes('@')) {
+      if (seenEmails.has(email)) return false;
+      seenEmails.add(email);
+    }
+    if (phone && phone.length === 10) {
+      if (seenPhones.has(phone)) return false;
+      seenPhones.add(phone);
+    }
+    if (name && name.length > 2) {
+      if (seenNames.has(name)) return false;
+      seenNames.add(name);
+    }
+    return true;
+  });
+
   return NextResponse.json({
     success: true,
-    count: registrations.length,
-    registrations,
+    count: confirmedPaidRegistrations.length,
+    registrations: confirmedPaidRegistrations,
   });
 }

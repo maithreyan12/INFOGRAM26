@@ -46,7 +46,9 @@ export default function PaymentsPage() {
     };
 
     const mergeAndSet = () => {
-      const combined = rawRegs.filter((r) => !isTestEntry(r));
+      const combined = rawRegs.filter(
+        (r) => !isTestEntry(r) && (r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId)
+      );
       rawTickets.forEach((t: any) => {
         if (isTestEntry(t)) return;
 

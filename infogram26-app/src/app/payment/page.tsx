@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 import React, { useEffect, useState, Suspense, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase/config';
-import { doc, getDoc, addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore';
 import PublicLayout from '@/components/layout/PublicLayout';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import {
@@ -48,6 +48,7 @@ function PaymentContent() {
     const fetchData = async () => {
       if (!regId) { router.push('/register'); return; }
 
+      const urlAppId = searchParams.get('appId') || '';
       const urlFee = Number(searchParams.get('fee')) || 0;
       const urlEvents = searchParams.get('events') ? searchParams.get('events')!.split(',') : [];
       const urlName = searchParams.get('name') || '';
@@ -61,9 +62,9 @@ function PaymentContent() {
         if (!db) {
           setRegistration({
             id: regId,
-            applicantId: `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
+            applicantId: urlAppId || `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
             totalFee: urlFee || 50,
-            events: [],
+            events: urlEvents,
             eventNames: urlEvents.length > 0 ? urlEvents : ['Symposium Event'],
             personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: urlCollege, department: urlDept, year: urlYear },
           });
@@ -77,14 +78,17 @@ function PaymentContent() {
           setRegistration({
             id: regDoc.id,
             ...data,
+            applicantId: urlAppId || data.applicantId,
             totalFee: data.totalFee || urlFee || 50,
             eventNames: data.eventNames || (urlEvents.length > 0 ? urlEvents : data.events),
+            personalInfo: data.personalInfo || { fullName: urlName, email: urlEmail, phone: urlPhone, college: urlCollege, department: urlDept, year: urlYear },
           });
         } else {
           setRegistration({
             id: regId,
-            applicantId: `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
+            applicantId: urlAppId || `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
             totalFee: urlFee || 50,
+            events: urlEvents,
             eventNames: urlEvents.length > 0 ? urlEvents : ['Event Registration'],
             personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: urlCollege, department: urlDept, year: urlYear },
           });
@@ -95,8 +99,9 @@ function PaymentContent() {
         console.error('Error fetching data:', err);
         setRegistration({
           id: regId,
-          applicantId: `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
+          applicantId: urlAppId || `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
           totalFee: urlFee || 50,
+          events: urlEvents,
           eventNames: urlEvents.length > 0 ? urlEvents : ['Event Registration'],
           personalInfo: { fullName: urlName, email: urlEmail, phone: urlPhone, college: urlCollege, department: urlDept, year: urlYear },
         });
@@ -107,7 +112,7 @@ function PaymentContent() {
     fetchData();
   }, [regId, router, searchParams]);
 
-  /* ── Finalize payment (write ticket + redirect) ── */
+  /* ── Finalize payment (auto-generate confirmed registration + ticket) ── */
   const finalizePayment = useCallback(async (paymentDetails: {
     razorpayOrderId: string;
     razorpayPaymentId: string;
@@ -122,8 +127,10 @@ function PaymentContent() {
       return;
     }
 
+    // 1. Record payment transaction
     const paymentRef = await addDoc(collection(db, 'payments'), {
       registrationId: registration.id,
+      applicantId: registration.applicantId,
       amount: registration.totalFee,
       method: 'razorpay',
       razorpayOrderId: paymentDetails.razorpayOrderId,
@@ -133,11 +140,50 @@ function PaymentContent() {
       createdAt: serverTimestamp(),
     });
 
-    await updateDoc(doc(db, 'registrations', registration.id), {
-      status: 'paid',
-      paymentId: paymentRef.id,
-    });
+    // 2. Auto-generate confirmed registration record in Firestore
+    await setDoc(
+      doc(db, 'registrations', registration.id),
+      {
+        applicantId: registration.applicantId,
+        personalInfo: registration.personalInfo || {},
+        events: registration.eventNames || registration.events || [],
+        eventNames: registration.eventNames || registration.events || [],
+        totalFee: registration.totalFee,
+        status: 'paid',
+        paymentId: paymentRef.id,
+        razorpayPaymentId: paymentDetails.razorpayPaymentId,
+        createdAt: serverTimestamp(),
+        paidAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
 
+    // 3. Auto-generate confirmed registration record in Supabase
+    try {
+      const { supabase } = await import('@/lib/supabase/config');
+      if (supabase) {
+        await supabase.from('registrations').upsert([
+          {
+            id: registration.id,
+            applicant_id: registration.applicantId,
+            full_name: registration.personalInfo?.fullName || '',
+            email: registration.personalInfo?.email || '',
+            phone: registration.personalInfo?.phone || '',
+            college: registration.personalInfo?.college || '',
+            department: registration.personalInfo?.department || '',
+            year: registration.personalInfo?.year || '',
+            events: registration.eventNames || registration.events || [],
+            total_fee: registration.totalFee,
+            status: 'paid',
+            razorpay_payment_id: paymentDetails.razorpayPaymentId,
+          },
+        ]);
+      }
+    } catch (spErr) {
+      console.warn('Supabase paid registration sync warning:', spErr);
+    }
+
+    // 4. Auto-generate official QR Ticket
     const ticketNumber = `TKT-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     const qrData = JSON.stringify({
       ticketNumber,

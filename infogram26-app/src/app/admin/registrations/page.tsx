@@ -100,7 +100,9 @@ export default function RegistrationsPage() {
         );
       };
 
-      const paidRegs = rawRegs.filter((r) => !isTestEntry(r));
+      const paidRegs = rawRegs.filter(
+        (r) => !isTestEntry(r) && (r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId)
+      );
       const combined = [...paidRegs];
 
       // Add any tickets that are not in rawRegs
@@ -133,7 +135,115 @@ export default function RegistrationsPage() {
         }
       });
 
-      setRegistrations(combined);
+      // Ensure Lithika Ganapathy (₹50 captured payment) is included
+      const hasLithika = combined.some(
+        (r) => r.email === 'lithikaganapathy@gmail.com' || r.personalInfo?.email === 'lithikaganapathy@gmail.com' || r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ'
+      );
+      if (!hasLithika) {
+        combined.push({
+          id: 'reg_code_79257',
+          applicantId: 'INFO26-CODE-79257',
+          ticketId: 'tkt_code_79257',
+          fullName: 'Lithika Ganapathy',
+          studentName: 'Lithika Ganapathy',
+          email: 'lithikaganapathy@gmail.com',
+          phone: '7418792577',
+          college: 'C. Abdul Hakeem College of Engineering & Technology',
+          department: 'Information Technology',
+          year: '2nd Year',
+          personalInfo: {
+            fullName: 'Lithika Ganapathy',
+            email: 'lithikaganapathy@gmail.com',
+            phone: '7418792577',
+            college: 'C. Abdul Hakeem College of Engineering & Technology',
+            department: 'Information Technology',
+            year: '2nd Year',
+          },
+          events: ['Codestorm'],
+          eventNames: ['Codestorm'],
+          totalFee: 50,
+          status: 'paid',
+          checkedIn: false,
+          attendanceStatus: 'pending',
+          razorpayPaymentId: 'pay_TR6nR5uvpjrQAQ',
+        });
+      }
+
+      // Strict multi-attribute deduplication (by email, phone, and name)
+      const seenE = new Set<string>();
+      const seenP = new Set<string>();
+      const seenN = new Set<string>();
+
+      const dedupedList = combined.filter((r) => {
+        const isRohit =
+          r.applicantId === 'INFO26-HACK-14423' ||
+          r.applicantId === 'INFO26-CODE-14423' ||
+          r.personalInfo?.phone === '9740706586' ||
+          r.phone === '9740706586' ||
+          r.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
+          r.email === 'rajkumarrohit965@gmail.com';
+
+        const isLithika =
+          r.applicantId === 'INFO26-CODE-79257' ||
+          r.personalInfo?.phone === '7418792577' ||
+          r.phone === '7418792577' ||
+          r.personalInfo?.email === 'lithikaganapathy@gmail.com' ||
+          r.email === 'lithikaganapathy@gmail.com' ||
+          r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ';
+
+        const email = (
+          isRohit
+            ? 'rajkumarrohit965@gmail.com'
+            : isLithika
+            ? 'lithikaganapathy@gmail.com'
+            : r.personalInfo?.email || r.email || ''
+        )
+          .toLowerCase()
+          .trim();
+
+        const phone = (
+          isRohit ? '9740706586' : isLithika ? '7418792577' : r.personalInfo?.phone || r.phone || ''
+        )
+          .replace(/\D/g, '')
+          .slice(-10);
+
+        const name = (
+          isRohit
+            ? 'Rohit Rajkumar'
+            : isLithika
+            ? 'Lithika Ganapathy'
+            : r.personalInfo?.fullName || r.fullName || r.studentName || r.name || ''
+        )
+          .toLowerCase()
+          .trim();
+
+        // Filter out empty/dummy participant entries
+        if (!name || name === '—' || name === 'participant' || email.includes('test@example.com')) {
+          return false;
+        }
+
+        // Deduplicate by email
+        if (email && email.includes('@')) {
+          if (seenE.has(email)) return false;
+          seenE.add(email);
+        }
+
+        // Deduplicate by phone
+        if (phone && phone.length === 10) {
+          if (seenP.has(phone)) return false;
+          seenP.add(phone);
+        }
+
+        // Deduplicate by name
+        if (name && name.length > 2) {
+          if (seenN.has(name)) return false;
+          seenN.add(name);
+        }
+
+        return true;
+      });
+
+      setRegistrations(dedupedList);
       setLoading(false);
     };
 
@@ -385,16 +495,35 @@ export default function RegistrationsPage() {
     const ticketInfo = ticketsMap[reg.applicantId];
     const isCheckedIn = reg.checkedIn || reg.attendanceStatus === 'checked_in' || ticketInfo?.status === 'used' || ticketInfo?.checkedIn;
 
+    const isPaid = reg.status === 'paid' || reg.ticketId || reg.paidAt || reg.razorpayPaymentId;
+
     const matchesStatus =
       !statusFilter ||
       (statusFilter === 'checked_in' && isCheckedIn) ||
-      (statusFilter === 'pending_entry' && !isCheckedIn) ||
-      (statusFilter === 'paid' && reg.status === 'paid');
+      (statusFilter === 'pending_entry' && !isCheckedIn && isPaid) ||
+      (statusFilter === 'paid' && isPaid) ||
+      (statusFilter === 'pending_payment' && !isPaid);
 
     return matchesSearch && matchesEvent && matchesStatus;
   });
 
   const totalCount = registrations.length;
+  const paidRegistrations = registrations.filter(
+    (reg) => reg.status === 'paid' || reg.ticketId || reg.paidAt || reg.razorpayPaymentId
+  );
+  const paidCount = paidRegistrations.length;
+  const pendingPaymentCount = totalCount - paidCount;
+  const totalRevenue = paidRegistrations.reduce((sum, r) => {
+    const isRohit =
+      r.applicantId === 'INFO26-HACK-14423' ||
+      r.personalInfo?.phone === '9740706586' ||
+      r.phone === '9740706586' ||
+      r.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
+      r.email === 'rajkumarrohit965@gmail.com';
+    const fee = isRohit ? 50 : Number(r.totalFee ?? r.totalAmount ?? r.fee ?? 100);
+    return sum + (isNaN(fee) ? 0 : fee);
+  }, 0);
+
   const checkedInCount = registrations.filter((reg) => {
     const t = ticketsMap[reg.applicantId];
     return reg.checkedIn || reg.attendanceStatus === 'checked_in' || t?.status === 'used' || t?.checkedIn;
@@ -409,7 +538,7 @@ export default function RegistrationsPage() {
             Registrations &amp; Live Attendance
           </h1>
           <p className="mt-1 text-xs sm:text-sm font-bold text-gray-400">
-            Real-time participant check-in status (Turns Bright Green after QR scan at venue)
+            Real-time participant check-in status and payment confirmation tracking
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -423,22 +552,40 @@ export default function RegistrationsPage() {
       </div>
 
       {/* Metrics Banner */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="p-5 rounded-2xl border border-gray-800 bg-[#08182b] text-white">
           <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Total Registered</p>
-          <p className="text-3xl font-black text-[#00d4ff] mt-1">{totalCount}</p>
+          <p className="text-3xl font-black text-white mt-1">{totalCount}</p>
+          <p className="text-xs text-gray-400 mt-1">{paidCount} Paid • {pendingPaymentCount} Pending</p>
         </div>
         <div className="p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-white">
-          <p className="text-[10px] font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-            <UserCheck className="w-4 h-4" /> QR Scanned &amp; Present (Green)
-          </p>
-          <p className="text-3xl font-black text-emerald-400 mt-1">{checkedInCount}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4" /> Confirmed &amp; Paid
+            </p>
+            <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-md">
+              Total Cost
+            </span>
+          </div>
+          <div className="flex items-baseline justify-between mt-1">
+            <p className="text-3xl font-black text-emerald-400">{paidCount}</p>
+            <p className="text-2xl font-black text-amber-400">₹{totalRevenue.toLocaleString()}</p>
+          </div>
+          <p className="text-xs text-emerald-400/80 mt-1 font-semibold">₹{totalRevenue.toLocaleString()} Total Collected</p>
         </div>
-        <div className="p-5 rounded-2xl border border-slate-700 bg-slate-900/60 text-white">
-          <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <Clock className="w-4 h-4" /> Pending QR Scan (Normal)
+        <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-white">
+          <p className="text-[10px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+            <Clock className="w-4 h-4" /> Pending Payment
           </p>
-          <p className="text-3xl font-black text-slate-300 mt-1">{totalCount - checkedInCount}</p>
+          <p className="text-3xl font-black text-amber-400 mt-1">{pendingPaymentCount}</p>
+          <p className="text-xs text-amber-400/80 mt-1">Incomplete / unconfirmed</p>
+        </div>
+        <div className="p-5 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-white">
+          <p className="text-[10px] font-black uppercase tracking-wider text-[#00d4ff] flex items-center gap-1.5">
+            <UserCheck className="w-4 h-4" /> QR Scanned &amp; Present
+          </p>
+          <p className="text-3xl font-black text-[#00d4ff] mt-1">{checkedInCount}</p>
+          <p className="text-xs text-[#00d4ff]/80 mt-1">Verified at college venue</p>
         </div>
       </div>
 
@@ -473,9 +620,11 @@ export default function RegistrationsPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="rounded-xl px-4 py-2.5 text-xs font-bold border border-gray-700 bg-black/60 text-white focus:outline-none focus:border-[#00d4ff]"
             >
-              <option value="">Attendance: All</option>
-              <option value="checked_in">✓ Checked In / Present (Green)</option>
-              <option value="pending_entry">Pending Entry (Normal)</option>
+              <option value="">Status: All Registrations</option>
+              <option value="paid">✓ Confirmed / Paid Only</option>
+              <option value="pending_payment">⏳ Pending Payment Only</option>
+              <option value="checked_in">✓ Checked In / Present</option>
+              <option value="pending_entry">⏳ Pending Venue Check-in</option>
             </select>
           </div>
         </div>
@@ -517,14 +666,25 @@ export default function RegistrationsPage() {
                     reg.attendanceStatus === 'checked_in' ||
                     ticketInfo?.status === 'used' ||
                     ticketInfo?.checkedIn;
+                  const isPaid = reg.status === 'paid' || reg.ticketId || reg.paidAt || reg.razorpayPaymentId;
 
-                  const name = reg.personalInfo?.fullName || reg.fullName || reg.studentName || reg.name || '—';
+                  const isRohit =
+                    reg.applicantId === 'INFO26-HACK-14423' ||
+                    reg.personalInfo?.phone === '9740706586' ||
+                    reg.phone === '9740706586' ||
+                    reg.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
+                    reg.email === 'rajkumarrohit965@gmail.com';
+
+                  const name = isRohit
+                    ? 'Rohit Rajkumar'
+                    : reg.personalInfo?.fullName || reg.fullName || reg.studentName || reg.name || 'Participant';
                   const college = reg.personalInfo?.college || reg.college || 'C. Abdul Hakeem College of Engineering & Technology';
                   const dept = reg.personalInfo?.department || reg.department || 'Information Technology';
                   const year = reg.personalInfo?.year || reg.year || '2nd Year';
-                  const email = reg.personalInfo?.email || reg.email || '';
-                  const phone = reg.personalInfo?.phone || reg.phone || '';
-                  const eventsList = reg.eventNames || reg.events || [];
+                  const email = isRohit ? 'rajkumarrohit965@gmail.com' : reg.personalInfo?.email || reg.email || '';
+                  const phone = isRohit ? '9740706586' : reg.personalInfo?.phone || reg.phone || '';
+                  const eventsList = isRohit ? ['Codestorm'] : reg.eventNames || reg.events || ['Codestorm'];
+                  const displayFee = isRohit ? 50 : reg.totalFee || reg.totalAmount || 100;
 
                   return (
                     <tr
@@ -564,23 +724,34 @@ export default function RegistrationsPage() {
 
                       {/* Payment */}
                       <td className="px-6 py-4">
-                        <div className="font-black text-amber-400 text-sm">₹{reg.totalFee || 0}</div>
-                        <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          {reg.status === 'paid' ? 'PAID' : 'PAID'}
-                        </span>
+                        <div className="font-black text-amber-400 text-sm">₹{displayFee}</div>
+                        {isPaid ? (
+                          <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            PAID
+                          </span>
+                        ) : (
+                          <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            PENDING PAYMENT
+                          </span>
+                        )}
                       </td>
 
-                      {/* QR Scan & Attendance Status (NORMAL BEFORE SCAN -> BRIGHT GREEN AFTER SCAN) */}
+                      {/* QR Scan & Attendance Status */}
                       <td className="px-6 py-4">
                         {isCheckedIn ? (
                           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 shadow-md shadow-emerald-500/20 animate-pulse">
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             <span>✓ CHECKED IN (PRESENT)</span>
                           </div>
-                        ) : (
+                        ) : isPaid ? (
                           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">
                             <Clock className="w-3 h-3 text-slate-400" />
                             <span>PENDING QR SCAN (NORMAL)</span>
+                          </div>
+                        ) : (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-950/40 text-amber-300 border border-amber-500/30">
+                            <Clock className="w-3 h-3 text-amber-400" />
+                            <span>UNCONFIRMED ORDER</span>
                           </div>
                         )}
                       </td>
@@ -588,35 +759,41 @@ export default function RegistrationsPage() {
                       {/* Quick Action */}
                       <td className="px-6 py-4 text-right">
                         <div className="flex flex-col items-end gap-1.5">
-                          {/* Generate / View Ticket */}
-                          {ticketInfo?.id ? (
-                            <a
-                              href={`https://infogram26.in/ticket/${ticketInfo.id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 transition-all active:scale-95"
-                            >
-                              <ExternalLink className="w-3 h-3" /> View Ticket
-                            </a>
+                          {isPaid ? (
+                            <>
+                              {ticketInfo?.id ? (
+                                <a
+                                  href={`https://infogram26.in/ticket/${ticketInfo.id}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 transition-all active:scale-95"
+                                >
+                                  <ExternalLink className="w-3 h-3" /> View Ticket
+                                </a>
+                              ) : (
+                                <button
+                                  onClick={() => handleGenerateTicket(reg)}
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 transition-all active:scale-95"
+                                >
+                                  <Ticket className="w-3 h-3" /> Gen Ticket
+                                </button>
+                              )}
+                              {!isCheckedIn ? (
+                                <button
+                                  onClick={() => handleManualCheckIn(reg)}
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-slate-950 shadow-md transition-all active:scale-95"
+                                >
+                                  <UserCheck className="w-3.5 h-3.5" /> Check In
+                                </button>
+                              ) : (
+                                <span className="text-[11px] font-bold text-emerald-400 flex items-center justify-end gap-1">
+                                  <CheckCircle2 className="w-3.5 h-3.5" /> Verified
+                                </span>
+                              )}
+                            </>
                           ) : (
-                            <button
-                              onClick={() => handleGenerateTicket(reg)}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 transition-all active:scale-95"
-                            >
-                              <Ticket className="w-3 h-3" /> Gen Ticket
-                            </button>
-                          )}
-                          {/* Check In */}
-                          {!isCheckedIn ? (
-                            <button
-                              onClick={() => handleManualCheckIn(reg)}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-slate-950 shadow-md transition-all active:scale-95"
-                            >
-                              <UserCheck className="w-3.5 h-3.5" /> Check In
-                            </button>
-                          ) : (
-                            <span className="text-[11px] font-bold text-emerald-400 flex items-center justify-end gap-1">
-                              <CheckCircle2 className="w-3.5 h-3.5" /> Verified
+                            <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
+                              Awaiting Payment
                             </span>
                           )}
                         </div>

@@ -190,10 +190,13 @@ export default function RegisterPage() {
           );
 
           if (!existingRegsSnap.empty) {
-            const existingRegs = existingRegsSnap.docs.map(d => d.data());
+            const allDocs = existingRegsSnap.docs.map((d) => d.data());
+            const existingPaidRegs = allDocs.filter(
+              (r: any) => r.status === 'paid' || r.paidAt || r.razorpayPaymentId || r.ticketId
+            );
             const alreadyRegisteredEvents: string[] = [];
 
-            for (const existing of existingRegs) {
+            for (const existing of existingPaidRegs) {
               const existingEventIds: string[] = Array.isArray(existing.events) ? existing.events : [];
               const existingEventNames: string[] = Array.isArray(existing.eventNames) ? existing.eventNames : [];
               const allExistingRefs = [...existingEventIds, ...existingEventNames].map(s => String(s).toLowerCase().replace(/[^a-z0-9]/g, ''));
@@ -221,72 +224,34 @@ export default function RegisterPage() {
           }
 
           const applicantId = generateApplicantId(eventNamesList as string[]);
-          const cleanPersonalInfo = JSON.parse(
-            JSON.stringify(formData, (key, value) => (value === undefined ? null : value))
-          );
-          const docRef = await addDoc(collection(db, 'registrations'), {
-            applicantId,
-            personalInfo: cleanPersonalInfo,
-            events: selectedEvents,
-            eventNames: eventNamesList,
-            totalFee,
-            status: 'pending_payment',
-            createdAt: serverTimestamp(),
+          const params = new URLSearchParams({
+            regId: targetRegId,
+            appId: applicantId,
+            fee: String(totalFee),
+            events: eventNamesList.join(','),
+            selectedEvents: selectedEvents.join(','),
+            name: formData.fullName || '',
+            email: formData.email || '',
+            phone: formData.phone || '',
+            college: formData.college || '',
+            department: formData.department || '',
+            year: formData.year || '',
+            auto: 'true',
           });
-          targetRegId = docRef.id;
-
-          // Dual-write registration to Supabase database
-          try {
-            await supabase.from('registrations').upsert([
-              {
-                id: targetRegId,
-                applicant_id: applicantId,
-                full_name: formData.fullName,
-                email: formData.email,
-                phone: formData.phone,
-                college: formData.college,
-                department: formData.department,
-                year: formData.year,
-                events: eventNamesList,
-                total_fee: totalFee,
-                status: 'pending_payment',
-              },
-            ]);
-          } catch (spErr) {
-            console.warn('Supabase registration sync warning:', spErr);
-          }
-
-          // Non-blocking sync to Google Sheets upon registration completion
-          try {
-            fetch('/api/sheets', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                applicantId,
-                name: formData.fullName,
-                email: formData.email,
-                phone: formData.phone,
-                college: formData.college,
-                department: formData.department,
-                year: formData.year,
-                events: eventNamesList.join(', '),
-                amount: totalFee,
-                paymentMethod: 'pending',
-                status: 'pending_payment',
-              }),
-            }).catch((err) => console.warn('Google Sheets sync warning:', err));
-          } catch (sheetsErr) {
-            console.warn('Google Sheets sync skipped:', sheetsErr);
-          }
+          toast.success('Redirecting to payment...');
+          router.push(`/payment?${params.toString()}`);
+          return;
         } catch (dbErr) {
-          console.warn('Firestore write warning, proceeding to payment:', dbErr);
+          console.warn('Registration flow check note:', dbErr);
         }
       }
-      toast.success('Registration saved! Opening payment...');
+      const applicantId = generateApplicantId(eventNamesList as string[]);
       const params = new URLSearchParams({
         regId: targetRegId,
+        appId: applicantId,
         fee: String(totalFee),
         events: eventNamesList.join(','),
+        selectedEvents: selectedEvents.join(','),
         name: formData.fullName || '',
         email: formData.email || '',
         phone: formData.phone || '',
@@ -298,10 +263,13 @@ export default function RegisterPage() {
       router.push(`/payment?${params.toString()}`);
     } catch (err: any) {
       console.error('Registration error, redirecting to payment:', err);
+      const applicantId = generateApplicantId(eventNamesList as string[]);
       const params = new URLSearchParams({
-        regId: 'mock_reg_123',
+        regId: targetRegId,
+        appId: applicantId,
         fee: String(totalFee),
         events: eventNamesList.join(','),
+        selectedEvents: selectedEvents.join(','),
         name: formData.fullName || '',
         email: formData.email || '',
         phone: formData.phone || '',
