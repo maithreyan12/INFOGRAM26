@@ -27,7 +27,11 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-11PB2J23P7",
 };
 
-export const isFirebaseConfigured = true;
+export const isFirebaseConfigured = Boolean(
+  firebaseConfig.apiKey &&
+  firebaseConfig.projectId &&
+  firebaseConfig.projectId !== ''
+);
 
 // ─── Singleton Firebase App ───────────────────────────────────
 export const app: FirebaseApp =
