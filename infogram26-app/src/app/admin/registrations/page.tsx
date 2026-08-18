@@ -92,11 +92,16 @@ export default function RegistrationsPage() {
         const email = (r.personalInfo?.email || r.email || '').toLowerCase().trim();
         const name = (r.personalInfo?.fullName || r.studentName || r.name || '').toLowerCase().trim();
         const appId = (r.applicantId || '').toLowerCase().trim();
+        const phone = (r.personalInfo?.phone || r.phone || '').replace(/\D/g, '');
         return (
           name === 'participant' ||
+          name.includes('participant') ||
           email === 'test@example.com' ||
           email.includes('verification.test') ||
-          appId.includes('999999')
+          email.includes('arunkumar') ||
+          phone === '9876543210' ||
+          appId.includes('999999') ||
+          appId.includes('live-7771')
         );
       };
 
@@ -135,11 +140,84 @@ export default function RegistrationsPage() {
         }
       });
 
-      // Ensure Lithika Ganapathy (₹50 captured payment) is included
-      const hasLithika = combined.some(
-        (r) => r.email === 'lithikaganapathy@gmail.com' || r.personalInfo?.email === 'lithikaganapathy@gmail.com' || r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ'
-      );
-      if (!hasLithika) {
+      // Reconcile and ensure Rohit Rajkumar's payment is confirmed
+      let foundRohit = false;
+      combined.forEach((r) => {
+        if (
+          r.email === 'rajkumarrohit965@gmail.com' ||
+          r.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
+          r.phone === '9740706586' ||
+          r.personalInfo?.phone === '9740706586' ||
+          r.applicantId === 'INFO26-CODE-14423' ||
+          r.applicantId === 'INFO26-HACK-14423' ||
+          r.razorpayPaymentId === 'pay_TQSsGjMXY4BxKi'
+        ) {
+          foundRohit = true;
+          r.fullName = 'Rohit Rajkumar';
+          r.studentName = 'Rohit Rajkumar';
+          r.email = 'rajkumarrohit965@gmail.com';
+          r.phone = '9740706586';
+          r.events = ['Codestorm'];
+          r.eventNames = ['Codestorm'];
+          r.totalFee = 50;
+          r.status = 'paid';
+          r.razorpayPaymentId = 'pay_TQSsGjMXY4BxKi';
+        }
+      });
+      if (!foundRohit) {
+        combined.push({
+          id: 'reg_code_14423',
+          applicantId: 'INFO26-CODE-14423',
+          ticketId: 'tkt_code_14423',
+          fullName: 'Rohit Rajkumar',
+          studentName: 'Rohit Rajkumar',
+          email: 'rajkumarrohit965@gmail.com',
+          phone: '9740706586',
+          college: 'C. Abdul Hakeem College of Engineering & Technology',
+          department: 'Information Technology',
+          year: '2nd Year',
+          personalInfo: {
+            fullName: 'Rohit Rajkumar',
+            email: 'rajkumarrohit965@gmail.com',
+            phone: '9740706586',
+            college: 'C. Abdul Hakeem College of Engineering & Technology',
+            department: 'Information Technology',
+            year: '2nd Year',
+          },
+          events: ['Codestorm'],
+          eventNames: ['Codestorm'],
+          totalFee: 50,
+          status: 'paid',
+          checkedIn: false,
+          attendanceStatus: 'pending',
+          razorpayPaymentId: 'pay_TQSsGjMXY4BxKi',
+        });
+      }
+
+      // Reconcile and ensure Lithika Ganapathy's payment is confirmed
+      let foundLithika = false;
+      combined.forEach((r) => {
+        if (
+          r.email === 'lithikaganapathy@gmail.com' ||
+          r.personalInfo?.email === 'lithikaganapathy@gmail.com' ||
+          r.phone === '7418792577' ||
+          r.personalInfo?.phone === '7418792577' ||
+          r.applicantId === 'INFO26-CODE-79257' ||
+          r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ'
+        ) {
+          foundLithika = true;
+          r.fullName = 'Lithika Ganapathy';
+          r.studentName = 'Lithika Ganapathy';
+          r.email = 'lithikaganapathy@gmail.com';
+          r.phone = '7418792577';
+          r.events = ['Codestorm'];
+          r.eventNames = ['Codestorm'];
+          r.totalFee = 50;
+          r.status = 'paid';
+          r.razorpayPaymentId = 'pay_TR6nR5uvpjrQAQ';
+        }
+      });
+      if (!foundLithika) {
         combined.push({
           id: 'reg_code_79257',
           applicantId: 'INFO26-CODE-79257',
@@ -761,23 +839,14 @@ export default function RegistrationsPage() {
                         <div className="flex flex-col items-end gap-1.5">
                           {isPaid ? (
                             <>
-                              {ticketInfo?.id ? (
-                                <a
-                                  href={`https://infogram26.in/ticket/${ticketInfo.id}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 transition-all active:scale-95"
-                                >
-                                  <ExternalLink className="w-3 h-3" /> View Ticket
-                                </a>
-                              ) : (
-                                <button
-                                  onClick={() => handleGenerateTicket(reg)}
-                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 transition-all active:scale-95"
-                                >
-                                  <Ticket className="w-3 h-3" /> Gen Ticket
-                                </button>
-                              )}
+                              <a
+                                href={`/ticket/${ticketInfo?.id || reg.ticketId || reg.applicantId || reg.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 transition-all active:scale-95"
+                              >
+                                <ExternalLink className="w-3 h-3" /> View Ticket
+                              </a>
                               {!isCheckedIn ? (
                                 <button
                                   onClick={() => handleManualCheckIn(reg)}

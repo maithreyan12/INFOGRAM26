@@ -114,11 +114,81 @@ export async function GET() {
     console.warn('API registrations Supabase fetch warning:', spErr);
   }
 
-  // Ensure Lithika Ganapathy's confirmed payment (pay_TR6nR5uvpjrQAQ) is included
-  const hasLithika = registrations.some(
-    (r) => r.email === 'lithikaganapathy@gmail.com' || r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ' || r.phone === '7418792577'
-  );
-  if (!hasLithika) {
+  // Reconcile and ensure Rohit Rajkumar's payment is confirmed
+  let foundRohit = false;
+  registrations.forEach((r) => {
+    if (
+      r.email === 'rajkumarrohit965@gmail.com' ||
+      r.phone === '9740706586' ||
+      r.applicantId === 'INFO26-CODE-14423' ||
+      r.applicantId === 'INFO26-HACK-14423' ||
+      r.razorpayPaymentId === 'pay_TQSsGjMXY4BxKi'
+    ) {
+      foundRohit = true;
+      r.fullName = 'Rohit Rajkumar';
+      r.studentName = 'Rohit Rajkumar';
+      r.email = 'rajkumarrohit965@gmail.com';
+      r.phone = '9740706586';
+      r.events = ['Codestorm'];
+      r.eventNames = ['Codestorm'];
+      r.totalFee = 50;
+      r.status = 'paid';
+      r.razorpayPaymentId = 'pay_TQSsGjMXY4BxKi';
+    }
+  });
+  if (!foundRohit) {
+    registrations.push({
+      id: 'reg_code_14423',
+      applicantId: 'INFO26-CODE-14423',
+      ticketId: 'tkt_code_14423',
+      fullName: 'Rohit Rajkumar',
+      studentName: 'Rohit Rajkumar',
+      email: 'rajkumarrohit965@gmail.com',
+      phone: '9740706586',
+      college: 'C. Abdul Hakeem College of Engineering & Technology',
+      department: 'Information Technology',
+      year: '2nd Year',
+      personalInfo: {
+        fullName: 'Rohit Rajkumar',
+        email: 'rajkumarrohit965@gmail.com',
+        phone: '9740706586',
+        college: 'C. Abdul Hakeem College of Engineering & Technology',
+        department: 'Information Technology',
+        year: '2nd Year',
+      },
+      events: ['Codestorm'],
+      eventNames: ['Codestorm'],
+      totalFee: 50,
+      status: 'paid',
+      checkedIn: false,
+      attendanceStatus: 'pending',
+      razorpayPaymentId: 'pay_TQSsGjMXY4BxKi',
+      createdAt: '2026-08-16T19:24:00.000Z',
+    });
+  }
+
+  // Reconcile and ensure Lithika Ganapathy's payment is confirmed
+  let foundLithika = false;
+  registrations.forEach((r) => {
+    if (
+      r.email === 'lithikaganapathy@gmail.com' ||
+      r.phone === '7418792577' ||
+      r.applicantId === 'INFO26-CODE-79257' ||
+      r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ'
+    ) {
+      foundLithika = true;
+      r.fullName = 'Lithika Ganapathy';
+      r.studentName = 'Lithika Ganapathy';
+      r.email = 'lithikaganapathy@gmail.com';
+      r.phone = '7418792577';
+      r.events = ['Codestorm'];
+      r.eventNames = ['Codestorm'];
+      r.totalFee = 50;
+      r.status = 'paid';
+      r.razorpayPaymentId = 'pay_TR6nR5uvpjrQAQ';
+    }
+  });
+  if (!foundLithika) {
     registrations.push({
       id: 'reg_code_79257',
       applicantId: 'INFO26-CODE-79257',
@@ -159,7 +229,14 @@ export async function GET() {
     const email = (r.personalInfo?.email || r.email || '').toLowerCase().trim();
     const phone = (r.personalInfo?.phone || r.phone || '').replace(/\D/g, '').slice(-10);
     const name = (r.personalInfo?.fullName || r.studentName || r.name || '').toLowerCase().trim();
-    const isTest = !name || name === '—' || name === 'participant' || email.includes('test@example.com');
+    const isTest =
+      !name ||
+      name === '—' ||
+      name === 'participant' ||
+      email.includes('test@example.com') ||
+      email.includes('arunkumar') ||
+      phone === '9876543210';
+
     if (!isPaid || isTest) return false;
 
     if (email && email.includes('@')) {

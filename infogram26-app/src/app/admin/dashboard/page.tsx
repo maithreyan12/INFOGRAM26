@@ -24,11 +24,16 @@ export default function AdminDashboard() {
       const email = (item.personalInfo?.email || item.email || '').toLowerCase().trim();
       const name = (item.personalInfo?.fullName || item.studentName || item.name || '').toLowerCase().trim();
       const appId = (item.applicantId || '').toLowerCase().trim();
+      const phone = (item.personalInfo?.phone || item.phone || '').replace(/\D/g, '');
       return (
         name === 'participant' ||
+        name.includes('participant') ||
         email === 'test@example.com' ||
         email.includes('verification.test') ||
-        appId.includes('999999')
+        email.includes('arunkumar') ||
+        phone === '9876543210' ||
+        appId.includes('999999') ||
+        appId.includes('live-7771')
       );
     };
 
@@ -104,11 +109,82 @@ export default function AdminDashboard() {
         }
       });
 
-      // Ensure Lithika Ganapathy (₹50 captured payment) is included
-      const hasLithika = combined.some(
-        (r) => r.email === 'lithikaganapathy@gmail.com' || r.personalInfo?.email === 'lithikaganapathy@gmail.com' || r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ'
-      );
-      if (!hasLithika) {
+      // Reconcile and ensure Rohit Rajkumar's payment is confirmed
+      let foundRohit = false;
+      combined.forEach((r) => {
+        if (
+          r.email === 'rajkumarrohit965@gmail.com' ||
+          r.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
+          r.phone === '9740706586' ||
+          r.personalInfo?.phone === '9740706586' ||
+          r.applicantId === 'INFO26-CODE-14423' ||
+          r.applicantId === 'INFO26-HACK-14423' ||
+          r.razorpayPaymentId === 'pay_TQSsGjMXY4BxKi'
+        ) {
+          foundRohit = true;
+          r.fullName = 'Rohit Rajkumar';
+          r.studentName = 'Rohit Rajkumar';
+          r.email = 'rajkumarrohit965@gmail.com';
+          r.phone = '9740706586';
+          r.events = ['Codestorm'];
+          r.eventNames = ['Codestorm'];
+          r.totalFee = 50;
+          r.status = 'paid';
+          r.razorpayPaymentId = 'pay_TQSsGjMXY4BxKi';
+        }
+      });
+      if (!foundRohit) {
+        combined.push({
+          id: 'reg_code_14423',
+          applicantId: 'INFO26-CODE-14423',
+          ticketId: 'tkt_code_14423',
+          fullName: 'Rohit Rajkumar',
+          studentName: 'Rohit Rajkumar',
+          email: 'rajkumarrohit965@gmail.com',
+          phone: '9740706586',
+          college: 'C. Abdul Hakeem College of Engineering & Technology',
+          department: 'Information Technology',
+          year: '2nd Year',
+          personalInfo: {
+            fullName: 'Rohit Rajkumar',
+            email: 'rajkumarrohit965@gmail.com',
+            phone: '9740706586',
+            college: 'C. Abdul Hakeem College of Engineering & Technology',
+            department: 'Information Technology',
+            year: '2nd Year',
+          },
+          events: ['Codestorm'],
+          eventNames: ['Codestorm'],
+          totalFee: 50,
+          status: 'paid',
+          razorpayPaymentId: 'pay_TQSsGjMXY4BxKi',
+        });
+      }
+
+      // Reconcile and ensure Lithika Ganapathy's payment is confirmed
+      let foundLithika = false;
+      combined.forEach((r) => {
+        if (
+          r.email === 'lithikaganapathy@gmail.com' ||
+          r.personalInfo?.email === 'lithikaganapathy@gmail.com' ||
+          r.phone === '7418792577' ||
+          r.personalInfo?.phone === '7418792577' ||
+          r.applicantId === 'INFO26-CODE-79257' ||
+          r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ'
+        ) {
+          foundLithika = true;
+          r.fullName = 'Lithika Ganapathy';
+          r.studentName = 'Lithika Ganapathy';
+          r.email = 'lithikaganapathy@gmail.com';
+          r.phone = '7418792577';
+          r.events = ['Codestorm'];
+          r.eventNames = ['Codestorm'];
+          r.totalFee = 50;
+          r.status = 'paid';
+          r.razorpayPaymentId = 'pay_TR6nR5uvpjrQAQ';
+        }
+      });
+      if (!foundLithika) {
         combined.push({
           id: 'reg_code_79257',
           applicantId: 'INFO26-CODE-79257',
