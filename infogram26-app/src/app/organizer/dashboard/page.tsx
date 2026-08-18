@@ -4,17 +4,89 @@ export const dynamic = 'force-dynamic';
 import OrganizerLayout from '@/components/admin/OrganizerLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useEventStore } from '@/store/eventStore';
-import { formatTimeRange } from '@/lib/eventsData';
+import { formatTimeRange, isEventMatch } from '@/lib/eventsData';
+import { db } from '@/lib/firebase/config';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import { Users, CheckCircle, Clock, Calendar, Edit3, Award, Trophy } from 'lucide-react';
 import Link from 'next/link';
 
 export default function OrganizerDashboard() {
   const { adminUser } = useAuth();
   const getEventByOrganizer = useEventStore((state) => state.getEventByOrganizer);
-  const getRegistrationsForEvent = useEventStore((state) => state.getRegistrationsForEvent);
 
   const event = getEventByOrganizer(adminUser?.uid, adminUser?.assignedEventId);
-  const eventRegistrations = event ? getRegistrationsForEvent(event.id) : [];
+  const [liveRegistrations, setLiveRegistrations] = useState<any[]>([]);
+
+  useEffect(() => {
+    let rawRegs: any[] = [];
+    let rawTickets: any[] = [];
+
+    const mergeLists = () => {
+      const combined = [...rawRegs];
+      rawTickets.forEach((t: any) => {
+        const exists = combined.some(
+          (r) =>
+            r.applicantId === t.applicantId ||
+            (r.personalInfo?.email && t.email && r.personalInfo?.email === t.email)
+        );
+        if (!exists && (t.studentName || t.applicantId)) {
+          combined.push({
+            id: t.ticketId || t.id,
+            applicantId: t.applicantId,
+            status: 'paid',
+            totalFee: t.totalAmount || 100,
+            personalInfo: {
+              fullName: t.studentName || t.name || 'Participant',
+              email: t.email || '',
+              phone: t.phone || '',
+              college: t.college || 'CAHCET',
+              department: t.department || 'Information Technology',
+              year: t.year || '1st',
+            },
+            eventNames: Array.isArray(t.events) ? t.events : [t.events],
+            events: Array.isArray(t.events) ? t.events : [t.events],
+          });
+        }
+      });
+      setLiveRegistrations(combined);
+    };
+
+    fetch('/api/admin/registrations')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.registrations)) {
+          rawRegs = data.registrations;
+          mergeLists();
+        }
+      })
+      .catch((e) => console.warn('API fetch note:', e));
+
+    if (!db) {
+      mergeLists();
+      return;
+    }
+
+    const unsubRegs = onSnapshot(collection(db, 'registrations'), (snap) => {
+      const dbItems = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      if (dbItems.length > 0) rawRegs = dbItems;
+      mergeLists();
+    });
+
+    const unsubTickets = onSnapshot(collection(db, 'tickets'), (snap) => {
+      rawTickets = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      mergeLists();
+    });
+
+    return () => {
+      unsubRegs();
+      unsubTickets();
+    };
+  }, []);
+
+  const eventRegistrations = event
+    ? liveRegistrations.filter((r: any) => isEventMatch(r, event))
+    : [];
 
   if (!event) {
     return (

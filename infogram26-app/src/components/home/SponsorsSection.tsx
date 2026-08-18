@@ -5,7 +5,7 @@ import { collection, onSnapshot } from 'firebase/firestore';
 // @ts-ignore
 import { db, isFirebaseConfigured } from '@/lib/firebase/config';
 import { useTheme } from '@/context/ThemeContext';
-import { Sparkles, ArrowUpRight, Handshake, CheckCircle2, ShieldCheck, Sparkle } from 'lucide-react';
+import { Sparkles, ArrowUpRight, Handshake } from 'lucide-react';
 import Link from 'next/link';
 
 type Sponsor = {
@@ -46,7 +46,6 @@ export default function SponsorsSection() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const [failedImgs, setFailedImgs] = useState<Record<string, boolean>>({});
-  const [selectedTemplate, setSelectedTemplate] = useState<'bento' | 'cyber' | 'luxe'>('bento');
 
   useEffect(() => {
     // Initial fetch from API
@@ -110,46 +109,12 @@ export default function SponsorsSection() {
         </h2>
 
         {/* Section Description */}
-        <p className="max-w-2xl mx-auto text-sm sm:text-base font-bold text-gray-400 leading-relaxed mb-6">
+        <p className="max-w-2xl mx-auto text-sm sm:text-base font-bold text-gray-400 leading-relaxed">
           Proudly powered and supported by visionary enterprises, tech trailblazers, and distinguished partners.
         </p>
-
-        {/* ── Square Card Template Selector ── */}
-        <div className="inline-flex items-center p-1.5 rounded-2xl bg-[#08182b]/80 border border-gray-800 backdrop-blur-xl gap-1.5 shadow-xl">
-          <button
-            onClick={() => setSelectedTemplate('bento')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
-              selectedTemplate === 'bento'
-                ? 'bg-gradient-to-r from-[#00d4ff] to-[#0096c7] text-slate-950 shadow-md'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <Sparkle className="w-3.5 h-3.5" /> Glass Bento
-          </button>
-          <button
-            onClick={() => setSelectedTemplate('cyber')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
-              selectedTemplate === 'cyber'
-                ? 'bg-gradient-to-r from-[#00d4ff] to-[#0096c7] text-slate-950 shadow-md'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" /> Cyber Frame
-          </button>
-          <button
-            onClick={() => setSelectedTemplate('luxe')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
-              selectedTemplate === 'luxe'
-                ? 'bg-gradient-to-r from-[#00d4ff] to-[#0096c7] text-slate-950 shadow-md'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <CheckCircle2 className="w-3.5 h-3.5" /> Minimal Luxe
-          </button>
-        </div>
       </div>
 
-      {/* ── Running Marquee Track (Square Showcase Cards) ── */}
+      {/* ── Running Marquee Track with Differentiated Membership Tier Square Cards ── */}
       <div className="relative w-full overflow-hidden py-6">
         {/* Left & Right Gradient Fade Masks */}
         <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-56 bg-gradient-to-r from-[#040d1a] to-transparent z-20 pointer-events-none" />
@@ -160,149 +125,126 @@ export default function SponsorsSection() {
             const normalized = normalizeImageUrl(sponsor.logoUrl);
             const showImg = normalized && !failedImgs[sponsor.id];
 
-            // ── TEMPLATE 1: GLASS BENTO SQUARE ──
-            if (selectedTemplate === 'bento') {
-              const BentoCard = (
-                <div
-                  className={`relative w-64 sm:w-72 p-6 rounded-3xl border transition-all duration-300 group/card overflow-hidden flex flex-col items-center text-center shrink-0 ${
-                    isDark
-                      ? 'bg-gradient-to-b from-slate-900/85 via-[#08182b]/85 to-[#040d1a]/95 backdrop-blur-2xl border-white/[0.08] shadow-2xl hover:border-[#00d4ff]/50 hover:shadow-[0_0_35px_rgba(0,212,255,0.2)]'
-                      : 'bg-white/90 backdrop-blur-xl border-slate-200 shadow-xl hover:border-[#7c3aed]/40'
-                  } hover:-translate-y-2`}
-                >
-                  <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#00d4ff]/30 to-transparent" />
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-[#00d4ff]/10 rounded-bl-full pointer-events-none group-hover/card:scale-150 transition-transform duration-500" />
+            // ── Distinct Template Config by Membership Tier ──
+            let tierConfig = {
+              cardBg: isDark
+                ? 'bg-gradient-to-b from-[#1f1704]/90 via-[#0d1527]/90 to-[#040d1a]/95 border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:border-amber-400 hover:shadow-[0_0_45px_rgba(245,158,11,0.3)]'
+                : 'bg-white/95 border-amber-300 shadow-xl hover:border-amber-400',
+              topGlow: 'bg-gradient-to-r from-transparent via-amber-400/40 to-transparent',
+              cornerAura: 'bg-amber-500/15',
+              logoBg: 'bg-gradient-to-b from-amber-500/15 via-black/50 to-black/70 border-amber-500/30 group-hover/card:border-amber-400/60',
+              textColor: 'text-amber-100',
+              badgeBg: 'bg-gradient-to-r from-amber-500/15 to-yellow-500/15 border-amber-500/40 text-amber-300',
+              badgeDot: 'bg-amber-400',
+              badgeLabel: 'Principal Partner',
+              buttonHover: 'hover:bg-amber-400 hover:text-slate-950',
+            };
 
-                  {/* Logo Container */}
-                  <div className="w-20 h-20 rounded-2xl bg-black/40 border border-white/10 p-2.5 flex items-center justify-center mb-4 group-hover/card:border-[#00d4ff]/40 group-hover/card:scale-105 transition-all duration-300 shadow-inner">
-                    {showImg ? (
-                      <img
-                        src={normalized}
-                        alt={sponsor.name}
-                        className="max-h-full max-w-full object-contain filter drop-shadow rounded-lg"
-                        onError={() => setFailedImgs((prev) => ({ ...prev, [sponsor.id]: true }))}
-                      />
-                    ) : (
-                      <span className="font-mono font-black text-sm text-[#00d4ff]">
-                        {getInitials(sponsor.name)}
-                      </span>
-                    )}
-                  </div>
-
-                  <h3 className="text-base font-black tracking-tight mb-3 truncate w-full text-white" title={sponsor.name}>
-                    {sponsor.name}
-                  </h3>
-
-                  {sponsor.websiteUrl ? (
-                    <span className="inline-flex items-center gap-1.5 text-xs font-black text-[#00d4ff] bg-[#00d4ff]/10 hover:bg-[#00d4ff]/20 border border-[#00d4ff]/30 px-4 py-1.5 rounded-full transition-all mt-auto">
-                      Visit Website <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5" />
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-400 bg-white/[0.04] border border-white/[0.08] px-4 py-1.5 rounded-full mt-auto">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Official Partner
-                    </span>
-                  )}
-                </div>
-              );
-
-              if (sponsor.websiteUrl) {
-                return (
-                  <a key={`${sponsor.id}-${index}`} href={sponsor.websiteUrl} target="_blank" rel="noopener noreferrer" className="block shrink-0">
-                    {BentoCard}
-                  </a>
-                );
-              }
-              return <div key={`${sponsor.id}-${index}`} className="shrink-0">{BentoCard}</div>;
+            if (sponsor.tier === 'silver') {
+              tierConfig = {
+                cardBg: isDark
+                  ? 'bg-gradient-to-b from-[#071d33]/90 via-[#081a2e]/90 to-[#040d1a]/95 border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.15)] hover:border-cyan-400 hover:shadow-[0_0_45px_rgba(6,182,212,0.3)]'
+                  : 'bg-white/95 border-cyan-300 shadow-xl hover:border-cyan-400',
+                topGlow: 'bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent',
+                cornerAura: 'bg-cyan-500/15',
+                logoBg: 'bg-gradient-to-b from-cyan-500/15 via-black/50 to-black/70 border-cyan-500/30 group-hover/card:border-cyan-400/60',
+                textColor: 'text-cyan-100',
+                badgeBg: 'bg-gradient-to-r from-cyan-500/15 to-blue-500/15 border-cyan-500/40 text-cyan-300',
+                badgeDot: 'bg-cyan-400',
+                badgeLabel: 'Associate Partner',
+                buttonHover: 'hover:bg-cyan-400 hover:text-slate-950',
+              };
+            } else if (sponsor.tier === 'bronze') {
+              tierConfig = {
+                cardBg: isDark
+                  ? 'bg-gradient-to-b from-[#1b0e2b]/90 via-[#0e1324]/90 to-[#040d1a]/95 border-purple-500/40 shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:border-purple-400 hover:shadow-[0_0_45px_rgba(168,85,247,0.3)]'
+                  : 'bg-white/95 border-purple-300 shadow-xl hover:border-purple-400',
+                topGlow: 'bg-gradient-to-r from-transparent via-purple-400/40 to-transparent',
+                cornerAura: 'bg-purple-500/15',
+                logoBg: 'bg-gradient-to-b from-purple-500/15 via-black/50 to-black/70 border-purple-500/30 group-hover/card:border-purple-400/60',
+                textColor: 'text-purple-100',
+                badgeBg: 'bg-gradient-to-r from-purple-500/15 to-pink-500/15 border-purple-500/40 text-purple-300',
+                badgeDot: 'bg-purple-400',
+                badgeLabel: 'Innovation Partner',
+                buttonHover: 'hover:bg-purple-400 hover:text-white',
+              };
+            } else if (sponsor.tier === 'partner') {
+              tierConfig = {
+                cardBg: isDark
+                  ? 'bg-gradient-to-b from-[#071c15]/90 via-[#081928]/90 to-[#040d1a]/95 border-emerald-500/40 shadow-[0_0_30px_rgba(16,185,129,0.15)] hover:border-emerald-400 hover:shadow-[0_0_45px_rgba(16,185,129,0.3)]'
+                  : 'bg-white/95 border-emerald-300 shadow-xl hover:border-emerald-400',
+                topGlow: 'bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent',
+                cornerAura: 'bg-emerald-500/15',
+                logoBg: 'bg-gradient-to-b from-emerald-500/15 via-black/50 to-black/70 border-emerald-500/30 group-hover/card:border-emerald-400/60',
+                textColor: 'text-emerald-100',
+                badgeBg: 'bg-gradient-to-r from-emerald-500/15 to-teal-500/15 border-emerald-500/40 text-emerald-300',
+                badgeDot: 'bg-emerald-400',
+                badgeLabel: 'Community Partner',
+                buttonHover: 'hover:bg-emerald-400 hover:text-slate-950',
+              };
             }
 
-            // ── TEMPLATE 2: CYBER FRAME SQUARE ──
-            if (selectedTemplate === 'cyber') {
-              const CyberCard = (
-                <div
-                  className={`relative w-64 sm:w-72 p-6 rounded-2xl border transition-all duration-300 group/cyber overflow-hidden flex flex-col items-center text-center shrink-0 ${
-                    isDark
-                      ? 'bg-[#081220]/90 backdrop-blur-xl border-cyan-500/25 shadow-2xl hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)]'
-                      : 'bg-white border-cyan-300 shadow-lg'
-                  } hover:-translate-y-2`}
-                >
-                  <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-cyan-400 animate-ping opacity-60" />
-                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-purple-400 opacity-60" />
-
-                  {/* Logo Pod */}
-                  <div className="w-24 h-24 rounded-xl bg-gradient-to-b from-cyan-950/40 to-black/60 border border-cyan-500/20 p-3 flex items-center justify-center mb-4 group-hover/cyber:scale-105 transition-transform duration-300 shadow-inner">
-                    {showImg ? (
-                      <img
-                        src={normalized}
-                        alt={sponsor.name}
-                        className="max-h-full max-w-full object-contain"
-                        onError={() => setFailedImgs((prev) => ({ ...prev, [sponsor.id]: true }))}
-                      />
-                    ) : (
-                      <span className="font-mono font-black text-base text-cyan-400">{getInitials(sponsor.name)}</span>
-                    )}
-                  </div>
-
-                  <h3 className="text-base font-black tracking-tight mb-2 truncate w-full text-white">
-                    {sponsor.name}
-                  </h3>
-
-                  <span className="text-[10px] font-black uppercase tracking-widest text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 px-3 py-1 rounded-md mt-auto">
-                    Verified Partner
-                  </span>
-                </div>
-              );
-
-              if (sponsor.websiteUrl) {
-                return (
-                  <a key={`${sponsor.id}-${index}`} href={sponsor.websiteUrl} target="_blank" rel="noopener noreferrer" className="block shrink-0">
-                    {CyberCard}
-                  </a>
-                );
-              }
-              return <div key={`${sponsor.id}-${index}`} className="shrink-0">{CyberCard}</div>;
-            }
-
-            // ── TEMPLATE 3: MINIMAL LUXE SQUARE ──
-            const LuxeCard = (
+            const CardContent = (
               <div
-                className={`relative w-64 sm:w-72 p-6 rounded-3xl border transition-all duration-300 group/luxe overflow-hidden flex flex-col items-center text-center shrink-0 ${
-                  isDark
-                    ? 'bg-gradient-to-b from-slate-900/90 to-[#0c121e]/95 backdrop-blur-xl border-amber-500/20 shadow-xl hover:border-amber-400/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)]'
-                    : 'bg-white border-amber-200 shadow-lg'
-                } hover:-translate-y-2`}
+                className={`relative w-64 sm:w-72 p-6 rounded-3xl border transition-all duration-300 group/card overflow-hidden flex flex-col items-center text-center shrink-0 backdrop-blur-2xl ${tierConfig.cardBg} hover:-translate-y-2.5`}
               >
-                <div className="w-20 h-20 rounded-full bg-amber-500/5 border border-amber-500/20 p-2.5 flex items-center justify-center mb-4 group-hover/luxe:scale-105 transition-transform duration-300 shadow-inner">
+                {/* Ambient Top Glow Line */}
+                <div className={`absolute top-0 inset-x-0 h-px ${tierConfig.topGlow}`} />
+                <div className={`absolute top-0 right-0 w-28 h-28 ${tierConfig.cornerAura} rounded-bl-full pointer-events-none group-hover/card:scale-150 transition-transform duration-500`} />
+
+                {/* ── Logo Frame ── */}
+                <div className={`w-20 h-20 rounded-2xl border p-2.5 flex items-center justify-center mb-4 transition-all duration-300 shadow-inner group-hover/card:scale-105 ${tierConfig.logoBg}`}>
                   {showImg ? (
                     <img
                       src={normalized}
                       alt={sponsor.name}
-                      className="max-h-full max-w-full object-contain rounded-full"
+                      className="max-h-full max-w-full object-contain filter drop-shadow rounded-lg"
                       onError={() => setFailedImgs((prev) => ({ ...prev, [sponsor.id]: true }))}
                     />
                   ) : (
-                    <span className="font-mono font-black text-sm text-amber-400">{getInitials(sponsor.name)}</span>
+                    <span className="font-mono font-black text-sm uppercase">
+                      {getInitials(sponsor.name)}
+                    </span>
                   )}
                 </div>
 
-                <h3 className="text-base font-black tracking-tight mb-2 truncate w-full text-white">
+                {/* ── Company Name ── */}
+                <h3
+                  className={`text-base font-black tracking-tight mb-3 truncate w-full ${isDark ? 'text-white' : 'text-slate-900'}`}
+                  title={sponsor.name}
+                >
                   {sponsor.name}
                 </h3>
 
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-auto">
-                  Official Sponsor
-                </span>
+                {/* ── Membership Badge or Interactive Website Link ── */}
+                {sponsor.websiteUrl ? (
+                  <span className={`inline-flex items-center gap-1.5 text-xs font-black px-4 py-1.5 rounded-full border transition-all mt-auto ${tierConfig.badgeBg} ${tierConfig.buttonHover}`}>
+                    Visit Website <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5" />
+                  </span>
+                ) : (
+                  <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-full border mt-auto ${tierConfig.badgeBg}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${tierConfig.badgeDot} animate-pulse`} />
+                    {tierConfig.badgeLabel}
+                  </span>
+                )}
               </div>
             );
 
             if (sponsor.websiteUrl) {
               return (
-                <a key={`${sponsor.id}-${index}`} href={sponsor.websiteUrl} target="_blank" rel="noopener noreferrer" className="block shrink-0">
-                  {LuxeCard}
+                <a
+                  key={`${sponsor.id}-${index}`}
+                  href={sponsor.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block shrink-0"
+                >
+                  {CardContent}
                 </a>
               );
             }
-            return <div key={`${sponsor.id}-${index}`} className="shrink-0">{LuxeCard}</div>;
+
+            return <div key={`${sponsor.id}-${index}`} className="shrink-0">{CardContent}</div>;
           })}
         </div>
       </div>

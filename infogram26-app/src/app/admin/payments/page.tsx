@@ -6,34 +6,30 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { IndianRupee, CheckCircle, Clock, Plus, Search, Filter, RefreshCw, X, ShieldCheck, Ticket } from 'lucide-react';
 import { db } from '@/lib/firebase/config';
 import { collection, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
-import { useEventStore } from '@/store/eventStore';
 import { toast } from 'sonner';
 
 export default function PaymentsPage() {
-  const storeRegistrations = useEventStore((state) => state.registrations);
   const [registrations, setRegistrations] = useState<any[]>([]);
   const [ticketsMap, setTicketsMap] = useState<Record<string, any>>({});
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedEvent, setSelectedEvent] = useState('');
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Manual Reconcile Modal state
+  // Manual reconciliation modal
   const [showModal, setShowModal] = useState(false);
   const [paymentIdInput, setPaymentIdInput] = useState('');
+  const [applicantIdInput, setApplicantIdInput] = useState('');
   const [nameInput, setNameInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [phoneInput, setPhoneInput] = useState('');
   const [amountInput, setAmountInput] = useState<number>(100);
   const [collegeInput, setCollegeInput] = useState('');
   const [selectedEventsInput, setSelectedEventsInput] = useState('');
+  const [reconciling, setReconciling] = useState(false);
 
-  /* ── 1. Live Firestore Sync ── */
+  /* ── 1. Real-time Firestore sync for Registrations & Payments ── */
   useEffect(() => {
-    if (!db) {
-      setRegistrations(storeRegistrations || []);
-      setLoading(false);
-      return;
-    }
-
     let rawRegs: any[] = [];
     let rawTickets: any[] = [];
 
@@ -43,30 +39,13 @@ export default function PaymentsPage() {
       const appId = (item.applicantId || '').toLowerCase().trim();
       return (
         name === 'participant' ||
-        name.includes('participant') ||
-        appId.includes('98035') ||
-        email.includes('verification.test') ||
-        email.includes('arunkumar.cahcet') ||
         email === 'test@example.com' ||
-        email.includes('test') ||
-        name.includes('test') ||
-        name.includes('verification') ||
-        appId.includes('9999') ||
-        appId.includes('test')
+        email.includes('verification.test') ||
+        appId.includes('999999')
       );
     };
 
     const mergeAndSet = () => {
-      // 0. Merge official storeRegistrations (including INFO26-HACK-14423 Rohit Rajkumar)
-      (storeRegistrations || []).forEach((sr: any) => {
-        if ((sr.status as string) === 'paid' || sr.applicantId === 'INFO26-HACK-14423') {
-          const exists = rawRegs.some((r) => r.applicantId === sr.applicantId || r.id === sr.id);
-          if (!exists) {
-            rawRegs.push(sr);
-          }
-        }
-      });
-
       const combined = rawRegs.filter((r) => !isTestEntry(r));
       rawTickets.forEach((t: any) => {
         if (isTestEntry(t)) return;
@@ -81,7 +60,7 @@ export default function PaymentsPage() {
             id: t.ticketId || t.id,
             applicantId: t.applicantId,
             razorpayPaymentId: t.razorpayPaymentId || t.paymentId || 'pass_issued',
-            totalFee: t.totalAmount || t.totalFee || 100,
+            totalFee: t.totalAmount || t.totalFee || 0,
             status: 'paid',
             personalInfo: {
               fullName: t.studentName || t.name || '',
@@ -96,21 +75,38 @@ export default function PaymentsPage() {
           });
         }
       });
-      const filteredStoreRegs = (storeRegistrations || []).filter((r) => !isTestEntry(r));
-      setRegistrations(combined.length > 0 ? combined : filteredStoreRegs);
+      setRegistrations(combined);
       setLoading(false);
     };
+
+    // Initial API fallback fetch
+    fetch('/api/admin/registrations')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
+          rawRegs = data.registrations;
+          mergeAndSet();
+        }
+      })
+      .catch((e) => console.warn('API registrations payment initial fetch note:', e));
+
+    if (!db) {
+      mergeAndSet();
+      return;
+    }
 
     const unsubRegs = onSnapshot(
       collection(db, 'registrations'),
       (snap) => {
-        rawRegs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const dbItems = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        if (dbItems.length > 0) {
+          rawRegs = dbItems;
+        }
         mergeAndSet();
       },
       (err) => {
         console.warn('Registrations payment live sync error:', err);
-        setRegistrations(storeRegistrations || []);
-        setLoading(false);
+        mergeAndSet();
       }
     );
 
@@ -130,8 +126,7 @@ export default function PaymentsPage() {
       unsubRegs();
       unsubTickets();
     };
-  }, [storeRegistrations]);
-
+  }, []);
 
   /* ── 2. Manual Reconcile Payment Handler ── */
   const handleReconcilePayment = async (e: React.FormEvent) => {

@@ -62,16 +62,7 @@ export default function EventsPage() {
           );
         };
 
-        const storeRegs = (useEventStore.getState?.()?.registrations) || [];
-        storeRegs.forEach((r: any) => {
-          if ((r.status === 'paid' || r.applicantId === 'INFO26-HACK-14423') && !isTest(r)) {
-            allPaidRecords.push({
-              applicantId: r.applicantId || r.id,
-              email: r.email || r.personalInfo?.email,
-              events: r.eventNames || r.events || [],
-            });
-          }
-        });
+        // Real backend records from Supabase and Firestore
 
         try {
           const { supabase } = await import('@/lib/supabase/config');

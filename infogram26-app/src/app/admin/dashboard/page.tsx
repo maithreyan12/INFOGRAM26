@@ -13,15 +13,10 @@ import { isEventMatch } from '@/lib/eventsData';
 
 export default function AdminDashboard() {
   const { user, adminUser, role } = useAuth();
-  const { events, organizers, registrations: storeRegistrations } = useEventStore();
+  const { events, organizers } = useEventStore();
   const [liveRegistrations, setLiveRegistrations] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!db) {
-      setLiveRegistrations(storeRegistrations || []);
-      return;
-    }
-
     let rawRegs: any[] = [];
     let ticketMap: Record<string, any> = {};
 
@@ -31,63 +26,44 @@ export default function AdminDashboard() {
       const appId = (item.applicantId || '').toLowerCase().trim();
       return (
         name === 'participant' ||
-        name.includes('participant') ||
-        appId.includes('98035') ||
-        email.includes('verification.test') ||
-        email.includes('arunkumar.cahcet') ||
         email === 'test@example.com' ||
-        email.includes('test') ||
-        name.includes('test') ||
-        name.includes('verification') ||
-        appId.includes('9999') ||
-        appId.includes('test')
+        email.includes('verification.test') ||
+        appId.includes('999999')
       );
     };
 
     const updateMetrics = async () => {
-      // 0. Merge official storeRegistrations (including INFO26-HACK-14423 Rohit Rajkumar)
-      (storeRegistrations || []).forEach((sr: any) => {
-        if ((sr.status as string) === 'paid' || sr.applicantId === 'INFO26-HACK-14423') {
-          const exists = rawRegs.some((r) => r.applicantId === sr.applicantId || r.id === sr.id);
-          if (!exists) {
-            rawRegs.push(sr);
-          }
-        }
-      });
-
       // 1. Fetch Supabase registrations
       try {
         const { supabase } = await import('@/lib/supabase/config');
-        const { data: spRegs } = await supabase.from('registrations').select('*').eq('status', 'paid');
-        if (spRegs) {
-          spRegs.forEach((sr: any) => {
-            const exists = rawRegs.some((r) => r.applicantId === sr.applicant_id || r.id === sr.id);
-            if (!exists) {
-              rawRegs.push({
-                id: sr.id,
-                applicantId: sr.applicant_id,
-                fullName: sr.full_name,
-                studentName: sr.full_name,
-                college: sr.college,
-                department: sr.department,
-                year: sr.year,
-                totalFee: sr.applicant_id === 'INFO26-HACK-14423' ? 50 : (sr.total_fee || 100),
-                status: 'paid',
-                razorpayPaymentId: sr.razorpay_payment_id,
-              });
-            }
-          });
+        if (supabase) {
+          const { data: spRegs } = await supabase.from('registrations').select('*');
+          if (spRegs) {
+            spRegs.forEach((sr: any) => {
+              const exists = rawRegs.some((r) => r.applicantId === sr.applicant_id || r.id === sr.id);
+              if (!exists) {
+                rawRegs.push({
+                  id: sr.id,
+                  applicantId: sr.applicant_id,
+                  fullName: sr.full_name,
+                  studentName: sr.full_name,
+                  college: sr.college,
+                  department: sr.department,
+                  year: sr.year,
+                  totalFee: sr.total_fee || 0,
+                  status: sr.status || 'paid',
+                  razorpayPaymentId: sr.razorpay_payment_id,
+                });
+              }
+            });
+          }
         }
       } catch (spErr) {
         console.warn('Supabase dashboard sync warning:', spErr);
       }
 
-      // Start from real paid registrations only
-      const paidRegs = rawRegs.filter((r) => {
-        const isPaidStatus = r.status === 'paid' || r.ticketId || ticketMap[r.applicantId] || r.paidAt || r.razorpayPaymentId;
-        return isPaidStatus && !isTestEntry(r);
-      });
-
+      // Start from real registrations
+      const paidRegs = rawRegs.filter((r) => !isTestEntry(r));
       const combined = [...paidRegs];
 
       // Add ticket-only entries that don't already exist in registrations
@@ -110,8 +86,8 @@ export default function AdminDashboard() {
             college: sCollege,
             department: t.department || t.branch || '',
             year: t.year || '',
-            totalFee: t.applicantId === 'INFO26-HACK-14423' ? 50 : (t.totalAmount ?? t.totalFee ?? 100),
-            status: 'paid',
+            totalFee: t.totalAmount ?? t.totalFee ?? 0,
+            status: t.status === 'valid' || t.status === 'used' ? 'paid' : (t.status || 'paid'),
             personalInfo: {
               fullName: sName,
               email: t.email || '',
@@ -126,14 +102,32 @@ export default function AdminDashboard() {
         }
       });
 
-      const filteredStoreRegs = (storeRegistrations || []).filter((r) => !isTestEntry(r) && (r.status as string) === 'paid');
-      setLiveRegistrations(combined.length > 0 ? combined : filteredStoreRegs);
+      setLiveRegistrations(combined);
     };
+
+    // Initial API fallback fetch to ensure instant data availability
+    fetch('/api/admin/registrations')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
+          rawRegs = data.registrations;
+          updateMetrics();
+        }
+      })
+      .catch((e) => console.warn('API registrations initial fetch note:', e));
+
+    if (!db) {
+      updateMetrics();
+      return;
+    }
 
     const unsubRegs = onSnapshot(
       collection(db, 'registrations'),
       (snap) => {
-        rawRegs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const dbItems = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        if (dbItems.length > 0) {
+          rawRegs = dbItems;
+        }
         updateMetrics();
       },
       (err) => {
@@ -163,15 +157,13 @@ export default function AdminDashboard() {
       unsubRegs();
       unsubTickets();
     };
-  }, [storeRegistrations]);
+  }, []);
 
-  const activeRegistrations = liveRegistrations.length > 0 ? liveRegistrations : (storeRegistrations || []).filter(r => (r.status as string) === 'paid');
+  const activeRegistrations = liveRegistrations;
   const totalRegistrations = activeRegistrations.length;
   const totalRevenue = activeRegistrations.reduce((sum, r) => {
-    const fee = (r.applicantId === 'INFO26-HACK-14423' || r.razorpayPaymentId === 'pay_TQSsGjMXY4BxKi')
-      ? 50
-      : Number(r.totalFee ?? r.totalAmount ?? r.fee ?? 100);
-    return sum + fee;
+    const fee = Number(r.totalFee ?? r.totalAmount ?? r.fee ?? 0);
+    return sum + (isNaN(fee) ? 0 : fee);
   }, 0);
   const activeEventsCount = events.length;
   const organizersCount = organizers.length;
@@ -356,6 +348,7 @@ export default function AdminDashboard() {
                   <th className="px-4 py-3">Applicant ID</th>
                   <th className="px-4 py-3">Participant</th>
                   <th className="px-4 py-3">College</th>
+                  <th className="px-4 py-3">Amount</th>
                   <th className="px-4 py-3 text-right">Status</th>
                 </tr>
               </thead>
@@ -368,6 +361,7 @@ export default function AdminDashboard() {
                       <td className="px-4 py-3.5 font-mono text-[#00d4ff] font-bold">{reg.applicantId}</td>
                       <td className="px-4 py-3.5 font-black text-white">{name}</td>
                       <td className="px-4 py-3.5 text-gray-300">{college}</td>
+                      <td className="px-4 py-3.5 font-black text-amber-400">₹{reg.totalFee ?? reg.totalAmount ?? reg.fee ?? 0}</td>
                       <td className="px-4 py-3.5 text-right">
                         <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase">
                           {reg.status === 'paid' ? 'PAID' : reg.status?.toUpperCase() || 'VERIFIED'}

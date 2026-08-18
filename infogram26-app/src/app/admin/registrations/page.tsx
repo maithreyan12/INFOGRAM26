@@ -11,7 +11,6 @@ import { toast } from 'sonner';
 import { OFFICIAL_EVENTS, isEventMatch } from '@/lib/eventsData';
 
 export default function RegistrationsPage() {
-  const storeRegistrations = useEventStore((state) => state.registrations);
   const [registrations, setRegistrations] = useState<any[]>([]);
   const [ticketsMap, setTicketsMap] = useState<Record<string, any>>({});
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,131 +20,97 @@ export default function RegistrationsPage() {
 
   /* ── 1. Real-time Firestore sync for Registrations & Tickets ── */
   useEffect(() => {
-    if (!db) {
-      setRegistrations(storeRegistrations || []);
-      setLoading(false);
-      return;
-    }
-
     let rawRegs: any[] = [];
     let ticketItems: Record<string, any> = {};
 
     const updateCombinedList = async () => {
-      // 0. Merge official storeRegistrations (including INFO26-HACK-14423 Rohit Rajkumar)
-      (storeRegistrations || []).forEach((sr: any) => {
-        if ((sr.status as string) === 'paid' || sr.applicantId === 'INFO26-HACK-14423') {
-          const exists = rawRegs.some((r) => r.applicantId === sr.applicantId || r.id === sr.id);
-          if (!exists) {
-            rawRegs.push(sr);
-          }
-        }
-      });
-
       // 1. Fetch Supabase registrations & tickets
       try {
         const { supabase } = await import('@/lib/supabase/config');
-        const { data: spRegs } = await supabase.from('registrations').select('*').eq('status', 'paid');
-        if (spRegs) {
-          spRegs.forEach((sr: any) => {
-            const exists = rawRegs.some((r) => r.applicantId === sr.applicant_id || r.id === sr.id);
-            if (!exists) {
-              rawRegs.push({
-                id: sr.id,
-                applicantId: sr.applicant_id,
-                fullName: sr.full_name,
-                email: sr.email,
-                phone: sr.phone,
-                college: sr.college,
-                department: sr.department,
-                year: sr.year,
-                personalInfo: {
+        if (supabase) {
+          const { data: spRegs } = await supabase.from('registrations').select('*');
+          if (spRegs) {
+            spRegs.forEach((sr: any) => {
+              const exists = rawRegs.some((r) => r.applicantId === sr.applicant_id || r.id === sr.id);
+              if (!exists) {
+                rawRegs.push({
+                  id: sr.id,
+                  applicantId: sr.applicant_id,
                   fullName: sr.full_name,
                   email: sr.email,
                   phone: sr.phone,
                   college: sr.college,
                   department: sr.department,
                   year: sr.year,
-                },
-                events: sr.events || [],
-                eventNames: sr.events || [],
-                totalFee: sr.total_fee || 100,
-                status: 'paid',
-                razorpayPaymentId: sr.razorpay_payment_id,
-              });
-            }
-          });
-        }
+                  personalInfo: {
+                    fullName: sr.full_name,
+                    email: sr.email,
+                    phone: sr.phone,
+                    college: sr.college,
+                    department: sr.department,
+                    year: sr.year,
+                  },
+                  events: sr.events || [],
+                  eventNames: sr.events || [],
+                  totalFee: sr.total_fee || 0,
+                  status: sr.status || 'paid',
+                  razorpayPaymentId: sr.razorpay_payment_id,
+                });
+              }
+            });
+          }
 
-        const { data: spTkts } = await supabase.from('tickets').select('*');
-        if (spTkts) {
-          spTkts.forEach((st: any) => {
-            if (st.applicant_id && !ticketItems[st.applicant_id]) {
-              ticketItems[st.applicant_id] = {
-                id: st.id,
-                ticketNumber: st.ticket_number,
-                applicantId: st.applicant_id,
-                studentName: st.student_name,
-                email: st.email,
-                phone: st.phone,
-                college: st.college,
-                department: st.department,
-                year: st.year,
-                events: st.events,
-                totalAmount: st.total_amount,
-                status: st.status,
-                qrData: st.qr_data,
-              };
-            }
-          });
+          const { data: spTkts } = await supabase.from('tickets').select('*');
+          if (spTkts) {
+            spTkts.forEach((st: any) => {
+              if (st.applicant_id && !ticketItems[st.applicant_id]) {
+                ticketItems[st.applicant_id] = {
+                  id: st.id,
+                  ticketNumber: st.ticket_number,
+                  applicantId: st.applicant_id,
+                  studentName: st.student_name,
+                  email: st.email,
+                  phone: st.phone,
+                  college: st.college,
+                  department: st.department,
+                  year: st.year,
+                  events: st.events,
+                  totalAmount: st.total_amount,
+                  status: st.status,
+                  qrData: st.qr_data,
+                };
+              }
+            });
+          }
         }
       } catch (spErr) {
         console.warn('Supabase admin registrations fetch warning:', spErr);
       }
 
-      // Filter rawRegs to ONLY include paid registrations or those with a valid ticket
-      const paidRegs = rawRegs.filter((r) => {
-        const isPaidStatus = r.status === 'paid' || r.ticketId || ticketItems[r.applicantId];
+      // Filter rawRegs
+      const isTestEntry = (r: any) => {
         const email = (r.personalInfo?.email || r.email || '').toLowerCase().trim();
         const name = (r.personalInfo?.fullName || r.studentName || r.name || '').toLowerCase().trim();
         const appId = (r.applicantId || '').toLowerCase().trim();
-        const isDemo =
+        return (
           name === 'participant' ||
-          name.includes('participant') ||
-          appId.includes('98035') ||
-          email.includes('verification.test') ||
-          email.includes('arunkumar.cahcet') ||
           email === 'test@example.com' ||
-          email.includes('test') ||
-          name.includes('test') ||
-          name.includes('verification') ||
-          appId.includes('9999');
-        return isPaidStatus && !isDemo;
-      });
+          email.includes('verification.test') ||
+          appId.includes('999999')
+        );
+      };
 
+      const paidRegs = rawRegs.filter((r) => !isTestEntry(r));
       const combined = [...paidRegs];
 
       // Add any tickets that are not in rawRegs
       Object.values(ticketItems).forEach((t: any) => {
-        const email = (t.email || '').toLowerCase().trim();
-        const name = (t.studentName || t.name || t.fullName || '').toLowerCase().trim();
-        const appId = (t.applicantId || '').toLowerCase().trim();
-        const isDemo =
-          name === 'participant' ||
-          name.includes('participant') ||
-          appId.includes('98035') ||
-          email.includes('verification.test') ||
-          email.includes('arunkumar.cahcet') ||
-          email === 'test@example.com' ||
-          email.includes('test') ||
-          name.includes('test') ||
-          name.includes('verification') ||
-          appId.includes('9999');
-        if (isDemo) return;
+        if (isTestEntry(t)) return;
 
         const exists = combined.some(
           (r) => r.applicantId === t.applicantId || (r.personalInfo?.email && r.personalInfo?.email === t.email)
         );
-        if (!exists && (name || email)) {
+        if (!exists && (t.studentName || t.name || t.fullName || t.email)) {
           combined.push({
             id: t.registrationId || t.id,
             applicantId: t.applicantId || `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
@@ -168,10 +133,25 @@ export default function RegistrationsPage() {
         }
       });
 
-      // Fallback to storeRegistrations if empty
-      setRegistrations(combined.length > 0 ? combined : (storeRegistrations || []).filter(r => (r.status as string) === 'paid' || r.status === 'confirmed'));
+      setRegistrations(combined);
       setLoading(false);
     };
+
+    // Initial API fallback fetch to guarantee immediate display
+    fetch('/api/admin/registrations')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
+          rawRegs = data.registrations;
+          updateCombinedList();
+        }
+      })
+      .catch((e) => console.warn('API registrations initial fetch note:', e));
+
+    if (!db) {
+      updateCombinedList();
+      return;
+    }
 
     // Realtime listener for registrations
     const unsubRegs = onSnapshot(
@@ -209,7 +189,7 @@ export default function RegistrationsPage() {
       unsubRegs();
       unsubTickets();
     };
-  }, [storeRegistrations]);
+  }, []);
 
   /* ── 2. Manual Check-in helper ── */
   const handleManualCheckIn = async (reg: any) => {

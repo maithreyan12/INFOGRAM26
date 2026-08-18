@@ -45,9 +45,9 @@ export async function POST(req: Request) {
     const { name, email, phone, college, department, year, events, amount, applicantId } = body;
     const db = getDB();
 
-    const appCode = applicantId || `INFO26-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
-    const eventsList = Array.isArray(events) ? events : [events || 'HackForge'];
-    const ticketNumber = `TKT-HACK-${Math.floor(10000 + Math.random() * 90000)}`;
+    const appCode = applicantId || `INFO26-EVNT-${Math.floor(10000 + Math.random() * 90000)}`;
+    const eventsList = Array.isArray(events) ? events : [events || 'Event'];
+    const ticketNumber = `TKT-EVNT-${Math.floor(10000 + Math.random() * 90000)}`;
 
     let regId = `reg_${Date.now()}_${Math.floor(Math.random()*1000)}`;
     let regError = null;

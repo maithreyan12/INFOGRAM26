@@ -80,7 +80,7 @@ export async function POST(req: Request) {
         college: 'C. Abdul Hakeem College of Engineering & Technology',
         department: 'Information Technology',
         year: '2nd Year',
-        events: ['HackForge'],
+        events: ['Codestorm'],
         amount: 50,
         razorpayPaymentId: 'pay_TQSsGjMXY4BxKi',
       },

@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '@/lib/firebase/config';
 import { supabase } from '@/lib/supabase/config';
-import { collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, serverTimestamp, query, where } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { CheckCircle, User, Calendar, ClipboardList, ChevronRight, ChevronLeft } from 'lucide-react';
@@ -180,6 +180,46 @@ export default function RegisterPage() {
     try {
       if (db) {
         try {
+          // ── Duplicate Registration Check ──
+          // Check if the same email has already registered for any of the selected events
+          const existingRegsSnap = await getDocs(
+            query(
+              collection(db, 'registrations'),
+              where('personalInfo.email', '==', formData.email)
+            )
+          );
+
+          if (!existingRegsSnap.empty) {
+            const existingRegs = existingRegsSnap.docs.map(d => d.data());
+            const alreadyRegisteredEvents: string[] = [];
+
+            for (const existing of existingRegs) {
+              const existingEventIds: string[] = Array.isArray(existing.events) ? existing.events : [];
+              const existingEventNames: string[] = Array.isArray(existing.eventNames) ? existing.eventNames : [];
+              const allExistingRefs = [...existingEventIds, ...existingEventNames].map(s => String(s).toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+              for (const selId of selectedEvents) {
+                const selEvent = events.find(e => e.id === selId);
+                if (!selEvent) continue;
+                const selNorms = [selId, selEvent.slug, selEvent.name].map(s => String(s).toLowerCase().replace(/[^a-z0-9]/g, ''));
+                const isDuplicate = selNorms.some(sn => allExistingRefs.some(er => er === sn || er.includes(sn) || sn.includes(er)));
+                if (isDuplicate) {
+                  alreadyRegisteredEvents.push(selEvent.name);
+                }
+              }
+            }
+
+            if (alreadyRegisteredEvents.length > 0) {
+              const uniqueNames = [...new Set(alreadyRegisteredEvents)];
+              toast.error(
+                `You have already registered for: ${uniqueNames.join(', ')}. Duplicate registrations are not allowed. Contact support if this is a mistake.`,
+                { duration: 6000 }
+              );
+              setIsSubmitting(false);
+              return;
+            }
+          }
+
           const applicantId = generateApplicantId(eventNamesList as string[]);
           const cleanPersonalInfo = JSON.parse(
             JSON.stringify(formData, (key, value) => (value === undefined ? null : value))
