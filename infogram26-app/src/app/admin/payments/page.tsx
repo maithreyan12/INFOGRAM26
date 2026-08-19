@@ -28,150 +28,39 @@ export default function PaymentsPage() {
   const [selectedEventsInput, setSelectedEventsInput] = useState('');
   const [reconciling, setReconciling] = useState(false);
 
-  /* ── 1. Real-time sync for Registrations & Payments ── */
-  useEffect(() => {
-    let rawRegs: any[] = [];
-    let rawTickets: any[] = [];
+  const [lastUpdated, setLastUpdated] = useState<string>('');
 
-    const isTestEntry = (item: any) => {
-      const email = (item.personalInfo?.email || item.email || '').toLowerCase().trim();
-      const name = (item.personalInfo?.fullName || item.studentName || item.name || '').toLowerCase().trim();
-      const appId = (item.applicantId || '').toLowerCase().trim();
-      const phone = (item.personalInfo?.phone || item.phone || '').replace(/\D/g, '');
-      return (
-        name === 'participant' ||
-        name.includes('participant') ||
-        email === 'test@example.com' ||
-        email.includes('verification.test') ||
-        email.includes('arunkumar') ||
-        phone === '9876543210' ||
-        appId.includes('999999') ||
-        appId.includes('live-7771')
-      );
-    };
-
-    const mergeAndSet = () => {
-      const combined = rawRegs.filter(
-        (r) => !isTestEntry(r) && (r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId)
-      );
-
-      rawTickets.forEach((t: any) => {
-        if (isTestEntry(t)) return;
-
-        const exists = combined.some(
-          (r) =>
-            r.applicantId === t.applicantId ||
-            (r.personalInfo?.email && t.email && r.personalInfo?.email === t.email)
-        );
-        if (!exists && (t.studentName || t.applicantId)) {
-          combined.push({
-            id: t.ticketId || t.id,
-            applicantId: t.applicantId,
-            razorpayPaymentId: t.razorpayPaymentId || t.paymentId || 'pay_verified_pass',
-            totalFee: t.totalAmount || t.totalFee || 0,
-            status: 'paid',
-            personalInfo: {
-              fullName: t.studentName || t.name || '',
-              email: t.email || '',
-              phone: t.phone || '',
-              college: t.college || 'C. Abdul Hakeem College of Engineering & Technology',
-              department: t.department || t.branch || 'Information Technology',
-              year: t.year || '2nd Year',
-            },
-            events: t.eventNames || t.events || [],
-            eventNames: t.eventNames || t.events || [],
-          });
-        }
-      });
-
-      // Deduplicate and filter real registrations (Event-aware)
-      const seenEventKeys = new Set<string>();
-      const seenAppIds = new Set<string>();
-
-      const deduped = combined.filter((r) => {
-        const email = (r.personalInfo?.email || r.email || '').toLowerCase().trim();
-        const phone = (r.personalInfo?.phone || r.phone || '').replace(/\D/g, '').slice(-10);
-        const name = (r.personalInfo?.fullName || r.studentName || r.name || '').toLowerCase().trim();
-        const appId = (r.applicantId || '').toUpperCase().trim();
-
-        if (!name || name === '—' || name === 'participant' || email.includes('test@example.com') || phone === '9876543210' || appId.includes('LIVE-7771')) {
-          return false;
-        }
-
-        if (appId) {
-          if (seenAppIds.has(appId)) return false;
-          seenAppIds.add(appId);
-        }
-
-        const eventList = (Array.isArray(r.events) ? r.events : r.eventNames || []).slice().sort().join(',').toLowerCase();
-        const identifier = email || phone || name;
-        if (identifier && eventList) {
-          const compositeKey = `${identifier}::${eventList}`;
-          if (seenEventKeys.has(compositeKey)) return false;
-          seenEventKeys.add(compositeKey);
-        }
-
-        return true;
-      });
-
-      setRegistrations(deduped);
-      setLoading(false);
-    };
-
-    // Initial API fallback fetch to guarantee 100% sync
-    fetch('/api/admin/registrations')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
-          rawRegs = data.registrations;
-          mergeAndSet();
-        }
-      })
-      .catch((e) => console.warn('API registrations payment initial fetch note:', e));
-
-    if (!db) {
-      mergeAndSet();
-      return;
-    }
-
-    const unsubRegs = onSnapshot(
-      collection(db, 'registrations'),
-      (snap) => {
-        const dbItems = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        if (dbItems.length > 0) {
-          rawRegs = dbItems;
-        }
-        mergeAndSet();
-      },
-      (err: any) => {
-        if (err?.code !== 'permission-denied') {
-          console.warn('Registrations payment live sync note:', err?.message || err);
-        }
-        mergeAndSet();
-      }
-    );
-
-    const unsubTickets = onSnapshot(
-      collection(db, 'tickets'),
-      (snap) => {
-        rawTickets = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const fetchLive = React.useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/live');
+      const data = await res.json();
+      if (data.success) {
+        setRegistrations(data.registrations || []);
+        
         const map: Record<string, any> = {};
-        rawTickets.forEach((t) => { if (t.applicantId) map[t.applicantId] = t; });
+        (data.tickets || []).forEach((t: any) => {
+          if (t.applicantId) {
+            map[t.applicantId] = t;
+          }
+          if (t.registrationId) {
+            map[t.registrationId] = t;
+          }
+        });
         setTicketsMap(map);
-        mergeAndSet();
-      },
-      (err: any) => {
-        if (err?.code !== 'permission-denied') {
-          console.warn('Tickets payment live sync note:', err?.message || err);
-        }
+        setLastUpdated(data.lastUpdated || new Date().toISOString());
       }
-    );
-
-    return () => {
-      unsubRegs();
-      unsubTickets();
-    };
+    } catch (e) {
+      console.warn('Payments live fetch error:', e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchLive();
+    const interval = setInterval(fetchLive, 15000);
+    return () => clearInterval(interval);
+  }, [fetchLive]);
 
   /* ── 2. Manual Reconcile Payment Handler ── */
   const handleReconcilePayment = async (e: React.FormEvent) => {
@@ -275,11 +164,25 @@ export default function PaymentsPage() {
     return name.includes(q) || email.includes(q) || appId.includes(q) || payId.includes(q);
   });
 
+  const fmtTime = (iso: string) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) +
+      ' · ' + d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+  };
+
   return (
     <AdminLayout>
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="flex items-center gap-1 text-[10px] font-black text-emerald-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              LIVE
+            </span>
+            {lastUpdated && <span className="text-[11px] text-gray-500 font-bold">Updated: {fmtTime(lastUpdated)}</span>}
+          </div>
           <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
             Payment &amp; Transaction Management
           </h1>
@@ -288,12 +191,20 @@ export default function PaymentsPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 transition-all active:scale-95"
-        >
-          <Plus className="w-4 h-4" /> Link Unlinked Payment / Issue Pass
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={fetchLive}
+            className="flex items-center gap-2 border border-gray-700 hover:border-[#00d4ff] text-gray-300 hover:text-[#00d4ff] px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all active:scale-95"
+          >
+            <RefreshCw className="w-4 h-4" /> Refresh
+          </button>
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 transition-all active:scale-95"
+          >
+            <Plus className="w-4 h-4" /> Link Unlinked Payment / Issue Pass
+          </button>
+        </div>
       </div>
 
       {/* Metrics Banner */}

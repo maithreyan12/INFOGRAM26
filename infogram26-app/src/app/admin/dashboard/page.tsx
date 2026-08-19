@@ -1,360 +1,56 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Users, IndianRupee, Calendar as CalendarIcon, Clock, Plus, Bell, UserCheck, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Users, IndianRupee, Calendar as CalendarIcon, Plus, UserCheck, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useEventStore } from '@/store/eventStore';
 import { useAuth } from '@/hooks/useAuth';
-import { db } from '@/lib/firebase/config';
-import { collection, onSnapshot } from 'firebase/firestore';
-import { isEventMatch } from '@/lib/eventsData';
 
 export default function AdminDashboard() {
   const { user, adminUser, role } = useAuth();
   const { events, organizers } = useEventStore();
   const [liveRegistrations, setLiveRegistrations] = useState<any[]>([]);
+  const [stats, setStats] = useState({ totalPaid: 0, totalRevenue: 0, totalTickets: 0, eventSlots: {} as Record<string, number> });
+  const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let rawRegs: any[] = [];
-    let ticketMap: Record<string, any> = {};
-
-    const isTestEntry = (item: any) => {
-      const email = (item.personalInfo?.email || item.email || '').toLowerCase().trim();
-      const name = (item.personalInfo?.fullName || item.studentName || item.name || '').toLowerCase().trim();
-      const appId = (item.applicantId || '').toLowerCase().trim();
-      const phone = (item.personalInfo?.phone || item.phone || '').replace(/\D/g, '');
-      return (
-        name === 'participant' ||
-        name.includes('participant') ||
-        email === 'test@example.com' ||
-        email.includes('verification.test') ||
-        email.includes('arunkumar') ||
-        phone === '9876543210' ||
-        appId.includes('999999') ||
-        appId.includes('live-7771')
-      );
-    };
-
-    const updateMetrics = async () => {
-      // 1. Fetch Supabase registrations
-      try {
-        const { supabase } = await import('@/lib/supabase/config');
-        if (supabase) {
-          const { data: spRegs } = await supabase.from('registrations').select('*');
-          if (spRegs) {
-            spRegs.forEach((sr: any) => {
-              const exists = rawRegs.some((r) => r.applicantId === sr.applicant_id || r.id === sr.id);
-              if (!exists) {
-                rawRegs.push({
-                  id: sr.id,
-                  applicantId: sr.applicant_id,
-                  fullName: sr.full_name,
-                  studentName: sr.full_name,
-                  college: sr.college,
-                  department: sr.department,
-                  year: sr.year,
-                  totalFee: sr.total_fee || 0,
-                  status: sr.status || 'paid',
-                  razorpayPaymentId: sr.razorpay_payment_id,
-                });
-              }
-            });
-          }
-        }
-      } catch (spErr) {
-        console.warn('Supabase dashboard sync warning:', spErr);
+  const fetchLive = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/live');
+      const data = await res.json();
+      if (data.success) {
+        setLiveRegistrations(data.registrations || []);
+        setStats(data.stats || { totalPaid: 0, totalRevenue: 0, totalTickets: 0, eventSlots: {} });
+        setLastUpdated(data.lastUpdated || new Date().toISOString());
       }
-
-      // Start from real confirmed paid registrations only
-      const paidRegs = rawRegs.filter(
-        (r) => !isTestEntry(r) && (r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId)
-      );
-      const combined = [...paidRegs];
-
-      // Add ticket-only entries that don't already exist in registrations
-      Object.values(ticketMap).forEach((t: any) => {
-        if (isTestEntry(t)) return;
-
-        const exists = combined.some(
-          (r) =>
-            r.applicantId === t.applicantId ||
-            ((r.personalInfo?.email || r.email) && t.email && (r.personalInfo?.email || r.email) === t.email)
-        );
-        if (!exists && (t.studentName || t.fullName || t.name || t.email || t.applicantId)) {
-          const sName = t.studentName || t.name || t.fullName || '';
-          const sCollege = t.college || '';
-          combined.push({
-            id: t.ticketId || t.id,
-            applicantId: t.applicantId,
-            fullName: sName,
-            studentName: sName,
-            college: sCollege,
-            department: t.department || t.branch || '',
-            year: t.year || '',
-            totalFee: t.totalAmount ?? t.totalFee ?? 0,
-            status: t.status === 'valid' || t.status === 'used' ? 'paid' : (t.status || 'paid'),
-            personalInfo: {
-              fullName: sName,
-              email: t.email || '',
-              phone: t.phone || '',
-              college: sCollege,
-              department: t.department || t.branch || '',
-              year: t.year || '',
-            },
-            events: t.eventNames || t.events || [],
-            eventNames: t.eventNames || t.events || [],
-          });
-        }
-      });
-
-      // Reconcile and ensure Rohit Rajkumar's payment is confirmed
-      let foundRohit = false;
-      combined.forEach((r) => {
-        if (
-          r.email === 'rajkumarrohit965@gmail.com' ||
-          r.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
-          r.phone === '9740706586' ||
-          r.personalInfo?.phone === '9740706586' ||
-          r.applicantId === 'INFO26-CODE-14423' ||
-          r.applicantId === 'INFO26-HACK-14423' ||
-          r.razorpayPaymentId === 'pay_TQSsGjMXY4BxKi'
-        ) {
-          foundRohit = true;
-          r.fullName = 'Rohit Rajkumar';
-          r.studentName = 'Rohit Rajkumar';
-          r.email = 'rajkumarrohit965@gmail.com';
-          r.phone = '9740706586';
-          r.events = ['Codestorm'];
-          r.eventNames = ['Codestorm'];
-          r.totalFee = 50;
-          r.status = 'paid';
-          r.razorpayPaymentId = 'pay_TQSsGjMXY4BxKi';
-        }
-      });
-      if (!foundRohit) {
-        combined.push({
-          id: 'reg_code_14423',
-          applicantId: 'INFO26-CODE-14423',
-          ticketId: 'tkt_code_14423',
-          fullName: 'Rohit Rajkumar',
-          studentName: 'Rohit Rajkumar',
-          email: 'rajkumarrohit965@gmail.com',
-          phone: '9740706586',
-          college: 'C. Abdul Hakeem College of Engineering & Technology',
-          department: 'Information Technology',
-          year: '2nd Year',
-          personalInfo: {
-            fullName: 'Rohit Rajkumar',
-            email: 'rajkumarrohit965@gmail.com',
-            phone: '9740706586',
-            college: 'C. Abdul Hakeem College of Engineering & Technology',
-            department: 'Information Technology',
-            year: '2nd Year',
-          },
-          events: ['Codestorm'],
-          eventNames: ['Codestorm'],
-          totalFee: 50,
-          status: 'paid',
-          razorpayPaymentId: 'pay_TQSsGjMXY4BxKi',
-        });
-      }
-
-      // Reconcile and ensure Lithika Ganapathy's Codestorm payment is confirmed
-      let foundLithika = false;
-      combined.forEach((r) => {
-        if (
-          r.applicantId === 'INFO26-CODE-79257' ||
-          r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ'
-        ) {
-          foundLithika = true;
-          r.fullName = 'Lithika Ganapathy';
-          r.studentName = 'Lithika Ganapathy';
-          r.email = 'lithikaganapathy@gmail.com';
-          r.phone = '7418792577';
-          r.events = ['Codestorm'];
-          r.eventNames = ['Codestorm'];
-          r.totalFee = 50;
-          r.status = 'paid';
-          r.razorpayPaymentId = 'pay_TR6nR5uvpjrQAQ';
-        }
-      });
-      if (!foundLithika) {
-        combined.push({
-          id: 'reg_code_79257',
-          applicantId: 'INFO26-CODE-79257',
-          ticketId: 'tkt_code_79257',
-          fullName: 'Lithika Ganapathy',
-          studentName: 'Lithika Ganapathy',
-          email: 'lithikaganapathy@gmail.com',
-          phone: '7418792577',
-          college: 'C. Abdul Hakeem College of Engineering & Technology',
-          department: 'Information Technology',
-          year: '2nd Year',
-          personalInfo: {
-            fullName: 'Lithika Ganapathy',
-            email: 'lithikaganapathy@gmail.com',
-            phone: '7418792577',
-            college: 'C. Abdul Hakeem College of Engineering & Technology',
-            department: 'Information Technology',
-            year: '2nd Year',
-          },
-          events: ['Codestorm'],
-          eventNames: ['Codestorm'],
-          totalFee: 50,
-          status: 'paid',
-          razorpayPaymentId: 'pay_TR6nR5uvpjrQAQ',
-        });
-      }
-
-      // Sort so paid registrations come before pending registrations for proper deduplication preference
-      combined.sort((a, b) => {
-        const aPaid = a.status === 'paid' || a.ticketId || a.paidAt || a.razorpayPaymentId ? 1 : 0;
-        const bPaid = b.status === 'paid' || b.ticketId || b.paidAt || b.razorpayPaymentId ? 1 : 0;
-        return bPaid - aPaid;
-      });
-
-      // Deduplicate and filter real registrations (Event-aware: allows same user for multiple events)
-      const seenEventKeys = new Set<string>();
-      const seenAppIds = new Set<string>();
-
-      const dedupedList = combined.filter((r) => {
-        const isRohit =
-          r.applicantId === 'INFO26-HACK-14423' ||
-          r.applicantId === 'INFO26-CODE-14423' ||
-          r.personalInfo?.phone === '9740706586' ||
-          r.phone === '9740706586' ||
-          r.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
-          r.email === 'rajkumarrohit965@gmail.com';
-
-        const isLithikaCodestorm =
-          r.applicantId === 'INFO26-CODE-79257' ||
-          r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ';
-
-        const email = (
-          isRohit
-            ? 'rajkumarrohit965@gmail.com'
-            : isLithikaCodestorm
-            ? 'lithikaganapathy@gmail.com'
-            : r.personalInfo?.email || r.email || ''
-        )
-          .toLowerCase()
-          .trim();
-
-        const phone = (
-          isRohit ? '9740706586' : isLithikaCodestorm ? '7418792577' : r.personalInfo?.phone || r.phone || ''
-        )
-          .replace(/\D/g, '')
-          .slice(-10);
-
-        const name = (
-          isRohit
-            ? 'Rohit Rajkumar'
-            : isLithikaCodestorm
-            ? 'Lithika Ganapathy'
-            : r.personalInfo?.fullName || r.fullName || r.studentName || r.name || ''
-        )
-          .toLowerCase()
-          .trim();
-
-        const appId = (r.applicantId || '').toUpperCase().trim();
-
-        // Filter out empty/dummy participant entries
-        if (!name || name === '—' || name === 'participant' || email.includes('test@example.com') || phone === '9876543210' || appId.includes('LIVE-7771')) {
-          return false;
-        }
-
-        if (appId) {
-          if (seenAppIds.has(appId)) return false;
-          seenAppIds.add(appId);
-        }
-
-        const eventList = (Array.isArray(r.events) ? r.events : r.eventNames || []).slice().sort().join(',').toLowerCase();
-        const identifier = email || phone || name;
-        if (identifier && eventList) {
-          const compositeKey = `${identifier}::${eventList}`;
-          if (seenEventKeys.has(compositeKey)) return false;
-          seenEventKeys.add(compositeKey);
-        }
-
-        return true;
-      });
-
-      setLiveRegistrations(dedupedList);
-    };
-
-    // Initial API fallback fetch to ensure instant data availability
-    fetch('/api/admin/registrations')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
-          rawRegs = data.registrations;
-          updateMetrics();
-        }
-      })
-      .catch((e) => console.warn('API registrations initial fetch note:', e));
-
-    if (!db) {
-      updateMetrics();
-      return;
+    } catch (e) {
+      console.warn('Dashboard live fetch error:', e);
+    } finally {
+      setLoading(false);
     }
-
-    const unsubRegs = onSnapshot(
-      collection(db, 'registrations'),
-      (snap) => {
-        const dbItems = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        if (dbItems.length > 0) {
-          rawRegs = dbItems;
-        }
-        updateMetrics();
-      },
-      (err: any) => {
-        if (err?.code !== 'permission-denied') {
-          console.warn('Dashboard registrations live sync note:', err?.message || err);
-        }
-        updateMetrics();
-      }
-    );
-
-    const unsubTickets = onSnapshot(
-      collection(db, 'tickets'),
-      (snap) => {
-        const map: Record<string, any> = {};
-        snap.docs.forEach((d) => {
-          const data = d.data();
-          if (data.applicantId) map[data.applicantId] = data;
-        });
-        ticketMap = map;
-        updateMetrics();
-      },
-      (err: any) => {
-        if (err?.code !== 'permission-denied') {
-          console.warn('Dashboard tickets live sync note:', err?.message || err);
-        }
-        updateMetrics();
-      }
-    );
-
-    return () => {
-      unsubRegs();
-      unsubTickets();
-    };
   }, []);
 
-  const paidRegistrations = liveRegistrations.filter(
-    (r) => r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId
-  );
-  const pendingRegistrations = liveRegistrations.filter(
-    (r) => !(r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId)
-  );
-  const totalRegistrations = paidRegistrations.length;
-  const totalRevenue = paidRegistrations.reduce((sum, r) => {
-    const fee = Number(r.totalFee ?? r.totalAmount ?? r.fee ?? 0);
-    return sum + (isNaN(fee) ? 0 : fee);
-  }, 0);
+  useEffect(() => {
+    fetchLive();
+    const interval = setInterval(fetchLive, 15000);
+    return () => clearInterval(interval);
+  }, [fetchLive]);
+
+  // All registrations from API are already paid (filtered server-side)
+  const paidRegistrations = liveRegistrations;
+  const totalRegistrations = stats.totalPaid;
+  const totalRevenue = stats.totalRevenue;
   const activeEventsCount = events.length;
   const organizersCount = organizers.length;
+
+  const fmtTime = (iso: string) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) +
+      ' · ' + d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+  };
 
   return (
     <AdminLayout>
@@ -368,16 +64,28 @@ export default function AdminDashboard() {
             <span className="text-[11px] font-bold text-gray-400">
               {user?.displayName || adminUser?.displayName || 'Administrator'}
             </span>
+            {/* Live indicator */}
+            <span className="flex items-center gap-1 text-[10px] font-black text-emerald-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              LIVE
+            </span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
             Dashboard Overview
           </h1>
           <p className="mt-1 text-xs sm:text-sm font-bold text-gray-400">
-            System-wide analytics, symposium events metrics, and organizer management
+            Live data from Supabase · auto-refreshes every 15s
+            {lastUpdated && <span className="ml-2 text-gray-600">· Last: {fmtTime(lastUpdated)}</span>}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-3">
+          <button
+            onClick={fetchLive}
+            className="flex items-center gap-2 border border-gray-700 hover:border-[#00d4ff] text-gray-300 hover:text-[#00d4ff] px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all active:scale-95"
+          >
+            <RefreshCw className="w-4 h-4" /> Refresh
+          </button>
           <Link
             href="/admin/registrations"
             className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 transition-all active:scale-95"
@@ -398,15 +106,11 @@ export default function AdminDashboard() {
         <div className="p-6 rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">
-                Confirmed Attendees
-              </p>
+              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">Confirmed Attendees</p>
               <h3 className="text-3xl font-black text-white">
-                {totalRegistrations}
+                {loading ? <span className="animate-pulse text-gray-600">—</span> : totalRegistrations}
               </h3>
-              <p className="text-[#00d4ff] text-xs mt-2 font-bold flex items-center gap-1">
-                <span>{pendingRegistrations.length} pending payment</span>
-              </p>
+              <p className="text-[#00d4ff] text-xs mt-2 font-bold">{stats.totalTickets} tickets issued</p>
             </div>
             <div className="p-3 bg-[#00d4ff]/10 rounded-2xl text-[#00d4ff] border border-[#00d4ff]/30">
               <Users className="w-6 h-6" />
@@ -417,13 +121,11 @@ export default function AdminDashboard() {
         <div className="p-6 rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">
-                Total Revenue
-              </p>
+              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">Total Revenue</p>
               <h3 className="text-3xl font-black text-emerald-400">
-                ₹{totalRevenue.toLocaleString()}
+                {loading ? <span className="animate-pulse text-gray-600">—</span> : `₹${totalRevenue.toLocaleString()}`}
               </h3>
-              <p className="text-emerald-400/80 text-xs mt-2 font-bold">100% verified collections</p>
+              <p className="text-emerald-400/80 text-xs mt-2 font-bold">100% Razorpay verified</p>
             </div>
             <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400 border border-emerald-500/30">
               <IndianRupee className="w-6 h-6" />
@@ -434,12 +136,8 @@ export default function AdminDashboard() {
         <div className="p-6 rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">
-                Active Events
-              </p>
-              <h3 className="text-3xl font-black text-white">
-                {activeEventsCount}
-              </h3>
+              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">Active Events</p>
+              <h3 className="text-3xl font-black text-white">{activeEventsCount}</h3>
               <p className="text-purple-400 text-xs mt-2 font-bold">Technical &amp; Non-Technical</p>
             </div>
             <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-400 border border-purple-500/30">
@@ -451,13 +149,9 @@ export default function AdminDashboard() {
         <div className="p-6 rounded-3xl border border-gray-800 bg-[#08182b] text-white shadow-2xl">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">
-                Event Admins
-              </p>
-              <h3 className="text-3xl font-black text-white">
-                {organizersCount}
-              </h3>
-              <p className="text-amber-400 text-xs mt-2 font-bold">Assigned student coordinators</p>
+              <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">Event Admins</p>
+              <h3 className="text-3xl font-black text-white">{organizersCount}</h3>
+              <p className="text-amber-400 text-xs mt-2 font-bold">Assigned coordinators</p>
             </div>
             <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 border border-amber-500/30">
               <UserCheck className="w-6 h-6" />
@@ -491,8 +185,9 @@ export default function AdminDashboard() {
               </thead>
               <tbody className="divide-y divide-gray-800/80">
                 {events.map((evt, idx) => {
-                  const org = organizers.find((o) => o.uid === evt.organizerUid || o.assignedEventId === evt.id);
-                  const evtCount = paidRegistrations.filter((r: any) => isEventMatch(r, evt)).length;
+                  const org = organizers.find((o: any) => o.uid === evt.organizerUid || o.assignedEventId === evt.id);
+                  // Use live slot count from backend
+                  const evtCount = stats.eventSlots[evt.name] || 0;
 
                   return (
                     <tr key={evt.id || evt.slug || `evt-${idx}`} className="transition-colors hover:bg-gray-800/50">
@@ -510,7 +205,7 @@ export default function AdminDashboard() {
                         {org ? org.displayName : 'IT Association'}
                       </td>
                       <td className="px-4 py-3.5 text-right font-black text-amber-400">
-                        {evtCount} / {evt.maxSlots || 200}
+                        {loading ? '—' : evtCount} / {evt.maxSlots || 200}
                       </td>
                     </tr>
                   );
@@ -543,40 +238,22 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/80">
-                {liveRegistrations.slice(0, 15).map((reg: any, index: number) => {
-                  const isRohit =
-                    reg.applicantId === 'INFO26-HACK-14423' ||
-                    reg.personalInfo?.phone === '9740706586' ||
-                    reg.phone === '9740706586' ||
-                    reg.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
-                    reg.email === 'rajkumarrohit965@gmail.com';
-
-                  const name = isRohit
-                    ? 'Rohit Rajkumar'
-                    : reg.personalInfo?.fullName || reg.fullName || reg.studentName || reg.name || 'Participant';
-                  const college = reg.personalInfo?.college || reg.college || 'C. Abdul Hakeem College of Engineering & Technology';
-                  const isPaid = reg.status === 'paid' || reg.ticketId || reg.paidAt || reg.razorpayPaymentId;
-                  const displayFee = isRohit ? 50 : (reg.totalFee ?? reg.totalAmount ?? reg.fee ?? 100);
-                  return (
-                    <tr key={reg.id || reg.applicantId || `reg-${index}`} className="transition-colors hover:bg-gray-800/50">
-                      <td className="px-4 py-3.5 font-mono text-[#00d4ff] font-bold">{reg.applicantId}</td>
-                      <td className="px-4 py-3.5 font-black text-white">{name}</td>
-                      <td className="px-4 py-3.5 text-gray-300">{college}</td>
-                      <td className="px-4 py-3.5 font-black text-amber-400">₹{displayFee}</td>
-                      <td className="px-4 py-3.5 text-right">
-                        {isPaid ? (
-                          <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase">
-                            PAID
-                          </span>
-                        ) : (
-                          <span className="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase">
-                            PENDING PAYMENT
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {loading && liveRegistrations.length === 0 && (
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-600 font-bold">Loading live data...</td></tr>
+                )}
+                {liveRegistrations.slice(0, 15).map((reg: any, index: number) => (
+                  <tr key={reg.id || reg.applicantId || `reg-${index}`} className="transition-colors hover:bg-gray-800/50">
+                    <td className="px-4 py-3.5 font-mono text-[#00d4ff] font-bold text-xs">{reg.applicantId}</td>
+                    <td className="px-4 py-3.5 font-black text-white">{reg.fullName || '—'}</td>
+                    <td className="px-4 py-3.5 text-gray-300 text-xs">{reg.college || '—'}</td>
+                    <td className="px-4 py-3.5 font-black text-amber-400">₹{reg.totalFee || 0}</td>
+                    <td className="px-4 py-3.5 text-right">
+                      <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase">
+                        PAID
+                      </span>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

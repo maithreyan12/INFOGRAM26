@@ -18,369 +18,39 @@ export default function RegistrationsPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
 
-  /* ── 1. Real-time Firestore sync for Registrations & Tickets ── */
-  useEffect(() => {
-    let rawRegs: any[] = [];
-    let ticketItems: Record<string, any> = {};
+  const [lastUpdated, setLastUpdated] = useState<string>('');
 
-    const updateCombinedList = async () => {
-      // 1. Fetch Supabase registrations & tickets
-      try {
-        const { supabase } = await import('@/lib/supabase/config');
-        if (supabase) {
-          const { data: spRegs } = await supabase.from('registrations').select('*');
-          if (spRegs) {
-            spRegs.forEach((sr: any) => {
-              const exists = rawRegs.some((r) => r.applicantId === sr.applicant_id || r.id === sr.id);
-              if (!exists) {
-                rawRegs.push({
-                  id: sr.id,
-                  applicantId: sr.applicant_id,
-                  fullName: sr.full_name,
-                  email: sr.email,
-                  phone: sr.phone,
-                  college: sr.college,
-                  department: sr.department,
-                  year: sr.year,
-                  personalInfo: {
-                    fullName: sr.full_name,
-                    email: sr.email,
-                    phone: sr.phone,
-                    college: sr.college,
-                    department: sr.department,
-                    year: sr.year,
-                  },
-                  events: sr.events || [],
-                  eventNames: sr.events || [],
-                  totalFee: sr.total_fee || 0,
-                  status: sr.status || 'paid',
-                  razorpayPaymentId: sr.razorpay_payment_id,
-                });
-              }
-            });
-          }
-
-          const { data: spTkts } = await supabase.from('tickets').select('*');
-          if (spTkts) {
-            spTkts.forEach((st: any) => {
-              if (st.applicant_id && !ticketItems[st.applicant_id]) {
-                ticketItems[st.applicant_id] = {
-                  id: st.id,
-                  ticketNumber: st.ticket_number,
-                  applicantId: st.applicant_id,
-                  studentName: st.student_name,
-                  email: st.email,
-                  phone: st.phone,
-                  college: st.college,
-                  department: st.department,
-                  year: st.year,
-                  events: st.events,
-                  totalAmount: st.total_amount,
-                  status: st.status,
-                  qrData: st.qr_data,
-                };
-              }
-            });
-          }
-        }
-      } catch (spErr) {
-        console.warn('Supabase admin registrations fetch warning:', spErr);
-      }
-
-      // Filter rawRegs
-      const isTestEntry = (r: any) => {
-        const email = (r.personalInfo?.email || r.email || '').toLowerCase().trim();
-        const name = (r.personalInfo?.fullName || r.studentName || r.name || '').toLowerCase().trim();
-        const appId = (r.applicantId || '').toLowerCase().trim();
-        const phone = (r.personalInfo?.phone || r.phone || '').replace(/\D/g, '');
-        return (
-          name === 'participant' ||
-          name.includes('participant') ||
-          email === 'test@example.com' ||
-          email.includes('verification.test') ||
-          email.includes('arunkumar') ||
-          phone === '9876543210' ||
-          appId.includes('999999') ||
-          appId.includes('live-7771')
-        );
-      };
-
-      const validRegs = rawRegs.filter(
-        (r) => !isTestEntry(r) && (r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId)
-      );
-      const combined = [...validRegs];
-
-      // Add any tickets that are not in rawRegs
-      Object.values(ticketItems).forEach((t: any) => {
-        if (isTestEntry(t)) return;
-
-        const exists = combined.some(
-          (r) => r.applicantId === t.applicantId || (r.personalInfo?.email && r.personalInfo?.email === t.email)
-        );
-        if (!exists && (t.studentName || t.name || t.fullName || t.email)) {
-          combined.push({
-            id: t.registrationId || t.id,
-            applicantId: t.applicantId || `INFO26-EVT-${Math.floor(10000 + Math.random() * 90000)}`,
-            personalInfo: {
-              fullName: t.studentName || t.fullName || '',
-              email: t.email || '',
-              phone: t.phone || '',
-              college: t.college || '',
-              department: t.department || '',
-              year: t.year || '',
-            },
-            eventNames: Array.isArray(t.events) ? t.events : (t.events ? [t.events] : []),
-            events: Array.isArray(t.events) ? t.events : (t.events ? [t.events] : []),
-            totalFee: t.totalAmount || 0,
-            status: 'paid',
-            checkedIn: t.status === 'used' || t.checkedIn,
-            attendanceStatus: t.status === 'used' || t.checkedIn ? 'checked_in' : 'pending',
-            razorpayPaymentId: t.razorpayPaymentId,
-          });
-        }
-      });
-
-      // Reconcile and ensure Rohit Rajkumar's payment is confirmed
-      let foundRohit = false;
-      combined.forEach((r) => {
-        if (
-          r.email === 'rajkumarrohit965@gmail.com' ||
-          r.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
-          r.phone === '9740706586' ||
-          r.personalInfo?.phone === '9740706586' ||
-          r.applicantId === 'INFO26-CODE-14423' ||
-          r.applicantId === 'INFO26-HACK-14423' ||
-          r.razorpayPaymentId === 'pay_TQSsGjMXY4BxKi'
-        ) {
-          foundRohit = true;
-          r.fullName = 'Rohit Rajkumar';
-          r.studentName = 'Rohit Rajkumar';
-          r.email = 'rajkumarrohit965@gmail.com';
-          r.phone = '9740706586';
-          r.events = ['Codestorm'];
-          r.eventNames = ['Codestorm'];
-          r.totalFee = 50;
-          r.status = 'paid';
-          r.razorpayPaymentId = 'pay_TQSsGjMXY4BxKi';
-        }
-      });
-      if (!foundRohit) {
-        combined.push({
-          id: 'reg_code_14423',
-          applicantId: 'INFO26-CODE-14423',
-          ticketId: 'tkt_code_14423',
-          fullName: 'Rohit Rajkumar',
-          studentName: 'Rohit Rajkumar',
-          email: 'rajkumarrohit965@gmail.com',
-          phone: '9740706586',
-          college: 'C. Abdul Hakeem College of Engineering & Technology',
-          department: 'Information Technology',
-          year: '2nd Year',
-          personalInfo: {
-            fullName: 'Rohit Rajkumar',
-            email: 'rajkumarrohit965@gmail.com',
-            phone: '9740706586',
-            college: 'C. Abdul Hakeem College of Engineering & Technology',
-            department: 'Information Technology',
-            year: '2nd Year',
-          },
-          events: ['Codestorm'],
-          eventNames: ['Codestorm'],
-          totalFee: 50,
-          status: 'paid',
-          checkedIn: false,
-          attendanceStatus: 'pending',
-          razorpayPaymentId: 'pay_TQSsGjMXY4BxKi',
-        });
-      }
-
-      // Reconcile and ensure Lithika Ganapathy's Codestorm payment is confirmed
-      let foundLithika = false;
-      combined.forEach((r) => {
-        if (
-          r.applicantId === 'INFO26-CODE-79257' ||
-          r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ'
-        ) {
-          foundLithika = true;
-          r.fullName = 'Lithika Ganapathy';
-          r.studentName = 'Lithika Ganapathy';
-          r.email = 'lithikaganapathy@gmail.com';
-          r.phone = '7418792577';
-          r.events = ['Codestorm'];
-          r.eventNames = ['Codestorm'];
-          r.totalFee = 50;
-          r.status = 'paid';
-          r.razorpayPaymentId = 'pay_TR6nR5uvpjrQAQ';
-        }
-      });
-      if (!foundLithika) {
-        combined.push({
-          id: 'reg_code_79257',
-          applicantId: 'INFO26-CODE-79257',
-          ticketId: 'tkt_code_79257',
-          fullName: 'Lithika Ganapathy',
-          studentName: 'Lithika Ganapathy',
-          email: 'lithikaganapathy@gmail.com',
-          phone: '7418792577',
-          college: 'C. Abdul Hakeem College of Engineering & Technology',
-          department: 'Information Technology',
-          year: '2nd Year',
-          personalInfo: {
-            fullName: 'Lithika Ganapathy',
-            email: 'lithikaganapathy@gmail.com',
-            phone: '7418792577',
-            college: 'C. Abdul Hakeem College of Engineering & Technology',
-            department: 'Information Technology',
-            year: '2nd Year',
-          },
-          events: ['Codestorm'],
-          eventNames: ['Codestorm'],
-          totalFee: 50,
-          status: 'paid',
-          checkedIn: false,
-          attendanceStatus: 'pending',
-          razorpayPaymentId: 'pay_TR6nR5uvpjrQAQ',
-        });
-      }
-
-      // Sort so paid registrations come before pending registrations for proper deduplication preference
-      combined.sort((a, b) => {
-        const aPaid = a.status === 'paid' || a.ticketId || a.paidAt || a.razorpayPaymentId ? 1 : 0;
-        const bPaid = b.status === 'paid' || b.ticketId || b.paidAt || b.razorpayPaymentId ? 1 : 0;
-        return bPaid - aPaid;
-      });
-
-      // Deduplicate and filter real registrations (Event-aware: allows same user for multiple events)
-      const seenEventKeys = new Set<string>();
-      const seenAppIds = new Set<string>();
-
-      const dedupedList = combined.filter((r) => {
-        const isRohit =
-          r.applicantId === 'INFO26-HACK-14423' ||
-          r.applicantId === 'INFO26-CODE-14423' ||
-          r.personalInfo?.phone === '9740706586' ||
-          r.phone === '9740706586' ||
-          r.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
-          r.email === 'rajkumarrohit965@gmail.com';
-
-        const isLithikaCodestorm =
-          r.applicantId === 'INFO26-CODE-79257' ||
-          r.razorpayPaymentId === 'pay_TR6nR5uvpjrQAQ';
-
-        const email = (
-          isRohit
-            ? 'rajkumarrohit965@gmail.com'
-            : isLithikaCodestorm
-            ? 'lithikaganapathy@gmail.com'
-            : r.personalInfo?.email || r.email || ''
-        )
-          .toLowerCase()
-          .trim();
-
-        const phone = (
-          isRohit ? '9740706586' : isLithikaCodestorm ? '7418792577' : r.personalInfo?.phone || r.phone || ''
-        )
-          .replace(/\D/g, '')
-          .slice(-10);
-
-        const name = (
-          isRohit
-            ? 'Rohit Rajkumar'
-            : isLithikaCodestorm
-            ? 'Lithika Ganapathy'
-            : r.personalInfo?.fullName || r.fullName || r.studentName || r.name || ''
-        )
-          .toLowerCase()
-          .trim();
-
-        const appId = (r.applicantId || '').toUpperCase().trim();
-
-        const isPaid = r.status === 'paid' || r.ticketId || r.paidAt || r.razorpayPaymentId;
-
-        // Filter out empty/dummy participant entries or unpaid entries
-        if (!isPaid || !name || name === '—' || name === 'participant' || email.includes('test@example.com') || phone === '9876543210' || appId.includes('LIVE-7771')) {
-          return false;
-        }
-
-        if (appId) {
-          if (seenAppIds.has(appId)) return false;
-          seenAppIds.add(appId);
-        }
-
-        const eventList = (Array.isArray(r.events) ? r.events : r.eventNames || []).slice().sort().join(',').toLowerCase();
-        const identifier = email || phone || name;
-        if (identifier && eventList) {
-          const compositeKey = `${identifier}::${eventList}`;
-          if (seenEventKeys.has(compositeKey)) return false;
-          seenEventKeys.add(compositeKey);
-        }
-
-        return true;
-      });
-
-      setRegistrations(dedupedList);
-      setLoading(false);
-    };
-
-    // Initial API fallback fetch to guarantee immediate display
-    fetch('/api/admin/registrations')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
-          rawRegs = data.registrations;
-          updateCombinedList();
-        }
-      })
-      .catch((e) => console.warn('API registrations initial fetch note:', e));
-
-    if (!db) {
-      updateCombinedList();
-      return;
-    }
-
-    // Realtime listener for registrations
-    const unsubRegs = onSnapshot(
-      collection(db, 'registrations'),
-      (snap) => {
-        rawRegs = snap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        }));
-        updateCombinedList();
-      },
-      (err: any) => {
-        if (err?.code !== 'permission-denied') {
-          console.warn('Registrations live sync note:', err?.message || err);
-        }
-        updateCombinedList();
-      }
-    );
-
-    // Realtime listener for tickets (to track QR check-in status and unlinked tickets)
-    const unsubTickets = onSnapshot(
-      collection(db, 'tickets'),
-      (snap) => {
+  const fetchLive = React.useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/live');
+      const data = await res.json();
+      if (data.success) {
+        setRegistrations(data.registrations || []);
+        
         const map: Record<string, any> = {};
-        snap.docs.forEach((d) => {
-          const data = d.data();
-          if (data.applicantId) map[data.applicantId] = { id: d.id, ...data };
+        (data.tickets || []).forEach((t: any) => {
+          if (t.applicantId) {
+            map[t.applicantId] = t;
+          }
+          if (t.registrationId) {
+            map[t.registrationId] = t;
+          }
         });
-        ticketItems = map;
         setTicketsMap(map);
-        updateCombinedList();
-      },
-      (err: any) => {
-        if (err?.code !== 'permission-denied') {
-          console.warn('Tickets live sync note:', err?.message || err);
-        }
+        setLastUpdated(data.lastUpdated || new Date().toISOString());
       }
-    );
-
-    return () => {
-      unsubRegs();
-      unsubTickets();
-    };
+    } catch (e) {
+      console.warn('Registrations live fetch error:', e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchLive();
+    const interval = setInterval(fetchLive, 15000);
+    return () => clearInterval(interval);
+  }, [fetchLive]);
 
   /* ── 2. Manual Check-in helper ── */
   const handleManualCheckIn = async (reg: any) => {
@@ -589,19 +259,11 @@ export default function RegistrationsPage() {
   });
 
   const totalCount = registrations.length;
-  const paidRegistrations = registrations.filter(
-    (reg) => reg.status === 'paid' || reg.ticketId || reg.paidAt || reg.razorpayPaymentId
-  );
+  const paidRegistrations = registrations;
   const paidCount = paidRegistrations.length;
-  const pendingPaymentCount = totalCount - paidCount;
-  const totalRevenue = paidRegistrations.reduce((sum, r) => {
-    const isRohit =
-      r.applicantId === 'INFO26-HACK-14423' ||
-      r.personalInfo?.phone === '9740706586' ||
-      r.phone === '9740706586' ||
-      r.personalInfo?.email === 'rajkumarrohit965@gmail.com' ||
-      r.email === 'rajkumarrohit965@gmail.com';
-    const fee = isRohit ? 50 : Number(r.totalFee ?? r.totalAmount ?? r.fee ?? 100);
+  const pendingPaymentCount = 0;
+  const totalRevenue = registrations.reduce((sum, r) => {
+    const fee = Number(r.totalFee ?? r.totalAmount ?? 0);
     return sum + (isNaN(fee) ? 0 : fee);
   }, 0);
 
@@ -610,11 +272,25 @@ export default function RegistrationsPage() {
     return reg.checkedIn || reg.attendanceStatus === 'checked_in' || t?.status === 'used' || t?.checkedIn;
   }).length;
 
+  const fmtTime = (iso: string) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) +
+      ' · ' + d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+  };
+
   return (
     <AdminLayout>
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="flex items-center gap-1 text-[10px] font-black text-emerald-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              LIVE
+            </span>
+            {lastUpdated && <span className="text-[11px] text-gray-500 font-bold">Updated: {fmtTime(lastUpdated)}</span>}
+          </div>
           <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
             Registrations &amp; Live Attendance
           </h1>
@@ -623,6 +299,12 @@ export default function RegistrationsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={fetchLive}
+            className="flex items-center gap-2 border border-gray-700 hover:border-[#00d4ff] text-gray-300 hover:text-[#00d4ff] px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all active:scale-95"
+          >
+            <RefreshCw className="w-4 h-4" /> Refresh
+          </button>
           <button
             onClick={handleExportCSV}
             className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 transition-all active:scale-95"
