@@ -446,7 +446,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     category: 'non-technical',
     description: 'BGMI & Free Fire Battle Royale gaming tournament with strict fair-play guidelines (Solo or Team up to 4).',
     rules: [
-      'Maximum of 4 members | Team registration: ₹60 | Solo registration: ₹50 per person',
+      'Maximum of 4 members | ₹50 per head',
       'Using emotes is strictly prohibited. If used, the participant/team will be disqualified.',
       'Only BR (Battle Royale) matches are allowed.',
       'People who cause skirmish or quarrel will be eliminated immediately.',
@@ -458,7 +458,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     startTime: '14:00',
     endTime: '15:30',
     registrationDeadline: '2026-08-20',
-    registrationFee: 60,
+    registrationFee: 50,
     maxSlots: 200,
     maxParticipants: 4,
     registeredCount: 0,
