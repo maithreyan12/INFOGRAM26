@@ -56,7 +56,14 @@ export default function EventsPage() {
         }
 
         const eventsData = initialList.map(localEv => {
-          const liveCount = slotMap[localEv.name] || slotMap[localEv.slug] || 0;
+          const normName = localEv.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const normSlug = localEv.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const liveCount =
+            slotMap[localEv.name] ||
+            slotMap[localEv.slug] ||
+            slotMap[normName] ||
+            slotMap[normSlug] ||
+            0;
 
           return {
             ...localEv,

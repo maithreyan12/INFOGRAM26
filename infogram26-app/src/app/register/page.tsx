@@ -126,11 +126,22 @@ export default function RegisterPage() {
           console.warn('API slots fetch warning:', e);
         }
 
-        const updatedEvents = demoEvents.map(e => ({
-          ...e,
-          registeredCount: slotMap[e.name] || slotMap[e.slug] || 0,
-          maxSlots: 200,
-        }));
+        const updatedEvents = demoEvents.map(e => {
+          const normName = e.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const normSlug = e.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const count =
+            slotMap[e.name] ||
+            slotMap[e.slug] ||
+            slotMap[normName] ||
+            slotMap[normSlug] ||
+            0;
+
+          return {
+            ...e,
+            registeredCount: count,
+            maxSlots: 200,
+          };
+        });
         setEvents(updatedEvents);
       } catch {
         setEvents(demoEvents);

@@ -52,7 +52,14 @@ export default function EventDetailPage() {
           const res = await fetch('/api/events/slots');
           const data = await res.json();
           if (data.success && data.eventSlots && localEvent) {
-            livePaidCount = data.eventSlots[localEvent.name] || data.eventSlots[localEvent.slug] || 0;
+            const normName = localEvent.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const normSlug = localEvent.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+            livePaidCount =
+              data.eventSlots[localEvent.name] ||
+              data.eventSlots[localEvent.slug] ||
+              data.eventSlots[normName] ||
+              data.eventSlots[normSlug] ||
+              0;
           }
         } catch (e) {
           console.warn('API events detail slot fetch error:', e);
