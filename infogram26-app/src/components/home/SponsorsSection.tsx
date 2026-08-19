@@ -117,8 +117,8 @@ export default function SponsorsSection() {
       {/* ── Running Marquee Track with Differentiated Membership Tier Square Cards ── */}
       <div className="relative w-full overflow-hidden py-6">
         {/* Left & Right Gradient Fade Masks */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-56 bg-gradient-to-r from-[#040d1a] to-transparent z-20 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-56 bg-gradient-to-l from-[#040d1a] to-transparent z-20 pointer-events-none" />
+        <div className={`absolute left-0 top-0 bottom-0 w-24 sm:w-56 bg-gradient-to-r ${isDark ? 'from-[#040d1a]' : 'from-slate-50'} to-transparent z-20 pointer-events-none`} />
+        <div className={`absolute right-0 top-0 bottom-0 w-24 sm:w-56 bg-gradient-to-l ${isDark ? 'from-[#040d1a]' : 'from-slate-50'} to-transparent z-20 pointer-events-none`} />
 
         <div className="marquee-track flex animate-[marquee_40s_linear_infinite] whitespace-nowrap gap-6 group-hover:[animation-play-state:paused] py-4 px-6">
           {[...sponsors, ...sponsors, ...sponsors, ...sponsors].map((sponsor, index) => {
@@ -129,58 +129,74 @@ export default function SponsorsSection() {
             let tierConfig = {
               cardBg: isDark
                 ? 'bg-gradient-to-b from-[#1f1704]/90 via-[#0d1527]/90 to-[#040d1a]/95 border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:border-amber-400 hover:shadow-[0_0_45px_rgba(245,158,11,0.3)]'
-                : 'bg-white/95 border-amber-300 shadow-xl hover:border-amber-400',
+                : 'bg-white border-amber-300/80 shadow-xl shadow-amber-500/10 hover:border-amber-400 hover:shadow-2xl',
               topGlow: 'bg-gradient-to-r from-transparent via-amber-400/40 to-transparent',
-              cornerAura: 'bg-amber-500/15',
-              logoBg: 'bg-gradient-to-b from-amber-500/15 via-black/50 to-black/70 border-amber-500/30 group-hover/card:border-amber-400/60',
-              textColor: 'text-amber-100',
-              badgeBg: 'bg-gradient-to-r from-amber-500/15 to-yellow-500/15 border-amber-500/40 text-amber-300',
-              badgeDot: 'bg-amber-400',
+              cornerAura: isDark ? 'bg-amber-500/15' : 'bg-amber-100',
+              logoBg: isDark
+                ? 'bg-gradient-to-b from-amber-500/15 via-black/50 to-black/70 border-amber-500/30 group-hover/card:border-amber-400/60'
+                : 'bg-amber-50 border-amber-200 text-slate-900',
+              textColor: isDark ? 'text-amber-100' : 'text-slate-900',
+              badgeBg: isDark
+                ? 'bg-gradient-to-r from-amber-500/15 to-yellow-500/15 border-amber-500/40 text-amber-300'
+                : 'bg-amber-100 border-amber-300 text-amber-900',
+              badgeDot: 'bg-amber-500',
               badgeLabel: 'Principal Partner',
-              buttonHover: 'hover:bg-amber-400 hover:text-slate-950',
+              buttonHover: isDark ? 'hover:bg-amber-400 hover:text-slate-950' : 'hover:bg-amber-500 hover:text-white',
             };
 
             if (sponsor.tier === 'silver') {
               tierConfig = {
                 cardBg: isDark
                   ? 'bg-gradient-to-b from-[#071d33]/90 via-[#081a2e]/90 to-[#040d1a]/95 border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.15)] hover:border-cyan-400 hover:shadow-[0_0_45px_rgba(6,182,212,0.3)]'
-                  : 'bg-white/95 border-cyan-300 shadow-xl hover:border-cyan-400',
+                  : 'bg-white border-cyan-300/80 shadow-xl shadow-cyan-500/10 hover:border-cyan-400 hover:shadow-2xl',
                 topGlow: 'bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent',
-                cornerAura: 'bg-cyan-500/15',
-                logoBg: 'bg-gradient-to-b from-cyan-500/15 via-black/50 to-black/70 border-cyan-500/30 group-hover/card:border-cyan-400/60',
-                textColor: 'text-cyan-100',
-                badgeBg: 'bg-gradient-to-r from-cyan-500/15 to-blue-500/15 border-cyan-500/40 text-cyan-300',
-                badgeDot: 'bg-cyan-400',
+                cornerAura: isDark ? 'bg-cyan-500/15' : 'bg-cyan-100',
+                logoBg: isDark
+                  ? 'bg-gradient-to-b from-cyan-500/15 via-black/50 to-black/70 border-cyan-500/30 group-hover/card:border-cyan-400/60'
+                  : 'bg-cyan-50 border-cyan-200 text-slate-900',
+                textColor: isDark ? 'text-cyan-100' : 'text-slate-900',
+                badgeBg: isDark
+                  ? 'bg-gradient-to-r from-cyan-500/15 to-blue-500/15 border-cyan-500/40 text-cyan-300'
+                  : 'bg-cyan-100 border-cyan-300 text-cyan-900',
+                badgeDot: 'bg-cyan-500',
                 badgeLabel: 'Associate Partner',
-                buttonHover: 'hover:bg-cyan-400 hover:text-slate-950',
+                buttonHover: isDark ? 'hover:bg-cyan-400 hover:text-slate-950' : 'hover:bg-cyan-500 hover:text-white',
               };
             } else if (sponsor.tier === 'bronze') {
               tierConfig = {
                 cardBg: isDark
                   ? 'bg-gradient-to-b from-[#1b0e2b]/90 via-[#0e1324]/90 to-[#040d1a]/95 border-purple-500/40 shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:border-purple-400 hover:shadow-[0_0_45px_rgba(168,85,247,0.3)]'
-                  : 'bg-white/95 border-purple-300 shadow-xl hover:border-purple-400',
+                  : 'bg-white border-purple-300/80 shadow-xl shadow-purple-500/10 hover:border-purple-400 hover:shadow-2xl',
                 topGlow: 'bg-gradient-to-r from-transparent via-purple-400/40 to-transparent',
-                cornerAura: 'bg-purple-500/15',
-                logoBg: 'bg-gradient-to-b from-purple-500/15 via-black/50 to-black/70 border-purple-500/30 group-hover/card:border-purple-400/60',
-                textColor: 'text-purple-100',
-                badgeBg: 'bg-gradient-to-r from-purple-500/15 to-pink-500/15 border-purple-500/40 text-purple-300',
-                badgeDot: 'bg-purple-400',
+                cornerAura: isDark ? 'bg-purple-500/15' : 'bg-purple-100',
+                logoBg: isDark
+                  ? 'bg-gradient-to-b from-purple-500/15 via-black/50 to-black/70 border-purple-500/30 group-hover/card:border-purple-400/60'
+                  : 'bg-purple-50 border-purple-200 text-slate-900',
+                textColor: isDark ? 'text-purple-100' : 'text-slate-900',
+                badgeBg: isDark
+                  ? 'bg-gradient-to-r from-purple-500/15 to-pink-500/15 border-purple-500/40 text-purple-300'
+                  : 'bg-purple-100 border-purple-300 text-purple-900',
+                badgeDot: 'bg-purple-500',
                 badgeLabel: 'Innovation Partner',
-                buttonHover: 'hover:bg-purple-400 hover:text-white',
+                buttonHover: 'hover:bg-purple-600 hover:text-white',
               };
             } else if (sponsor.tier === 'partner') {
               tierConfig = {
                 cardBg: isDark
                   ? 'bg-gradient-to-b from-[#071c15]/90 via-[#081928]/90 to-[#040d1a]/95 border-emerald-500/40 shadow-[0_0_30px_rgba(16,185,129,0.15)] hover:border-emerald-400 hover:shadow-[0_0_45px_rgba(16,185,129,0.3)]'
-                  : 'bg-white/95 border-emerald-300 shadow-xl hover:border-emerald-400',
+                  : 'bg-white border-emerald-300/80 shadow-xl shadow-emerald-500/10 hover:border-emerald-400 hover:shadow-2xl',
                 topGlow: 'bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent',
-                cornerAura: 'bg-emerald-500/15',
-                logoBg: 'bg-gradient-to-b from-emerald-500/15 via-black/50 to-black/70 border-emerald-500/30 group-hover/card:border-emerald-400/60',
-                textColor: 'text-emerald-100',
-                badgeBg: 'bg-gradient-to-r from-emerald-500/15 to-teal-500/15 border-emerald-500/40 text-emerald-300',
-                badgeDot: 'bg-emerald-400',
+                cornerAura: isDark ? 'bg-emerald-500/15' : 'bg-emerald-100',
+                logoBg: isDark
+                  ? 'bg-gradient-to-b from-emerald-500/15 via-black/50 to-black/70 border-emerald-500/30 group-hover/card:border-emerald-400/60'
+                  : 'bg-emerald-50 border-emerald-200 text-slate-900',
+                textColor: isDark ? 'text-emerald-100' : 'text-slate-900',
+                badgeBg: isDark
+                  ? 'bg-gradient-to-r from-emerald-500/15 to-teal-500/15 border-emerald-500/40 text-emerald-300'
+                  : 'bg-emerald-100 border-emerald-300 text-emerald-900',
+                badgeDot: 'bg-emerald-500',
                 badgeLabel: 'Community Partner',
-                buttonHover: 'hover:bg-emerald-400 hover:text-slate-950',
+                buttonHover: isDark ? 'hover:bg-emerald-400 hover:text-slate-950' : 'hover:bg-emerald-500 hover:text-white',
               };
             }
 
@@ -202,7 +218,7 @@ export default function SponsorsSection() {
                       onError={() => setFailedImgs((prev) => ({ ...prev, [sponsor.id]: true }))}
                     />
                   ) : (
-                    <span className="font-mono font-black text-sm uppercase">
+                    <span className={`font-mono font-black text-sm uppercase ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {getInitials(sponsor.name)}
                     </span>
                   )}
@@ -251,7 +267,11 @@ export default function SponsorsSection() {
 
       {/* ── Sponsor CTA Banner ── */}
       <div className="container-xl mx-auto px-4 mt-12 relative z-10">
-        <div className="max-w-4xl mx-auto p-8 rounded-3xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-slate-900/80 to-cyan-950/40 backdrop-blur-xl shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+        <div className={`max-w-4xl mx-auto p-8 rounded-3xl border shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left backdrop-blur-xl ${
+          isDark 
+            ? 'border-purple-500/30 bg-gradient-to-r from-purple-950/80 via-slate-900/90 to-cyan-950/80 text-white' 
+            : 'border-purple-300/60 bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white shadow-purple-900/20'
+        }`}>
           <div className="space-y-1.5">
             <div className="flex items-center justify-center sm:justify-start gap-2">
               <Handshake className="w-5 h-5 text-[#00d4ff]" />
@@ -259,7 +279,7 @@ export default function SponsorsSection() {
                 Partner with INFOGRAM&apos;26
               </h3>
             </div>
-            <p className="text-xs sm:text-sm font-bold text-gray-400 max-w-lg">
+            <p className={`text-xs sm:text-sm font-bold ${isDark ? 'text-gray-300' : 'text-purple-100'} max-w-lg`}>
               Showcase your brand to 1,500+ aspiring engineers, developers, and innovators across Tamil Nadu.
             </p>
           </div>
