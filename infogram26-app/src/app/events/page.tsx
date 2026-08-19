@@ -44,133 +44,38 @@ export default function EventsPage() {
           return demo;
         });
 
-        // Calculate live paid registration counts per event from storeRegistrations, Supabase & Firestore without double counting
-        const allPaidRecords: Array<{ applicantId: string; email?: string; events: string[] }> = [];
-
-        const isTest = (item: any) => {
-          const email = (item.email || item.personalInfo?.email || '').toLowerCase();
-          const name = (item.fullName || item.studentName || item.name || '').toLowerCase();
-          const appId = (item.applicantId || '').toLowerCase();
-          return (
-            name === 'participant' ||
-            name.includes('participant') ||
-            email.includes('test') ||
-            email.includes('verification') ||
-            appId.includes('98035') ||
-            appId.includes('9999') ||
-            appId.includes('test')
-          );
-        };
-
-        // Real backend records from Supabase and Firestore
-
+        let slotMap: Record<string, number> = {};
         try {
-          const { supabase } = await import('@/lib/supabase/config');
-          const { data: spRegs } = await supabase.from('registrations').select('*').eq('status', 'paid');
-          if (spRegs) {
-            spRegs.forEach((sr: any) => {
-              if (isTest(sr)) return;
-              const exists = allPaidRecords.some(
-                r => r.applicantId === sr.applicant_id || (sr.email && r.email === sr.email)
-              );
-              if (!exists) {
-                allPaidRecords.push({
-                  applicantId: sr.applicant_id || sr.id,
-                  email: sr.email,
-                  events: sr.events || [],
-                });
-              }
-            });
+          const res = await fetch('/api/events/slots');
+          const data = await res.json();
+          if (data.success && data.eventSlots) {
+            slotMap = data.eventSlots;
           }
-        } catch (spErr) {
-          console.warn('Supabase slot count warning:', spErr);
-        }
-
-        try {
-          if (db && isFirebaseConfigured) {
-            const regSnap = await getDocs(collection(db, 'registrations'));
-            regSnap.docs.forEach(doc => {
-              const data = doc.data();
-              if ((data.status === 'paid' || data.paidAt || data.razorpayPaymentId) && !isTest(data)) {
-                const exists = allPaidRecords.some(
-                  r => r.applicantId === data.applicantId || (data.email && r.email === data.email)
-                );
-                if (!exists) {
-                  allPaidRecords.push({
-                    applicantId: data.applicantId || doc.id,
-                    email: data.personalInfo?.email || data.email,
-                    events: data.eventNames || data.events || [],
-                  });
-                }
-              }
-            });
-
-            const tktSnap = await getDocs(collection(db, 'tickets'));
-            tktSnap.docs.forEach(doc => {
-              const data = doc.data();
-              if ((data.status === 'valid' || data.status === 'paid') && !data.registrationId) {
-                const eventsList = data.events || data.eventNames || [];
-                // Tickets might be duplicates, but we assume distinct ticket objects
-                allPaidRecords.push({
-                  applicantId: data.applicantId || doc.id,
-                  email: data.email,
-                  events: eventsList,
-                });
-              }
-            });
-          }
-        } catch (cntErr) {
-          console.warn('Firestore paid registration count warning:', cntErr);
-        }
-
-        let snapshot: any = { empty: true, docs: [] };
-        if (db && isFirebaseConfigured) {
-          try {
-            const eventsRef = collection(db, 'events');
-            snapshot = await getDocs(eventsRef);
-          } catch {}
+        } catch (e) {
+          console.warn('API events slots fetch error:', e);
         }
 
         const eventsData = initialList.map(localEv => {
-          const liveCount = allPaidRecords.filter(rec => isEventMatch(rec, localEv)).length;
-
-          let dbData: Partial<Event> | null = null;
-          let firestoreId = localEv.id;
-
-          if (!snapshot.empty) {
-            const normLocalSlug = localEv.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const normLocalName = localEv.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const firestoreMatch = snapshot.docs.find((doc: any) => {
-              const d = doc.data();
-              const dNorm = (d.slug || d.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-              return dNorm === normLocalSlug || dNorm === normLocalName || doc.id === localEv.id;
-            });
-            if (firestoreMatch) {
-              dbData = firestoreMatch.data() as Event;
-              firestoreId = firestoreMatch.id;
-            }
-          }
-
-          const finalRegisteredCount = Math.max(dbData?.registeredCount || 0, liveCount, localEv.registeredCount || 0);
+          const liveCount = slotMap[localEv.name] || slotMap[localEv.slug] || 0;
 
           return {
             ...localEv,
-            id: firestoreId,
-            registeredCount: finalRegisteredCount,
-            bannerUrl: dbData?.bannerUrl || localEv.bannerUrl,
-            status: dbData?.status || localEv.status,
+            registeredCount: Math.max(localEv.registeredCount || 0, liveCount),
           };
         });
 
         setEvents(eventsData);
       } catch (error) {
-        console.error("Error fetching events:", error);
+        console.error('Error fetching events:', error);
         setEvents(demoEvents);
       } finally {
         setLoading(false);
       }
     };
+
     fetchEvents();
+    const interval = setInterval(fetchEvents, 15000);
+    return () => clearInterval(interval);
   }, [storeEvents]);
 
   const filteredEvents = events.filter(event => {

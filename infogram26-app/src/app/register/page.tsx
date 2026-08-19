@@ -115,30 +115,31 @@ export default function RegisterPage() {
 
     const fetchEvents = async () => {
       try {
-        if (!db) { setEvents(demoEvents); return; }
-        const snap = await getDocs(collection(db, 'events'));
-        if (snap.empty) {
-          setEvents(demoEvents);
-        } else {
-          const dbEvts = snap.docs.map(d => {
-            const data = d.data();
-            return {
-              id: d.id,
-              slug: data.slug || d.id,
-              name: data.name,
-              category: data.category === 'technical' || data.category === 'Technical' ? 'Technical' : 'Non-Technical',
-              fee: data.registrationFee ?? data.fee ?? 50,
-              maxParticipants: data.maxParticipants ?? 2,
-              time: data.startTime && data.endTime ? formatTimeRange(data.startTime, data.endTime) : 'Full Day',
-              coordinatorName: data.coordinatorName,
-              rules: data.rules,
-            };
-          });
-          setEvents(dbEvts.length > 0 ? dbEvts : demoEvents);
+        let slotMap: Record<string, number> = {};
+        try {
+          const res = await fetch('/api/events/slots');
+          const data = await res.json();
+          if (data.success && data.eventSlots) {
+            slotMap = data.eventSlots;
+          }
+        } catch (e) {
+          console.warn('API slots fetch warning:', e);
         }
-      } catch { setEvents(demoEvents); }
+
+        const updatedEvents = demoEvents.map(e => ({
+          ...e,
+          registeredCount: slotMap[e.name] || slotMap[e.slug] || 0,
+          maxSlots: 200,
+        }));
+        setEvents(updatedEvents);
+      } catch {
+        setEvents(demoEvents);
+      }
     };
+
     fetchEvents();
+    const interval = setInterval(fetchEvents, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleNext = async () => {
@@ -497,6 +498,8 @@ export default function RegisterPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {techEvents.map(event => {
                           const sel = selectedEvents.includes(event.id);
+                          const totalSlots = event.maxSlots || 200;
+                          const seatsLeft = Math.max(0, totalSlots - (event.registeredCount || 0));
                           return (
                             <div key={event.id} onClick={() => toggleEvent(event.id)}
                               className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
@@ -519,7 +522,7 @@ export default function RegisterPage() {
                               <div className="flex items-center justify-between mt-1 pt-1 border-t border-slate-200/40 dark:border-slate-800">
                                 <p className="text-amber-500 font-extrabold text-sm">₹{event.fee}</p>
                                 <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${isDark ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
-                                  ⚡ 200 Slots
+                                  ⚡ {seatsLeft > 0 ? `${seatsLeft} / ${totalSlots} Slots` : 'Full'}
                                 </span>
                               </div>
                             </div>
@@ -535,6 +538,8 @@ export default function RegisterPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {nonTechEvents.map(event => {
                           const sel = selectedEvents.includes(event.id);
+                          const totalSlots = event.maxSlots || 200;
+                          const seatsLeft = Math.max(0, totalSlots - (event.registeredCount || 0));
                           return (
                             <div key={event.id} onClick={() => toggleEvent(event.id)}
                               className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
@@ -562,7 +567,7 @@ export default function RegisterPage() {
                               <div className="flex items-center justify-between mt-1 pt-1 border-t border-slate-200/40 dark:border-slate-800">
                                 <p className="text-amber-500 font-extrabold text-sm">₹{event.fee}</p>
                                 <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${isDark ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
-                                  ⚡ 200 Slots
+                                  ⚡ {seatsLeft > 0 ? `${seatsLeft} / ${totalSlots} Slots` : 'Full'}
                                 </span>
                               </div>
                             </div>
