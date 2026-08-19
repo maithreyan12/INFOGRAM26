@@ -520,7 +520,16 @@ export default function RegisterPage() {
                               }`}
                             >
                               <div className="flex justify-between items-start mb-1.5">
-                                <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.name}</h3>
+                                <div>
+                                  <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                    {event.name}
+                                    {event.realType && (
+                                      <span className="ml-1.5 text-xs font-bold text-purple-600 dark:text-purple-300">
+                                        ({event.realType})
+                                      </span>
+                                    )}
+                                  </h3>
+                                </div>
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                                   sel
                                     ? isDark ? 'border-amber-300 bg-amber-300' : 'border-[#7c3aed] bg-[#7c3aed]'
@@ -561,7 +570,14 @@ export default function RegisterPage() {
                             >
                               <div className="flex justify-between items-start mb-1.5">
                                 <div>
-                                  <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{event.name}</h3>
+                                  <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                    {event.name}
+                                    {event.realType && (
+                                      <span className="ml-1.5 text-xs font-bold text-teal-600 dark:text-teal-300">
+                                        ({event.realType})
+                                      </span>
+                                    )}
+                                  </h3>
                                   {(event.id === 'nontech-6' || event.name.toLowerCase().includes('flavour')) && (
                                     <span className="inline-block mt-1 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-400 border border-pink-500/30">
                                       🎀 Girls Only

@@ -86,6 +86,11 @@ export default function EventCard({ event }: EventCardProps) {
               isDark ? 'text-white' : 'text-slate-900'
             }`}>
               {event.name}
+              {event.realType && (
+                <span className="ml-1.5 text-xs sm:text-sm font-bold text-purple-600 dark:text-purple-300">
+                  ({event.realType})
+                </span>
+              )}
             </h3>
             {(event.slug === 'flavour-fusion' || event.id === 'nontech-6' || event.name.toLowerCase().includes('flavour')) && (
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30 flex items-center gap-1 shadow-sm">

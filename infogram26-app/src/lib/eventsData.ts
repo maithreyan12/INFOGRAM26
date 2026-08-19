@@ -30,6 +30,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'tech-1',
     slug: 'tech-talks',
     name: 'Tech Talks',
+    realType: 'Paper Presentation',
     category: 'technical',
     description: 'Present your innovative ideas and research papers to a panel of industry experts on cutting-edge IT topics.',
     rules: [
@@ -61,6 +62,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'tech-2',
     slug: 'codestorm',
     name: 'Codestorm',
+    realType: 'Coding & Debugging',
     category: 'technical',
     description: 'Two-round coding & debugging challenge testing speed, accuracy, and problem-solving skills across any programming language.',
     rules: [
@@ -92,6 +94,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'tech-3',
     slug: 'pixel-craft',
     name: 'Pixel Craft',
+    realType: 'Web Design & UI/UX',
     category: 'technical',
     description: 'Design and develop responsive web interfaces and UI/UX designs on an on-the-spot topic.',
     rules: [
@@ -122,6 +125,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'tech-4',
     slug: 'open-source',
     name: 'Open Source',
+    realType: 'Git & GitHub Workflow',
     category: 'technical',
     description: 'Single-round open-source workflow challenge: Find, fix, and improve a given codebase using Git and GitHub.',
     rules: [
@@ -154,6 +158,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'tech-5',
     slug: 'byte-battle',
     name: 'Byte Battle',
+    realType: 'IT Tech Quiz',
     category: 'technical',
     description: 'Fast-paced technical contest testing your knowledge of IT domain concepts.',
     rules: [
@@ -184,6 +189,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'tech-6',
     slug: 'hack-forge',
     name: 'Hack Forge',
+    realType: 'Project Pitch & Prototype',
     category: 'technical',
     description: 'Open innovation project pitching contest featuring a 5-minute prototype pitch and 1-minute final pitch.',
     rules: [
@@ -214,6 +220,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'tech-7',
     slug: 'clash-of-minds',
     name: 'Clash of Minds',
+    realType: 'Technical Debate',
     category: 'technical',
     description: 'Technical debate contest where one team member speaks for the topic and the other speaks against it.',
     rules: [
@@ -247,6 +254,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'nontech-1',
     slug: 'mind-matrix',
     name: 'Mind Matrix',
+    realType: 'Connexions & Puzzles',
     category: 'non-technical',
     description: 'Connect displayed images on screen to solve non-technical trivia and mind-bending puzzles.',
     rules: [
@@ -277,6 +285,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'nontech-2',
     slug: 'quest-x',
     name: 'Quest X',
+    realType: 'Treasure Hunt',
     category: 'non-technical',
     description: 'Campus-wide treasure hunt. Follow sequential clues as a team to find the hidden treasure.',
     rules: [
@@ -308,6 +317,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'nontech-3',
     slug: 'frame-craft',
     name: 'Frame Craft',
+    realType: 'Mobile Photography',
     category: 'non-technical',
     description: 'On-spot mobile photography contest capturing campus moments matching the given theme.',
     rules: [
@@ -339,6 +349,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'nontech-4',
     slug: 'fun-fiesta',
     name: 'Fun Fiesta',
+    realType: 'Mini Games & Arcade',
     category: 'non-technical',
     description: 'High-energy mini-games and spot challenges with exciting prizes throughout the day.',
     rules: [
@@ -368,6 +379,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'nontech-5',
     slug: 'artistry',
     name: 'Artistry',
+    realType: 'Fine Art & Mehendi',
     category: 'non-technical',
     description: 'Fine art, mehendi, and creative illustration contest testing artistic skills and imagination.',
     rules: [
@@ -398,6 +410,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'nontech-6',
     slug: 'flavour-fusion',
     name: 'Flavour Fusion',
+    realType: 'No-Fire Cooking',
     category: 'non-technical',
     description: 'No-fire cooking & culinary contest evaluated on food taste, presentation, area cleanliness, and number of dishes. (Exclusively for Girls)',
     rules: [
@@ -429,6 +442,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'nontech-7',
     slug: 'battle-verse',
     name: 'Battle Verse',
+    realType: 'BGMI & Free Fire Gaming',
     category: 'non-technical',
     description: 'BGMI & Free Fire Battle Royale gaming tournament with strict fair-play guidelines (Solo or Team up to 4).',
     rules: [
@@ -462,6 +476,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'nontech-8',
     slug: 'mic-drop',
     name: 'Mic Drop',
+    realType: 'Open Mic & Singing',
     category: 'non-technical',
     description: 'Open mic stage for solo singing, poetry, stand-up comedy, and acoustic performances.',
     rules: [
@@ -492,6 +507,7 @@ export const OFFICIAL_EVENTS: Event[] = [
     id: 'nontech-9',
     slug: 'reel-it-feel-it',
     name: 'Reel It Feel It',
+    realType: 'Reel & Short Video',
     category: 'non-technical',
     description: 'Short mobile reel/video contest on an on-the-spot topic filmed inside campus.',
     rules: [

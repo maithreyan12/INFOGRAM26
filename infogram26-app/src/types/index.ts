@@ -25,6 +25,7 @@ export interface Event {
   id: string;
   slug: string;
   name: string;
+  realType?: string; // Descriptive real name / type in brackets e.g. (Treasure Hunt)
   category: EventCategory;
   description: string;
   rules: string[];

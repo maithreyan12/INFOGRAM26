@@ -155,6 +155,11 @@ export default function EventDetailPage() {
               isDark ? 'text-white' : 'text-slate-900'
             }`} style={{ fontFamily: 'var(--font-display)' }}>
               {event.name}
+              {event.realType && (
+                <span className="ml-2 text-xl sm:text-3xl font-bold text-purple-600 dark:text-purple-300">
+                  ({event.realType})
+                </span>
+              )}
             </h1>
           </div>
         </div>
