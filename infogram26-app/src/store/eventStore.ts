@@ -21,6 +21,7 @@ interface EventState {
   updateEvent: (id: string, updates: Partial<Event>) => void;
   deleteEvent: (id: string) => void;
 
+  setOrganizers: (organizers: OrganizerData[]) => void;
   addOrganizer: (organizer: Omit<OrganizerData, 'uid' | 'createdAt' | 'isActive'>) => OrganizerData;
   updateOrganizer: (uid: string, updates: Partial<OrganizerData>) => void;
   assignOrganizerToEvent: (organizerUid: string, eventId: string) => void;
@@ -43,6 +44,9 @@ export const useEventStore = create<EventState>()(
       events: INITIAL_EVENTS,
       organizers: INITIAL_ORGANIZERS,
       registrations: INITIAL_REGISTRATIONS,
+
+      // Bulk-set organizers (used by StoreSync to hydrate from Firestore)
+      setOrganizers: (organizers) => set({ organizers }),
 
       addEvent: (eventData) => {
         const newId = `evt-${Date.now()}`;

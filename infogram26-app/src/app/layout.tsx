@@ -153,6 +153,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from '@/context/ThemeContext';
+import StoreSync from '@/components/layout/StoreSync';
 
 // ─── Structured Data (JSON-LD) ───────────────────────────────
 const jsonLd = {
@@ -328,6 +329,7 @@ export default function RootLayout({
           <div className="aurora-bg" aria-hidden="true" />
 
           <div className="relative z-10 min-h-screen">
+            <StoreSync />
             {children}
           </div>
 
