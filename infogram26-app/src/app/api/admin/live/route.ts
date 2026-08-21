@@ -18,6 +18,19 @@ export async function GET() {
         .order('issue_date', { ascending: false }),
     ]);
 
+    // Fetch organizers count from Firestore if possible
+    let organizersCount = 0;
+    try {
+      const { db } = await import('@/lib/firebase/config');
+      if (db) {
+        const { collection, getDocs } = await import('firebase/firestore');
+        const orgsSnap = await getDocs(collection(db, 'organizers'));
+        organizersCount = orgsSnap.size;
+      }
+    } catch {
+      organizersCount = 0;
+    }
+
     const registrations = (regsResult.data || []).map((r: any) => ({
       id: r.id,
       applicantId: r.applicant_id,
@@ -51,6 +64,7 @@ export async function GET() {
       events: t.events || [],
       totalAmount: t.total_amount || 0,
       razorpayPaymentId: t.razorpay_payment_id,
+      paymentMethod: t.payment_method || 'UPI',
       status: t.status,
       issueDate: t.issue_date,
     }));
@@ -65,6 +79,24 @@ export async function GET() {
 
     const totalRevenue = registrations.reduce((s: number, r: any) => s + (r.totalFee || 0), 0);
 
+    // Calculate Payment Method Stats
+    const paymentMethods: Record<string, number> = {
+      upi: 0,
+      wallet: 0,
+      netbanking: 0,
+      card: 0,
+      other: 0,
+    };
+
+    tickets.forEach((t: any) => {
+      const method = (t.paymentMethod || 'upi').toLowerCase();
+      if (method.includes('upi')) paymentMethods.upi++;
+      else if (method.includes('wallet')) paymentMethods.wallet++;
+      else if (method.includes('netbank') || method.includes('bank')) paymentMethods.netbanking++;
+      else if (method.includes('card')) paymentMethods.card++;
+      else paymentMethods.upi++; // default majority UPI
+    });
+
     return NextResponse.json({
       success: true,
       registrations,
@@ -73,7 +105,9 @@ export async function GET() {
         totalPaid: registrations.length,
         totalRevenue,
         totalTickets: tickets.length,
+        organizersCount,
         eventSlots,
+        paymentMethods,
       },
       lastUpdated: new Date().toISOString(),
     });

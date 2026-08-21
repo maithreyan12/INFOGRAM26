@@ -3,18 +3,27 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Users, IndianRupee, Calendar as CalendarIcon, Plus, UserCheck, RefreshCw } from 'lucide-react';
+import { Users, IndianRupee, Calendar as CalendarIcon, Plus, UserCheck, RefreshCw, Zap, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useEventStore } from '@/store/eventStore';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase/config';
+import { toast } from 'sonner';
 
 export default function AdminDashboard() {
   const { user, adminUser, role } = useAuth();
   const { events, organizers } = useEventStore();
   const [liveRegistrations, setLiveRegistrations] = useState<any[]>([]);
-  const [stats, setStats] = useState({ totalPaid: 0, totalRevenue: 0, totalTickets: 0, eventSlots: {} as Record<string, number> });
+  const [stats, setStats] = useState({
+    totalPaid: 0,
+    totalRevenue: 0,
+    totalTickets: 0,
+    organizersCount: 0,
+    eventSlots: {} as Record<string, number>,
+  });
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
 
   const fetchLive = useCallback(async () => {
     try {
@@ -22,7 +31,7 @@ export default function AdminDashboard() {
       const data = await res.json();
       if (data.success) {
         setLiveRegistrations(data.registrations || []);
-        setStats(data.stats || { totalPaid: 0, totalRevenue: 0, totalTickets: 0, eventSlots: {} });
+        setStats(data.stats || { totalPaid: 0, totalRevenue: 0, totalTickets: 0, organizersCount: 0, eventSlots: {} });
         setLastUpdated(data.lastUpdated || new Date().toISOString());
       }
     } catch (e) {
@@ -32,24 +41,71 @@ export default function AdminDashboard() {
     }
   }, []);
 
+  const handleReconcile = async () => {
+    setSyncing(true);
+    const toastId = toast.loading('Synchronizing Razorpay & Supabase records...');
+    try {
+      const res = await fetch('/api/admin/reconcile', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        toast.dismiss(toastId);
+        toast.success(`🎉 ${data.message}`);
+        await fetchLive();
+      } else {
+        toast.dismiss(toastId);
+        toast.error(`Sync error: ${data.error}`);
+      }
+    } catch (err: any) {
+      toast.dismiss(toastId);
+      toast.error('Failed to trigger reconciliation.');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   useEffect(() => {
     fetchLive();
+
+    // 1. Fallback polling every 15 seconds
     const interval = setInterval(fetchLive, 15000);
-    return () => clearInterval(interval);
+
+    // 2. Supabase Realtime Subscription for instant updates
+    let channel: any = null;
+    try {
+      if (supabase) {
+        channel = supabase
+          .channel('admin-dashboard-realtime')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'registrations' }, () => {
+            fetchLive();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'tickets' }, () => {
+            fetchLive();
+          })
+          .subscribe();
+      }
+    } catch (e) {
+      console.warn('Realtime subscription notice:', e);
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, [fetchLive]);
 
-  // All registrations from API are already paid (filtered server-side)
   const paidRegistrations = liveRegistrations;
   const totalRegistrations = stats.totalPaid;
   const totalRevenue = stats.totalRevenue;
   const activeEventsCount = events.length;
-  const organizersCount = organizers.length;
+  const displayOrganizersCount = stats.organizersCount || organizers.length;
 
   const fmtTime = (iso: string) => {
     if (!iso) return '';
     const d = new Date(iso);
-    return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) +
-      ' · ' + d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+    return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) +
+      ' · ' + d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
   return (
@@ -57,29 +113,36 @@ export default function AdminDashboard() {
       {/* Top Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="text-[10px] bg-[#00d4ff]/20 text-[#00d4ff] border border-[#00d4ff]/40 px-3 py-0.5 rounded-full font-black uppercase tracking-wider">
               {role === 'super_admin' ? 'Super Admin Mode' : 'Event Admin Mode'}
             </span>
             <span className="text-[11px] font-bold text-gray-400">
               {user?.displayName || adminUser?.displayName || 'Administrator'}
             </span>
-            {/* Live indicator */}
-            <span className="flex items-center gap-1 text-[10px] font-black text-emerald-400">
+            {/* Realtime indicator */}
+            <span className="flex items-center gap-1 text-[10px] font-black text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              LIVE
+              LIVE REALTIME
             </span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
             Dashboard Overview
           </h1>
-          <p className="mt-1 text-xs sm:text-sm font-bold text-gray-400">
-            Live data from Supabase · auto-refreshes every 15s
-            {lastUpdated && <span className="ml-2 text-gray-600">· Last: {fmtTime(lastUpdated)}</span>}
+          <p className="mt-1 text-xs sm:text-sm font-bold text-gray-400 flex items-center gap-2 flex-wrap">
+            <span>Live data from Supabase &amp; Razorpay</span>
+            {lastUpdated && <span className="text-gray-500">· Last synced: {fmtTime(lastUpdated)}</span>}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-3">
+          <button
+            onClick={handleReconcile}
+            disabled={syncing}
+            className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 transition-all active:scale-95 disabled:opacity-50"
+          >
+            <Zap className="w-4 h-4" /> {syncing ? 'Syncing...' : 'Sync Payment Data'}
+          </button>
           <button
             onClick={fetchLive}
             className="flex items-center gap-2 border border-gray-700 hover:border-[#00d4ff] text-gray-300 hover:text-[#00d4ff] px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all active:scale-95"
@@ -88,15 +151,9 @@ export default function AdminDashboard() {
           </button>
           <Link
             href="/admin/registrations"
-            className="flex items-center gap-2 bg-[#00d4ff] hover:bg-[#00b4d8] text-slate-950 px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-[#00d4ff]/20 transition-all active:scale-95"
-          >
-            <Users className="w-4 h-4" /> View Attendees
-          </Link>
-          <Link
-            href="/admin/events"
             className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-purple-600/20 transition-all active:scale-95"
           >
-            <Plus className="w-4 h-4" /> Manage Events
+            <Users className="w-4 h-4" /> View Attendees
           </Link>
         </div>
       </div>
@@ -123,9 +180,11 @@ export default function AdminDashboard() {
             <div>
               <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">Total Revenue</p>
               <h3 className="text-3xl font-black text-emerald-400">
-                {loading ? <span className="animate-pulse text-gray-600">—</span> : `₹${totalRevenue.toLocaleString()}`}
+                {loading ? <span className="animate-pulse text-gray-600">—</span> : `₹${totalRevenue.toLocaleString('en-IN')}`}
               </h3>
-              <p className="text-emerald-400/80 text-xs mt-2 font-bold">100% Razorpay verified</p>
+              <p className="text-emerald-400/80 text-xs mt-2 font-bold flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> 100% Razorpay verified
+              </p>
             </div>
             <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400 border border-emerald-500/30">
               <IndianRupee className="w-6 h-6" />
@@ -150,7 +209,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-xs font-black uppercase tracking-wider mb-1 text-gray-400">Event Admins</p>
-              <h3 className="text-3xl font-black text-white">{organizersCount}</h3>
+              <h3 className="text-3xl font-black text-white">{displayOrganizersCount}</h3>
               <p className="text-amber-400 text-xs mt-2 font-bold">Assigned coordinators</p>
             </div>
             <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 border border-amber-500/30">
@@ -186,7 +245,6 @@ export default function AdminDashboard() {
               <tbody className="divide-y divide-gray-800/80">
                 {events.map((evt, idx) => {
                   const org = organizers.find((o: any) => o.uid === evt.organizerUid || o.assignedEventId === evt.id);
-                  // Use live slot count from backend
                   const evtCount = stats.eventSlots[evt.name] || 0;
 
                   return (
