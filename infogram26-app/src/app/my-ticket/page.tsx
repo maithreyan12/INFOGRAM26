@@ -4,9 +4,10 @@ export const dynamic = 'force-dynamic';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase/config';
+import { supabase } from '@/lib/supabase/config';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import PublicLayout from '@/components/layout/PublicLayout';
-import { Search, Ticket, Phone, Mail, ArrowRight, AlertCircle, CheckCircle, ExternalLink } from 'lucide-react';
+import { Search, Ticket, Phone, Mail, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { toast } from 'sonner';
 
@@ -23,83 +24,107 @@ export default function MyTicketPage() {
 
   const handleSearch = async () => {
     const val = searchValue.trim();
-    if (!val) { toast.error('Please enter your mobile number or email'); return; }
+    if (!val) {
+      toast.error('Please enter your mobile number or email');
+      return;
+    }
 
     setLoading(true);
     setSearched(false);
     setResults([]);
 
     try {
-      if (!db) { toast.error('Database connection unavailable'); setLoading(false); return; }
-
       const rawDigits = val.replace(/\D/g, '').slice(-10);
       const searchLower = val.toLowerCase();
       const matchedMap = new Map<string, any>();
 
-      // ── 1. Search by Applicant ID (exact & formatted if user entered ID) ──
-      const appCodeVariations = [
-        val,
-        val.toUpperCase(),
-        val.toLowerCase(),
-        val.replace(/INFO26EVT/i, 'INFO26-EVT-'),
-        val.replace(/INFO26HACK/i, 'INFO26-HACK-'),
-        val.replace(/INFO26BYTE/i, 'INFO26-BYTE-'),
-        val.replace(/INFO26TECH/i, 'INFO26-TECH-'),
-        val.replace(/INFO26CODE/i, 'INFO26-CODE-'),
-      ];
+      // ── 1. Search Supabase Production Database (Primary Truth) ──
+      try {
+        if (supabase) {
+          // Search Supabase Tickets Table
+          let ticketQuery = supabase.from('tickets').select('*');
+          if (rawDigits.length >= 10) {
+            ticketQuery = ticketQuery.or(`phone.ilike.%${rawDigits}%,email.ilike.%${searchLower}%,applicant_id.ilike.%${val}%,ticket_number.ilike.%${val}%`);
+          } else if (searchLower.includes('@')) {
+            ticketQuery = ticketQuery.or(`email.ilike.%${searchLower}%,applicant_id.ilike.%${val}%,ticket_number.ilike.%${val}%`);
+          } else {
+            ticketQuery = ticketQuery.or(`applicant_id.ilike.%${val}%,ticket_number.ilike.%${val}%`);
+          }
 
-      for (const appVar of appCodeVariations) {
-        if (!appVar) continue;
-        try {
-          const qApp = query(collection(db, 'tickets'), where('applicantId', '==', appVar), limit(5));
-          const snapApp = await getDocs(qApp);
-          snapApp.docs.forEach((d) => {
-            const data = d.data();
-            const dedupKey = (data.applicantId || data.phone || data.email || d.id).toLowerCase();
-            matchedMap.set(dedupKey, { id: d.id, ...data });
+          const { data: supaTickets } = await ticketQuery;
+          (supaTickets || []).forEach((t: any) => {
+            const dedupKey = (t.applicant_id || t.phone || t.email || t.id).toLowerCase();
+            matchedMap.set(dedupKey, {
+              id: t.id,
+              ticketNumber: t.ticket_number,
+              applicantId: t.applicant_id,
+              studentName: t.student_name || 'Participant',
+              email: t.email || '',
+              phone: t.phone || '',
+              college: t.college || 'College Participant',
+              department: t.department || 'Information Technology',
+              year: t.year || '1st',
+              events: t.events || [],
+              totalAmount: t.total_amount || 50,
+              status: t.status || 'valid',
+            });
           });
-        } catch {}
 
-        if (matchedMap.size === 0) {
-          try {
-            const qRegApp = query(collection(db, 'registrations'), where('applicantId', '==', appVar), limit(5));
-            const snapRegApp = await getDocs(qRegApp);
-            snapRegApp.docs.forEach((d) => {
-              const data = d.data();
-              const fakeId = data.ticketId || `tkt_${d.id}`;
-              matchedMap.set(fakeId, {
-                id: fakeId,
-                registrationId: d.id,
-                studentName: data.personalInfo?.fullName || data.studentName || 'Participant',
-                email: data.personalInfo?.email || data.email || '',
-                phone: data.personalInfo?.phone || data.phone || '',
-                college: data.personalInfo?.college || data.college || '',
-                department: data.personalInfo?.department || data.department || '',
-                year: data.personalInfo?.year || data.year || '',
-                events: data.eventNames || data.events || [],
-                totalAmount: data.totalFee || 50,
-                status: data.status === 'paid' ? 'valid' : 'pending',
-                applicantId: data.applicantId,
+          // Search Supabase Registrations Table (if no ticket entry found)
+          if (matchedMap.size === 0) {
+            let regQuery = supabase.from('registrations').select('*');
+            if (rawDigits.length >= 10) {
+              regQuery = regQuery.or(`phone.ilike.%${rawDigits}%,email.ilike.%${searchLower}%,applicant_id.ilike.%${val}%`);
+            } else if (searchLower.includes('@')) {
+              regQuery = regQuery.or(`email.ilike.%${searchLower}%,applicant_id.ilike.%${val}%`);
+            } else {
+              regQuery = regQuery.or(`applicant_id.ilike.%${val}%`);
+            }
+
+            const { data: supaRegs } = await regQuery;
+            (supaRegs || []).forEach((r: any) => {
+              const dedupKey = (r.applicant_id || r.phone || r.email || r.id).toLowerCase();
+              matchedMap.set(dedupKey, {
+                id: `tkt_${r.id}`,
+                registrationId: r.id,
+                applicantId: r.applicant_id,
+                studentName: r.full_name || 'Participant',
+                email: r.email || '',
+                phone: r.phone || '',
+                college: r.college || 'College Participant',
+                department: r.department || 'Information Technology',
+                year: r.year || '1st',
+                events: r.events || [],
+                totalAmount: r.total_fee || 50,
+                status: r.status === 'paid' ? 'valid' : 'pending',
               });
             });
-          } catch {}
+          }
         }
+      } catch (supaErr) {
+        console.warn('Supabase ticket lookup error:', supaErr);
       }
 
-      // ── 2. Search by Phone Number (if digits >= 10) ──
-      if (rawDigits.length >= 10) {
-        const phoneVariations = [
-          rawDigits,
-          `+91${rawDigits}`,
-          `+91 ${rawDigits}`,
-          `91${rawDigits}`,
+      // ── 2. Search Firebase Firestore Database (Secondary / Fallback) ──
+      if (matchedMap.size === 0 && db) {
+        // Applicant ID Lookup
+        const appCodeVariations = [
+          val,
+          val.toUpperCase(),
+          val.toLowerCase(),
+          val.replace(/INFO26EVT/i, 'INFO26-EVT-'),
+          val.replace(/INFO26HACK/i, 'INFO26-HACK-'),
+          val.replace(/INFO26BYTE/i, 'INFO26-BYTE-'),
+          val.replace(/INFO26TECH/i, 'INFO26-TECH-'),
+          val.replace(/INFO26CODE/i, 'INFO26-CODE-'),
         ];
 
-        for (const pVar of phoneVariations) {
+        for (const appVar of appCodeVariations) {
+          if (!appVar) continue;
           try {
-            const q1 = query(collection(db, 'tickets'), where('phone', '==', pVar), limit(5));
-            const snap1 = await getDocs(q1);
-            snap1.docs.forEach((d) => {
+            const qApp = query(collection(db, 'tickets'), where('applicantId', '==', appVar), limit(5));
+            const snapApp = await getDocs(qApp);
+            snapApp.docs.forEach((d) => {
               const data = d.data();
               const dedupKey = (data.applicantId || data.phone || data.email || d.id).toLowerCase();
               matchedMap.set(dedupKey, { id: d.id, ...data });
@@ -107,67 +132,58 @@ export default function MyTicketPage() {
           } catch {}
         }
 
-        if (matchedMap.size === 0) {
+        // Phone Lookup
+        if (rawDigits.length >= 10 && matchedMap.size === 0) {
+          const phoneVariations = [rawDigits, `+91${rawDigits}`, `+91 ${rawDigits}`, `91${rawDigits}`];
           for (const pVar of phoneVariations) {
             try {
-              const q2 = query(collection(db, 'registrations'), where('personalInfo.phone', '==', pVar), limit(5));
-              const snap2 = await getDocs(q2);
-              snap2.docs.forEach((d) => {
+              const q1 = query(collection(db, 'tickets'), where('phone', '==', pVar), limit(5));
+              const snap1 = await getDocs(q1);
+              snap1.docs.forEach((d) => {
                 const data = d.data();
-                const fakeId = data.ticketId || `tkt_${d.id}`;
-                matchedMap.set(fakeId, {
-                  id: fakeId,
-                  registrationId: d.id,
-                  studentName: data.personalInfo?.fullName || data.studentName || 'Participant',
-                  email: data.personalInfo?.email || data.email || '',
-                  phone: data.personalInfo?.phone || data.phone || '',
-                  college: data.personalInfo?.college || data.college || '',
-                  department: data.personalInfo?.department || data.department || '',
-                  year: data.personalInfo?.year || data.year || '',
-                  events: data.eventNames || data.events || [],
-                  totalAmount: data.totalFee || 50,
-                  status: data.status === 'paid' ? 'valid' : 'pending',
-                  applicantId: data.applicantId,
-                });
+                const dedupKey = (data.applicantId || data.phone || data.email || d.id).toLowerCase();
+                matchedMap.set(dedupKey, { id: d.id, ...data });
               });
             } catch {}
           }
+
+          if (matchedMap.size === 0) {
+            for (const pVar of phoneVariations) {
+              try {
+                const q2 = query(collection(db, 'registrations'), where('personalInfo.phone', '==', pVar), limit(5));
+                const snap2 = await getDocs(q2);
+                snap2.docs.forEach((d) => {
+                  const data = d.data();
+                  const fakeId = data.ticketId || `tkt_${d.id}`;
+                  matchedMap.set(fakeId, {
+                    id: fakeId,
+                    registrationId: d.id,
+                    studentName: data.personalInfo?.fullName || data.studentName || 'Participant',
+                    email: data.personalInfo?.email || data.email || '',
+                    phone: data.personalInfo?.phone || data.phone || '',
+                    college: data.personalInfo?.college || data.college || '',
+                    department: data.personalInfo?.department || data.department || '',
+                    year: data.personalInfo?.year || data.year || '',
+                    events: data.eventNames || data.events || [],
+                    totalAmount: data.totalFee || 50,
+                    status: data.status === 'paid' ? 'valid' : 'pending',
+                    applicantId: data.applicantId,
+                  });
+                });
+              } catch {}
+            }
+          }
         }
-      }
 
-      // ── 3. Search by Email (if contains '@') ──
-      if (searchLower.includes('@')) {
-        try {
-          const q1 = query(collection(db, 'tickets'), where('email', '==', searchLower), limit(5));
-          const snap1 = await getDocs(q1);
-          snap1.docs.forEach((d) => {
-            const data = d.data();
-            const dedupKey = (data.applicantId || data.phone || data.email || d.id).toLowerCase();
-            matchedMap.set(dedupKey, { id: d.id, ...data });
-          });
-        } catch {}
-
-        if (matchedMap.size === 0) {
+        // Email Lookup
+        if (searchLower.includes('@') && matchedMap.size === 0) {
           try {
-            const q2 = query(collection(db, 'registrations'), where('personalInfo.email', '==', searchLower), limit(5));
-            const snap2 = await getDocs(q2);
-            snap2.docs.forEach((d) => {
+            const q1 = query(collection(db, 'tickets'), where('email', '==', searchLower), limit(5));
+            const snap1 = await getDocs(q1);
+            snap1.docs.forEach((d) => {
               const data = d.data();
-              const fakeId = data.ticketId || `tkt_${d.id}`;
-              matchedMap.set(fakeId, {
-                id: fakeId,
-                registrationId: d.id,
-                studentName: data.personalInfo?.fullName || data.studentName || 'Participant',
-                email: data.personalInfo?.email || data.email || '',
-                phone: data.personalInfo?.phone || data.phone || '',
-                college: data.personalInfo?.college || data.college || '',
-                department: data.personalInfo?.department || data.department || '',
-                year: data.personalInfo?.year || data.year || '',
-                events: data.eventNames || data.events || [],
-                totalAmount: data.totalFee || 50,
-                status: data.status === 'paid' ? 'valid' : 'pending',
-                applicantId: data.applicantId,
-              });
+              const dedupKey = (data.applicantId || data.phone || data.email || d.id).toLowerCase();
+              matchedMap.set(dedupKey, { id: d.id, ...data });
             });
           } catch {}
         }
@@ -198,7 +214,6 @@ export default function MyTicketPage() {
     <PublicLayout>
       <div className={`min-h-screen pt-28 pb-16 px-4 ${isDark ? 'bg-[#030a16]' : 'bg-gradient-to-br from-slate-50 to-purple-50/30'}`}>
         <div className="max-w-2xl mx-auto">
-
           {/* Header */}
           <div className="text-center mb-10">
             <div className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-black uppercase tracking-wider mb-4 ${isDark ? 'bg-amber-400/10 border border-amber-400/30 text-amber-300' : 'bg-purple-500/10 border border-purple-500/20 text-purple-700'}`}>
@@ -242,7 +257,7 @@ export default function MyTicketPage() {
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
                 placeholder={
                   searchType === 'phone'
-                    ? 'Enter 10-digit mobile number (e.g. 9876543210)'
+                    ? 'Enter 10-digit mobile number (e.g. 9551763170)'
                     : 'Enter email address (e.g. student@gmail.com)'
                 }
                 className={`w-full pl-12 pr-4 py-4 rounded-2xl text-sm font-bold border transition-all focus:outline-none focus:ring-2 ${isDark ? 'bg-white/[0.06] border-white/[0.1] text-white placeholder-slate-500 focus:border-amber-400 focus:ring-amber-400/20' : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:border-purple-500 focus:ring-purple-500/20'}`}
@@ -338,7 +353,6 @@ export default function MyTicketPage() {
               For quick support, WhatsApp us directly at <a href="https://wa.me/918722964910" target="_blank" rel="noopener noreferrer" className="font-bold text-emerald-400 hover:underline">+91 87229 64910</a>
             </p>
           </div>
-
         </div>
       </div>
     </PublicLayout>
