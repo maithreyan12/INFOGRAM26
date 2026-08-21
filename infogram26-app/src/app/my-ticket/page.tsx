@@ -257,7 +257,7 @@ export default function MyTicketPage() {
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
                 placeholder={
                   searchType === 'phone'
-                    ? 'Enter 10-digit mobile number (e.g. 9551763170)'
+                    ? 'Enter 10-digit mobile number (e.g. 9876543210)'
                     : 'Enter email address (e.g. student@gmail.com)'
                 }
                 className={`w-full pl-12 pr-4 py-4 rounded-2xl text-sm font-bold border transition-all focus:outline-none focus:ring-2 ${isDark ? 'bg-white/[0.06] border-white/[0.1] text-white placeholder-slate-500 focus:border-amber-400 focus:ring-amber-400/20' : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:border-purple-500 focus:ring-purple-500/20'}`}
